@@ -185,6 +185,15 @@ node -v
 
 
 echo "==============================================="
+echo "  Install netron ......"
+echo "==============================================="
+#https://github.com/lutzroeder/netron
+pip install netron
+netron --version
+# netron [FILE] or netron.start('[FILE]').
+
+
+echo "==============================================="
 echo "  Set Aliases ......"
 echo "==============================================="
 echo "alias c='clear'" | tee -a ~/.bashrc
