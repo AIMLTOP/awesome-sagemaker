@@ -194,6 +194,37 @@ netron --version
 
 
 echo "==============================================="
+echo "  Install more Extensions ......"
+echo "==============================================="
+# conda install -c conda-forge nodejs
+source activate JupyterSystemEnv
+
+# jupyterlab-lsp
+pip install jupyterlab-lsp
+pip install 'python-lsp-server[all]'
+jupyter server extension enable --user --py jupyter_lsp
+
+# https://github.com/lckr/jupyterlab-variableInspector
+pip install lckr-jupyterlab-variableinspector
+
+# https://github.com/matplotlib/ipympl
+pip install ipympl
+
+# https://github.com/aquirdTurtle/Collapsible_Headings
+pip install aquirdturtle_collapsible_headings
+
+# https://github.com/QuantStack/jupyterlab-drawio
+pip install jupyterlab-drawio
+
+# https://github.com/jtpio/jupyterlab-system-monitor
+pip install jupyterlab-system-monitor
+
+# https://github.com/deshaw/jupyterlab-execute-time
+pip install jupyterlab_execute_time
+
+ 
+
+echo "==============================================="
 echo "  Set Aliases ......"
 echo "==============================================="
 echo "alias c='clear'" | tee -a ~/.bashrc
