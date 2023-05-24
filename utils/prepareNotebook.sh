@@ -236,6 +236,6 @@ source ~/.bashrc
 
 
 # 最后再执行一次 source
-echo "source .bashrc"
+echo "source ~/.bashrc"
 shopt -s expand_aliases
 source ~/.bashrc
