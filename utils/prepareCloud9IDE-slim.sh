@@ -19,6 +19,24 @@ download_and_verify () {
 cd /tmp/
 
 echo "==============================================="
+echo "  Upgrade awscli to v2 ......"
+echo "==============================================="
+sudo mv /bin/aws /bin/aws1
+sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
+ls -l /usr/local/bin/aws
+rm -fr awscliv2.zip aws
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+unzip /tmp/awscliv2.zip -d /tmp
+sudo /tmp/aws/install
+which aws_completer
+echo $SHELL
+cat >> ~/.bashrc <<EOF
+complete -C '/usr/local/bin/aws_completer' aws
+EOF
+source ~/.bashrc
+aws --version
+
+echo "==============================================="
 echo "  Install eksctl ......"
 echo "==============================================="
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
