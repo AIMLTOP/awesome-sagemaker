@@ -78,48 +78,6 @@ echo 'yq() {
 
 
 echo "==============================================="
-echo "  Install Maven ......"
-echo "==============================================="
-wget https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -O /tmp/apache-maven-3.8.6-bin.tar.gz
-sudo tar xzvf /tmp/apache-maven-3.8.6-bin.tar.gz -C /opt
-cat >> ~/.bashrc <<EOF
-export PATH="/opt/apache-maven-3.8.6/bin:$PATH"
-EOF
-source ~/.bashrc
-mvn --version
-
-
-echo "==============================================="
-echo "  Install ec2-instance-selector ......"
-echo "==============================================="
-curl -Lo ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.3.3/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 && chmod +x ec2-instance-selector
-chmod +x ./ec2-instance-selector
-mkdir -p $HOME/bin && mv ./ec2-instance-selector $HOME/bin/ec2-instance-selector
-
-
-echo "==============================================="
-echo "  Install siege ......"
-echo "==============================================="
-sudo yum install siege -y
-siege -V
-#siege -q -t 15S -c 200 -i URL
-#ab -c 500 -n 30000 http://$(kubectl get ing -n front-end --output=json | jq -r .items[].status.loadBalancer.ingress[].hostname)/
-
-
-echo "==============================================="
-echo "  Install terraform ......"
-echo "==============================================="
-sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo yum install terraform -y
-echo "alias tf='terraform'" >> ~/.bashrc
-echo "alias tfp='terraform plan -out tfplan'" >> ~/.bashrc
-echo "alias tfa='terraform apply --auto-approve'" >> ~/.bashrc # terraform apply tfplan
-source ~/.bashrc
-terraform --version
-
-
-echo "==============================================="
 echo "  Install Go ......"
 echo "==============================================="
 sudo yum install golang -y
@@ -154,15 +112,6 @@ alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpi
 EOF
 source ~/.bashrc
 # dfimage -sV=1.36 nginx:latest 
-
-
-echo "==============================================="
-echo "  Install sam cli ......"
-echo "==============================================="
-wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
-unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
-sudo ./sam-installation/install
-sam --version
 
 
 echo "==============================================="
@@ -244,7 +193,7 @@ pip install jupyterlab_execute_time
 
 #sudo systemctl daemon-reload
 #sudo systemctl restart jupyter-server
-
+ 
 
 echo "==============================================="
 echo "  Set Aliases ......"
