@@ -22,7 +22,6 @@ echo "==============================================="
 echo "  Upgrade awscli to v2 ......"
 echo "==============================================="
 sudo mv /bin/aws /bin/aws1
-ls -l /usr/local/bin/aws
 rm -fr awscliv2.zip aws
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
 unzip /tmp/awscliv2.zip -d /tmp
