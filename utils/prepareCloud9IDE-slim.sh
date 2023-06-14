@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+# set -e
 
 download_and_verify () {
   url=$1
@@ -83,9 +83,28 @@ curl -sS https://webinstall.dev/k9s | bash
 
 
 echo "==============================================="
+echo "  Install kubetail ......"
+echo "==============================================="
+curl -o /tmp/kubetail https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
+chmod +x /tmp/kubetail
+sudo mv /tmp/kubetail /usr/local/bin/kubetail
+cat >> ~/.bashrc <<EOF
+alias kt=kubetail
+EOF
+source ~/.bashrc
+
+
+echo "==============================================="
 echo "  Install c9 to open files in cloud9 ......"
 echo "==============================================="
 npm install -g c9
+
+
+echo "==============================================="
+echo "  Install yq for yaml processing ......"
+echo "==============================================="
+sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
+    sudo chmod +x /usr/bin/yq
 
 
 echo "==============================================="

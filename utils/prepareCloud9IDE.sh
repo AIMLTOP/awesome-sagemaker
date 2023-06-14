@@ -220,19 +220,18 @@ echo "==============================================="
 echo "  Install session-manager ......"
 echo "==============================================="
 curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "/tmp/session-manager-plugin.rpm"
-
 sudo yum install -y /tmp/session-manager-plugin.rpm
-
 session-manager-plugin
 
 
-# More tools
 echo "==============================================="
 echo "  Install yq for yaml processing ......"
 echo "==============================================="
-echo 'yq() {
-  docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
-}' | tee -a ~/.bashrc && source ~/.bashrc
+sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
+    sudo chmod +x /usr/bin/yq
+# echo 'yq() {
+#   docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
+# }' | tee -a ~/.bashrc && source ~/.bashrc
 
 
 echo "==============================================="
