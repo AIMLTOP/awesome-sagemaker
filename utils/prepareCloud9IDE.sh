@@ -70,14 +70,6 @@ sudo mv ./eksctl-anywhere /usr/local/bin/
 eksctl anywhere version
 
 
-# 辅助工具
-echo "==============================================="
-echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
-echo "==============================================="
-# moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo yum -y install jq gettext bash-completion moreutils
-
-
 # 更新 awscli 并配置自动完成
 echo "==============================================="
 echo "  Upgrade awscli to v2 ......"
@@ -99,6 +91,7 @@ aws --version
 # container way
 # https://aws.amazon.com/blogs/developer/new-aws-cli-v2-docker-images-available-on-amazon-ecr-public/
 # docker run --rm -it public.ecr.aws/aws-cli/aws-cli:2.9.1 --version aws-cli/2.9.1 Python/3.9.11 Linux/5.10.47-linuxkit docker/aarch64.amzn.2 prompt/off
+
 
 echo "==============================================="
 echo "  Install kubectl ......"
@@ -138,6 +131,46 @@ echo "alias ka='kubectl apply'" | tee -a ~/.bashrc
 echo "alias kr='kubectl run $dry'" | tee -a ~/.bashrc
 echo "alias ke='kubectl explain'" | tee -a ~/.bashrc
 source ~/.bashrc
+
+
+echo "==============================================="
+echo "  Install copilot ......"
+echo "==============================================="
+sudo curl -Lo /usr/local/bin/copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux \
+   && sudo chmod +x /usr/local/bin/copilot \
+   && copilot --help
+
+
+echo "==============================================="
+echo "  Install App2Container ......"
+echo "==============================================="
+#https://docs.aws.amazon.com/app2container/latest/UserGuide/start-step1-install.html
+#https://aws.amazon.com/blogs/containers/modernize-java-and-net-applications-remotely-using-aws-app2container/
+curl -o /tmp/AWSApp2Container-installer-linux.tar.gz https://app2container-release-us-east-1.s3.us-east-1.amazonaws.com/latest/linux/AWSApp2Container-installer-linux.tar.gz
+sudo tar xvf /tmp/AWSApp2Container-installer-linux.tar.gz -C /tmp
+# sudo ./install.sh
+echo y |sudo /tmp/install.sh
+sudo app2container --version
+cat >> ~/.bashrc <<EOF
+alias a2c="sudo app2container"
+EOF
+source ~/.bashrc
+a2c help
+curl -o /tmp/optimizeImage.zip https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/samples/p-attach/dc756bff-1fcd-4fd2-8c4f-dc494b5007b9/attachments/attachment.zip
+sudo unzip /tmp/optimizeImage.zip -d /tmp/optimizeImage
+sudo chmod 755 /tmp/optimizeImage/optimizeImage.sh
+sudo mv /tmp/optimizeImage/optimizeImage.sh /usr/local/bin/optimizeImage.sh
+optimizeImage.sh -h
+
+
+echo "==============================================="
+echo "  EKS Pod Information Collector ......"
+echo "==============================================="
+# https://github.com/awslabs/amazon-eks-ami/tree/master/log-collector-script/linux
+sudo curl -o /usr/local/bin/epic https://raw.githubusercontent.com/aws-samples/eks-pod-information-collector/main/eks-pod-information-collector.sh
+sudo chmod +x /usr/local/bin/epic
+# epic -p <Pod_Name> -n <Pod_Namespace>
+# epic --podname <Pod_Name> --namespace <Pod_Namespace>
 
 
 echo "==============================================="
@@ -224,6 +257,14 @@ echo "==============================================="
 curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "/tmp/session-manager-plugin.rpm"
 sudo yum install -y /tmp/session-manager-plugin.rpm
 session-manager-plugin
+
+
+# 辅助工具
+echo "==============================================="
+echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
+echo "==============================================="
+# moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
+sudo yum -y install jq gettext bash-completion moreutils
 
 
 echo "==============================================="
@@ -404,30 +445,6 @@ sudo pip3 install wildq
 # cat file.ini \
 #   |wildq -i ini -M '.Key = "value"' \
 #   |sponge file.ini
-
-
-echo "==============================================="
-echo "  Install copilot ......"
-echo "==============================================="
-sudo curl -Lo /usr/local/bin/copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux \
-   && sudo chmod +x /usr/local/bin/copilot \
-   && copilot --help
-
-
-# echo "==============================================="
-# echo "  Install App2Container ......"
-# echo "==============================================="
-# #https://docs.aws.amazon.com/app2container/latest/UserGuide/start-step1-install.html
-# #https://aws.amazon.com/blogs/containers/modernize-java-and-net-applications-remotely-using-aws-app2container/
-# curl -o /tmp/AWSApp2Container-installer-linux.tar.gz https://app2container-release-us-east-1.s3.us-east-1.amazonaws.com/latest/linux/AWSApp2Container-installer-linux.tar.gz
-# sudo tar xvf /tmp/AWSApp2Container-installer-linux.tar.gz
-# # sudo ./install.sh
-# echo y |sudo ./tmp/install.sh
-# sudo app2container --version
-# cat >> ~/.bashrc <<EOF
-# alias a2c="sudo app2container"
-# EOF
-# source ~/.bashrc
 
 
 echo "==============================================="

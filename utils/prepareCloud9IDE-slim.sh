@@ -33,6 +33,29 @@ EOF
 source ~/.bashrc
 aws --version
 
+
+echo "==============================================="
+echo "  Install App2Container ......"
+echo "==============================================="
+#https://docs.aws.amazon.com/app2container/latest/UserGuide/start-step1-install.html
+#https://aws.amazon.com/blogs/containers/modernize-java-and-net-applications-remotely-using-aws-app2container/
+curl -o /tmp/AWSApp2Container-installer-linux.tar.gz https://app2container-release-us-east-1.s3.us-east-1.amazonaws.com/latest/linux/AWSApp2Container-installer-linux.tar.gz
+sudo tar xvf /tmp/AWSApp2Container-installer-linux.tar.gz -C /tmp
+# sudo ./install.sh
+echo y |sudo /tmp/install.sh
+sudo app2container --version
+cat >> ~/.bashrc <<EOF
+alias a2c="sudo app2container"
+EOF
+source ~/.bashrc
+a2c help
+curl -o /tmp/optimizeImage.zip https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/samples/p-attach/dc756bff-1fcd-4fd2-8c4f-dc494b5007b9/attachments/attachment.zip
+sudo unzip /tmp/optimizeImage.zip -d /tmp/optimizeImage
+sudo chmod 755 /tmp/optimizeImage/optimizeImage.sh
+sudo mv /tmp/optimizeImage/optimizeImage.sh /usr/local/bin/optimizeImage.sh
+optimizeImage.sh -h
+
+
 echo "==============================================="
 echo "  Install eksctl ......"
 echo "==============================================="
@@ -95,9 +118,26 @@ source ~/.bashrc
 
 
 echo "==============================================="
+echo "  EKS Pod Information Collector ......"
+echo "==============================================="
+# https://github.com/awslabs/amazon-eks-ami/tree/master/log-collector-script/linux
+sudo curl -o /usr/local/bin/epic https://raw.githubusercontent.com/aws-samples/eks-pod-information-collector/main/eks-pod-information-collector.sh
+sudo chmod +x /usr/local/bin/epic
+# epic -p <Pod_Name> -n <Pod_Namespace>
+# epic --podname <Pod_Name> --namespace <Pod_Namespace>
+
+
+echo "==============================================="
 echo "  Install c9 to open files in cloud9 ......"
 echo "==============================================="
 npm install -g c9
+
+
+echo "==============================================="
+echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
+echo "==============================================="
+# moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
+sudo yum -y install jq gettext bash-completion moreutils
 
 
 echo "==============================================="
