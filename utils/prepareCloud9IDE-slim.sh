@@ -118,6 +118,15 @@ source ~/.bashrc
 
 
 echo "==============================================="
+echo "  EKS Node Logs Collector (Linux) ......"
+echo "==============================================="
+# run this script on your eks node
+sudo curl -o /usr/local/bin/enic https://raw.githubusercontent.com/awslabs/amazon-eks-ami/master/log-collector-script/linux/eks-log-collector.sh
+sudo chmod +x /usr/local/bin/enic
+enic help
+
+
+echo "==============================================="
 echo "  EKS Pod Information Collector ......"
 echo "==============================================="
 # https://github.com/awslabs/amazon-eks-ami/tree/master/log-collector-script/linux
