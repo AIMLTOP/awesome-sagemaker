@@ -96,7 +96,9 @@ complete -C '/usr/local/bin/aws_completer' aws
 EOF
 source ~/.bashrc
 aws --version
-
+# container way
+# https://aws.amazon.com/blogs/developer/new-aws-cli-v2-docker-images-available-on-amazon-ecr-public/
+# docker run --rm -it public.ecr.aws/aws-cli/aws-cli:2.9.1 --version aws-cli/2.9.1 Python/3.9.11 Linux/5.10.47-linuxkit docker/aarch64.amzn.2 prompt/off
 
 echo "==============================================="
 echo "  Install kubectl ......"
@@ -180,6 +182,7 @@ kubectl krew list
 # k count pod
 # k node-shell <node>
 
+
 echo "==============================================="
 echo "  Install kubetail ......"
 echo "==============================================="
@@ -211,7 +214,6 @@ cat >> ~/.bashrc <<EOF
 export PATH=\$PATH:\$HOME/.local/bin:\$HOME/bin:/usr/local/bin
 EOF
 source ~/.bashrc
-
 sudo python3 -m pip install awscurl
 
 
@@ -249,9 +251,9 @@ echo "==============================================="
 sh -c "$(curl -sSL https://git.io/install-kubent)"
 
 
-echo "==============================================="
-echo "  Install IAM Authenticator ......"
-echo "==============================================="
+# echo "==============================================="
+# echo "  Install IAM Authenticator ......"
+# echo "==============================================="
 ## https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
 ## curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
 ## curl -o aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
@@ -441,19 +443,6 @@ javac -version
 
 
 echo "==============================================="
-echo "  Install flink ......"
-echo "==============================================="
-wget https://archive.apache.org/dist/flink/flink-1.15.3/flink-1.15.3-bin-scala_2.12.tgz -O /tmp/flink-1.15.3.tgz
-sudo tar xzvf /tmp/flink-1.15.3.tgz -C /opt
-sudo chown -R ec2-user /opt/flink-1.15.3
-cat >> ~/.bashrc <<EOF
-export PATH="/opt/flink-1.15.3/bin:$PATH"
-EOF
-source ~/.bashrc
-flink -v
-
-
-echo "==============================================="
 echo "  Expand disk space ......"
 echo "==============================================="
 wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
@@ -487,18 +476,23 @@ docker buildx ls
 # kmf -h
 
 
-# echo "==============================================="
-# echo "  Install Kubectl EKS Plugin ......"
-# echo "==============================================="
+echo "==============================================="
+echo "  Install Kubectl EKS Plugin ......"
+echo "==============================================="
 # git clone https://github.com/surajincloud/kubectl-eks.git
 # cd kubectl-eks
 # make
 # sudo mv ./kubectl-eks /usr/local/bin
 # cd ..
-# # kubectl eks irsa
-# # kubectl eks irsa -n kube-system
-# # kubectl eks ssm <name-of-the-node>
-# # kubectl eks nodes
+kubectl krew index add surajincloud git@github.com:surajincloud/krew-index.git
+kubectl krew search eks
+kubectl krew install surajincloud/kubectl-eks
+# https://surajincloud.github.io/kubectl-eks/usage/
+# kubectl eks irsa
+# kubectl eks irsa -n kube-system
+# kubectl eks ssm <name-of-the-node>
+# kubectl eks nodes
+# kubectl eks suggest-ami
 
 
 echo "==============================================="
@@ -529,21 +523,6 @@ echo "==============================================="
 echo "  Install lynx ......"
 echo "==============================================="
 sudo yum install lynx -y
-
-
-echo "==============================================="
-echo "  Install emr-on-eks-custom-image ......"
-echo "==============================================="
-wget -O /tmp/amazon-emr-on-eks-custom-image-cli-linux.zip https://github.com/awslabs/amazon-emr-on-eks-custom-image-cli/releases/download/v1.03/amazon-emr-on-eks-custom-image-cli-linux-v1.03.zip
-sudo mkdir -p /opt/emr-on-eks-custom-image
-unzip /tmp/amazon-emr-on-eks-custom-image-cli-linux.zip -d /opt/emr-on-eks-custom-image
-sudo /opt/emr-on-eks-custom-image/installation
-emr-on-eks-custom-image --version
-cat >> ~/.bashrc <<EOF
-alias eec=emr-on-eks-custom-image
-EOF
-source ~/.bashrc
-eec --version
 
 
 #https://github.com/awslabs/eks-node-viewer
@@ -586,7 +565,7 @@ source ~/.bashrc
 
 
 # echo "==============================================="
-# echo "  S3 Mountpoint ......"
+# echo " S3 Mountpoint ......"
 # echo "==============================================="
 # sudo yum install fuse fuse-devel cmake3 clang-devel -y
 # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/sh.rustup.rs
@@ -634,7 +613,7 @@ s5cmd version
 echo "==============================================="
 echo " node-latency-for-k8s ......"
 echo "==============================================="
-#https://github.com/awslabs/node-latency-for-k8s
+# https://github.com/awslabs/node-latency-for-k8s
 [[ `uname -m` == "aarch64" ]] && ARCH="arm64" || ARCH="amd64"
 OS=`uname | tr '[:upper:]' '[:lower:]'`
 wget https://github.com/awslabs/node-latency-for-k8s/releases/download/v0.1.10/node-latency-for-k8s_0.1.10_${OS}_${ARCH}.tar.gz -O /tmp/node-latency-for-k8s.tar.gz
@@ -646,6 +625,63 @@ export PATH="/opt/node-latency-for-k8s:$PATH"
 EOF
 source ~/.bashrc
 node-latency-for-k8s -h
+
+
+echo "==============================================="
+echo " krr (Prometheus-based Kubernetes Resource Recommendations) ......"
+echo "==============================================="
+#https://github.com/robusta-dev/krr
+
+
+echo "==============================================="
+echo " tumx ......"
+echo "==============================================="
+#https://tmuxcheatsheet.com/
+#https://github.com/MarcoLeongDev/handsfree-stable-diffusion
+
+
+echo "==============================================="
+echo " eksdemo ......"
+echo "==============================================="
+# https://github.com/awslabs/eksdemo
+
+
+echo "==============================================="
+echo " gettext ......"
+echo "==============================================="
+#envsubst for environment variables substitution (envsubst is included in gettext package)
+#https://yum-info.contradodigital.com/view-package/base/gettext/
+
+
+echo "==============================================="
+echo " kubefirst ......"
+echo "==============================================="
+# https://github.com/kubefirst/kubefirst
+# https://docs.kubefirst.io/aws/overview
+
+
+echo "==============================================="
+echo " Steampipe ......"
+echo "==============================================="
+# Visualizing AWS EKS Kubernetes Clusters with Relationship Graphs
+# https://dev.to/aws-builders/visualizing-aws-eks-kubernetes-clusters-with-relationship-graphs-46a4
+# sudo /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/turbot/steampipe/main/install.sh)"
+# steampipe plugin install kubernetes
+# git clone https://github.com/turbot/steampipe-mod-kubernetes-insights
+# cd steampipe-mod-kubernetes-insights
+# steampipe dashboard
+
+
+echo "==============================================="
+echo " resource-lister ......"
+echo "==============================================="
+# https://github.com/awslabs/resource-lister
+python3 -m pip install  pipx
+python3 -m pip install  boto3
+python3 -m pipx install resource-lister
+# pipx run resource_lister
+# python3 -m pipx run resource_lister
+
 
 echo "==============================================="
 echo "  More Aliases ......"
