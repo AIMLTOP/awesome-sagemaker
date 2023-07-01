@@ -285,6 +285,12 @@ curl -sS https://webinstall.dev/k9s | bash
 
 
 echo "==============================================="
+echo "  K10 ......"
+echo "==============================================="
+# https://docs.kasten.io/latest/install/aws/aws.html
+
+
+echo "==============================================="
 echo "  Install kube-no-trouble (kubent) ......"
 echo "==============================================="
 # https://github.com/doitintl/kube-no-trouble
@@ -698,6 +704,25 @@ python3 -m pip install  boto3
 python3 -m pipx install resource-lister
 # pipx run resource_lister
 # python3 -m pipx run resource_lister
+
+
+echo "==============================================="
+echo " kuboard ......"
+echo "==============================================="
+# https://kuboard.cn/install/v3/install-built-in.html#%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92
+LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+sudo docker run -d \
+  --restart=unless-stopped \
+  --name=kuboard \
+  -p 80:80/tcp \
+  -p 10081:10081/tcp \
+  -e KUBOARD_ENDPOINT="http://${LOCAL_IPV4}:80" \
+  -e KUBOARD_AGENT_SERVER_TCP_PORT="10081" \
+  -v /root/kuboard-data:/data \
+  eipwork/kuboard:v3
+  # 也可以使用镜像 swr.cn-east-2.myhuaweicloud.com/kuboard/kuboard:v3 ，可以更快地完成镜像下载。
+  # 请不要使用 127.0.0.1 或者 localhost 作为内网 IP \
+  # Kuboard 不需要和 K8S 在同一个网段，Kuboard Agent 甚至可以通过代理访问 Kuboard Server \
 
 
 echo "==============================================="

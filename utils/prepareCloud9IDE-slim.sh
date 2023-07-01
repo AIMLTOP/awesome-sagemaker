@@ -155,6 +155,13 @@ echo "==============================================="
 sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
     sudo chmod +x /usr/bin/yq
 
+echo "==============================================="
+echo "  Expand disk space ......"
+echo "==============================================="
+wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
+chmod +x /tmp/resize-ebs.sh
+/tmp/resize-ebs.sh 100
+
 
 echo "==============================================="
 echo "  More Aliases ......"
