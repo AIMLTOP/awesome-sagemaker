@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo "==============================================="
+echo "  Prepare bigdata folder ......"
+echo "==============================================="
+mkdir -p ~/environment/bigdata
+
 
 echo "==============================================="
 echo "  Install emr-on-eks-custom-image ......"
@@ -27,6 +32,31 @@ export PATH="/opt/flink-1.15.3/bin:$PATH"
 EOF
 source ~/.bashrc
 flink -v
+
+
+echo "==============================================="
+echo "  Install Cruise Control ......"
+echo "==============================================="
+git clone https://github.com/linkedin/cruise-control.git ~/environment/bigdata/cruise-control && cd ~/environment/bigdata/cruise-control/
+./gradlew jar copyDependantLibs
+mkdir logs; touch logs/kafka-cruise-control.out
+# export MSK_ARN=`aws kafka list-clusters|grep ClusterArn|cut -d ':' -f 2-|cut -d ',' -f 1 | sed -e 's/\"//g'`
+# export MSK_BROKERS=`aws kafka get-bootstrap-brokers --cluster-arn $MSK_ARN|grep BootstrapBrokerString|grep 9092| cut -d ':' -f 2- | sed -e 's/\"//g' | sed -e 's/,$//'`
+# export MSK_ZOOKEEPER=`aws kafka describe-cluster --cluster-arn $MSK_ARN|grep ZookeeperConnectString|grep -v Tls|cut -d ':' -f 2-|sed 's/,$//g'|sed -e 's/\"//g'`
+# sed -i "s/localhost:9092/${MSK_BROKERS}/g" config/cruisecontrol.properties
+# sed -i "s/localhost:2181/${MSK_ZOOKEEPER}/g" config/cruisecontrol.properties
+# sed -i "s/webserver.http.port=9090/webserver.http.port=8080/g" config/cruisecontrol.properties 
+# sed -i "s/capacity.config.file=config\/capacityJBOD.json/capacity.config.file=.\/config\/capacityCores.json/g" config/cruisecontrol.properties
+# sudo chmod -R 777 .
+# # sed -i "s/com.linkedin.kafka.cruisecontrol.monitor.sampling.CruiseControlMetricsReporterSampler/com.linkedin.kafka.cruisecontrol.monitor.sampling.prometheus.PrometheusMetricSampler/g" config/cruisecontrol.properties
+# # echo "prometheus.server.endpoint=localhost:9090" >> config/cruisecontrol.properties
+# update capacityCores.json
+# # start 
+# cd ~/environment/bigdata/cruise-control/
+# ./kafka-cruise-control-start.sh -daemon config/cruisecontrol.properties
+wget https://github.com/linkedin/cruise-control-ui/releases/download/v0.3.4/cruise-control-ui-0.3.4.tar.gz  -O /tmp/cruise-control-ui-0.3.4.tar.gz
+sudo tar xzvf /tmp/cruise-control-ui-0.3.4.tar.gz -C ~/environment/bigdata/cruise-control/
+sudo chown -R ec2-user ~/environment/bigdata/cruise-control/
 
 
 echo "==============================================="

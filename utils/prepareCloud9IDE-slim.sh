@@ -155,6 +155,17 @@ echo "==============================================="
 sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
     sudo chmod +x /usr/bin/yq
 
+
+echo "==============================================="
+echo "  Install Java ......"
+echo "==============================================="
+sudo yum -y install java-11-amazon-corretto
+#sudo alternatives --config java
+#sudo update-alternatives --config javac
+java -version
+javac -version
+
+
 echo "==============================================="
 echo "  Expand disk space ......"
 echo "==============================================="

@@ -454,11 +454,12 @@ sudo pip3 install wildq
 
 
 echo "==============================================="
-echo "  Install java 8 ......"
+echo "  Install Java ......"
 echo "==============================================="
-sudo amazon-linux-extras enable corretto8
+# sudo amazon-linux-extras enable corretto8
 # sudo yum clean metadata
-sudo yum install java-1.8.0-amazon-corretto-devel -y
+# sudo yum install java-1.8.0-amazon-corretto-devel -y
+sudo yum -y install java-11-amazon-corretto
 #sudo alternatives --config java
 #sudo update-alternatives --config javac
 java -version
