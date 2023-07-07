@@ -35,14 +35,35 @@ flink -v
 
 
 echo "==============================================="
+echo "  Kafka ......"
+echo "==============================================="
+wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz -O /tmp/kafka_2.12-2.8.1.tgz
+tar -xzf /tmp/kafka_2.12-2.8.1.tgz -C ~/environment/bigdata/
+sudo chown -R ec2-user ~/environment/bigdata
+cat >> ~/.bashrc <<EOF
+export PATH="~/environment/bigdata/kafka_2.12-2.8.1/bin:$PATH"
+EOF
+source ~/.bashrc
+# ln -s kafka_2.12-2.8.1 kafka
+
+
+echo "==============================================="
 echo "  Install Cruise Control ......"
 echo "==============================================="
 git clone https://github.com/linkedin/cruise-control.git ~/environment/bigdata/cruise-control && cd ~/environment/bigdata/cruise-control/
 ./gradlew jar copyDependantLibs
 mkdir logs; touch logs/kafka-cruise-control.out
 # export MSK_ARN=`aws kafka list-clusters|grep ClusterArn|cut -d ':' -f 2-|cut -d ',' -f 1 | sed -e 's/\"//g'`
+export MSK_ARN=$(aws kafka list-clusters --output json | jq -r .ClusterInfoList[].ClusterArn)
 # export MSK_BROKERS=`aws kafka get-bootstrap-brokers --cluster-arn $MSK_ARN|grep BootstrapBrokerString|grep 9092| cut -d ':' -f 2- | sed -e 's/\"//g' | sed -e 's/,$//'`
+export MSK_BROKERS=$(aws kafka get-bootstrap-brokers --cluster-arn $MSK_ARN --output json | jq -r .BootstrapBrokerString)
 # export MSK_ZOOKEEPER=`aws kafka describe-cluster --cluster-arn $MSK_ARN|grep ZookeeperConnectString|grep -v Tls|cut -d ':' -f 2-|sed 's/,$//g'|sed -e 's/\"//g'`
+export MSK_ZOOKEEPER=$(aws kafka describe-cluster --cluster-arn $MSK_ARN|grep ZookeeperConnectString|grep -v Tls|cut -d ':' -f 2-|sed 's/,$//g'|sed -e 's/\"//g')
+echo "export MSK_ARN=\"${MSK_ARN}\"" | tee -a ~/.bashrc
+echo "export MSK_BROKERS=\"${MSK_BROKERS}\"" | tee -a ~/.bashrc
+echo "export MSK_ZOOKEEPER=\"${MSK_ZOOKEEPER}\"" >> ~/.bashrc
+source ~/.bashrc
+
 # sed -i "s/localhost:9092/${MSK_BROKERS}/g" config/cruisecontrol.properties
 # sed -i "s/localhost:2181/${MSK_ZOOKEEPER}/g" config/cruisecontrol.properties
 # sed -i "s/webserver.http.port=9090/webserver.http.port=8080/g" config/cruisecontrol.properties 
