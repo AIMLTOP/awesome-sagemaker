@@ -224,6 +224,11 @@ pip install jupyterlab-lsp
 pip install 'python-lsp-server[all]'
 jupyter server extension enable --user --py jupyter_lsp
 
+# S3 browser
+jupyter labextension install jupyterlab-s3-browser
+pip install jupyterlab-s3-browser
+jupyter serverextension enable --py jupyterlab_s3_browser
+
 # https://github.com/lckr/jupyterlab-variableInspector
 pip install lckr-jupyterlab-variableinspector
 
@@ -244,11 +249,15 @@ pip install jupyterlab_execute_time
 
 #sudo systemctl daemon-reload
 #sudo systemctl restart jupyter-server
+source deactivate
 
 
 echo "==============================================="
 echo "  Set Aliases ......"
 echo "==============================================="
+echo "Create sh profile  ..."
+echo "alias b='/bin/bash'" > ~/.profile
+source ~/.profile
 echo "alias c='clear'" | tee -a ~/.bashrc
 echo "alias b='/bin/bash'" | tee -a ~/.bashrc
 echo "alias cds='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
