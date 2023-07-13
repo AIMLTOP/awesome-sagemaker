@@ -1,5 +1,6 @@
 # 参考
 # https://github.com/fmmasood/eks-cli-init-tools/blob/main/cli_tools.sh
+mkdir -p /home/ec2-user/SageMaker/custom
 
 echo "==============================================="
 echo "  Config envs ......"
@@ -220,6 +221,33 @@ source deactivate
 
 
 echo "==============================================="
+echo "  Cost Saving ......"
+echo "==============================================="
+echo "Fetching the autostop script"
+wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
+# auto stop idle
+# IDLE_TIME=3600
+IDLE_TIME=10800
+# IDLE_TIME=28800
+echo "Detecting Python install with boto3 install"
+# Find which install has boto3 and use that to run the cron command. So will use default when available
+# Redirect stderr as it is unneeded
+CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
+if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then
+    PYTHON_DIR=$CONDA_PYTHON_DIR
+elif /usr/bin/python -c "import boto3" 2>/dev/null; then
+    PYTHON_DIR='/usr/bin/python'
+else
+    # If no boto3 just quit because the script won't work
+    echo "No boto3 found in Python or Python3. Exiting..."
+    exit 1
+fi
+echo "Found boto3 at $PYTHON_DIR"
+echo "Starting the SageMaker autostop script in cron"
+(crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
+
+
+echo "==============================================="
 echo "  Set Aliases ......"
 echo "==============================================="
 echo "Create sh profile  ..."
@@ -227,13 +255,16 @@ echo "alias b='/bin/bash'" > ~/.profile
 source ~/.profile
 echo "alias c='clear'" | tee -a ~/.bashrc
 echo "alias b='/bin/bash'" | tee -a ~/.bashrc
-echo "alias cds='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
-echo "alias saj='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
+echo "alias cs='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
+echo "alias cls='conda env list'" | tee -a ~/.bashrc
+echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
 echo "alias sd='source deactivate'" | tee -a ~/.bashrc
 source ~/.bashrc
 
 
 # 最后再执行一次 source
+sudo chmod +x /home/ec2-user/SageMaker/custom/*.sh
+sudo chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 echo "source ~/.bashrc"
 shopt -s expand_aliases
 source ~/.profile

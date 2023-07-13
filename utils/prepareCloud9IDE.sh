@@ -191,12 +191,16 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 EOF
 source ~/.bashrc
 kubectl krew update
+kubectl krew install ingress-nginx
+kubectl ingress-nginx --help
 kubectl krew install resource-capacity
 kubectl krew install count
 kubectl krew install get-all
 kubectl krew install ktop
 kubectl krew install ctx # kubectx
 kubectl krew install ns # kubens
+kubectl krew install nodepools # https://github.com/grafana/kubectl-nodepools
+kubectl nodepools list
 # kubectl krew install lineage
 #kubectl krew install custom-cols
 #kubectl krew install explore
