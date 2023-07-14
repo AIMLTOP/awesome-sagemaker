@@ -91,6 +91,12 @@ aws --version
 # container way
 # https://aws.amazon.com/blogs/developer/new-aws-cli-v2-docker-images-available-on-amazon-ecr-public/
 # docker run --rm -it public.ecr.aws/aws-cli/aws-cli:2.9.1 --version aws-cli/2.9.1 Python/3.9.11 Linux/5.10.47-linuxkit docker/aarch64.amzn.2 prompt/off
+# Mac
+# curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "/tmp/AWSCLIV2.pkg"
+# sudo installer -pkg /tmp/AWSCLIV2.pkg -target /
+# which aws
+# aws --version
+# rm -fr /tmp/AWSCLIV2.pkg
 
 
 echo "==============================================="
@@ -214,6 +220,7 @@ kubectl krew list
 # k resource-capacity --pods --util --pod-labels app.kubernetes.io/name=aws-node --namespace kube-system --sort cpu.util
 # k get po -l app.kubernetes.io/name=aws-node -n kube-system -o wide
 # kubectl ktop
+# kubectl ktop -n default
 # kubectl lineage --version
 # k get-all
 # k count pod
@@ -261,6 +268,11 @@ echo "==============================================="
 curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "/tmp/session-manager-plugin.rpm"
 sudo yum install -y /tmp/session-manager-plugin.rpm
 session-manager-plugin
+# Mac
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/mac/sessionmanager-bundle.zip" -o "/tmp/sessionmanager-bundle.zip"
+unzip /tmp/sessionmanager-bundle.zip -d /tmp
+sudo /tmp/sessionmanager-bundle/install -i /usr/local/sessionmanagerplugin -b /usr/local/bin/session-manager-plugin
+rm -fr /tmp/sessionmanager-bundle*
 
 
 # 辅助工具

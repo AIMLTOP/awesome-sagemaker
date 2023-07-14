@@ -123,6 +123,14 @@ EOF
 source ~/.bashrc
 # dfimage -sV=1.36 nginx:latest 
 
+echo "==============================================="
+echo "  Docker Compose ......"
+echo "==============================================="
+#sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version
+
 
 echo "==============================================="
 echo "  Install sam cli ......"
@@ -184,8 +192,15 @@ s5cmd version
 echo "==============================================="
 echo "  Install more Extensions ......"
 echo "==============================================="
+#https://medium.com/@shivangisareen/for-anyone-using-jupyter-notebook-installing-packages-18a9468d0c1c
+#https://jakevdp.github.io/blog/2017/12/05/installing-python-packages-from-jupyter/#The-Details:-Why-is-Installation-from-Jupyter-so-Messy?
 # conda install -c conda-forge nodejs
-source activate JupyterSystemEnv
+source activate JupyterSystemEnv # virtual environment directory and the virtualenv is now activated
+
+# globally install packages
+#import sys
+#!{sys.executable} -m pip install <package_name> or !conda install --yes --prefix {sys.prefix} <package_name>
+# python -m ipykernel install --user --name myenv --display-name "Python (myenv)"
 
 # jupyterlab-lsp
 pip install jupyterlab-lsp
@@ -194,7 +209,8 @@ jupyter server extension enable --user --py jupyter_lsp
 
 # S3 browser
 jupyter labextension install jupyterlab-s3-browser
-pip install jupyterlab-s3-browser
+# pip install jupyterlab-s3-browser
+python -m pip install jupyterlab-s3-browser
 jupyter serverextension enable --py jupyterlab_s3_browser
 
 # https://github.com/lckr/jupyterlab-variableInspector
@@ -207,7 +223,8 @@ pip install ipympl
 pip install aquirdturtle_collapsible_headings
 
 # https://github.com/QuantStack/jupyterlab-drawio
-pip install jupyterlab-drawio
+# pip install jupyterlab-drawio
+python -m pip install jupyterlab-drawio
 
 # https://github.com/jtpio/jupyterlab-system-monitor
 pip install jupyterlab-system-monitor
@@ -227,38 +244,71 @@ echo "Fetching the autostop script"
 wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
 # auto stop idle
 # IDLE_TIME=3600
+# IDLE_TIME=10800
+# # IDLE_TIME=28800
+# echo "Detecting Python install with boto3 install"
+# # Find which install has boto3 and use that to run the cron command. So will use default when available
+# # Redirect stderr as it is unneeded
+# CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
+# if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then
+#     PYTHON_DIR=$CONDA_PYTHON_DIR
+# elif /usr/bin/python -c "import boto3" 2>/dev/null; then
+#     PYTHON_DIR='/usr/bin/python'
+# else
+#     # If no boto3 just quit because the script won't work
+#     echo "No boto3 found in Python or Python3. Exiting..."
+#     exit 1
+# fi
+# echo "Found boto3 at $PYTHON_DIR"
+# echo "Starting the SageMaker autostop script in cron"
+# (crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
+
+
+echo "==============================================="
+echo "  Shell Scripts ......"
+echo "==============================================="
+# echo "Create sh profile  ..."
+# echo "alias b='/bin/bash'" > ~/.profile
+# source ~/.profile
+# echo "alias c='clear'" | tee -a ~/.bashrc
+# echo "alias b='/bin/bash'" | tee -a ~/.bashrc
+# echo "alias cs='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
+# echo "alias cls='conda env list'" | tee -a ~/.bashrc
+# echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
+# echo "alias sd='source deactivate'" | tee -a ~/.bashrc
+# echo "alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'" | tee -a ~/.bashrc
+# source ~/.bashrc
+
+sudo bash -c "cat << EOF > /usr/local/bin/b
+#!/bin/bash
+/bin/bash
+EOF"
+sudo chmod +x /usr/local/bin/b
+
+sudo bash -c "cat > /usr/local/bin/rc <<EOF
+#!/bin/bash
+echo \"alias c='clear'\" | tee -a ~/.bashrc
+echo \"alias b='/bin/bash'\" | tee -a ~/.bashrc
+echo \"alias cs='cd /home/ec2-user/SageMaker'\" | tee -a ~/.bashrc
+echo \"alias cls='conda env list'\" | tee -a ~/.bashrc
+echo \"alias sa='source activate JupyterSystemEnv'\" | tee -a ~/.bashrc
+echo \"alias sd='source deactivate'\" | tee -a ~/.bashrc
+echo \"alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'\" | tee -a ~/.bashrc
 IDLE_TIME=10800
-# IDLE_TIME=28800
-echo "Detecting Python install with boto3 install"
-# Find which install has boto3 and use that to run the cron command. So will use default when available
-# Redirect stderr as it is unneeded
-CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
-if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then
-    PYTHON_DIR=$CONDA_PYTHON_DIR
-elif /usr/bin/python -c "import boto3" 2>/dev/null; then
+CONDA_PYTHON_DIR=\\\$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
+if \\\$CONDA_PYTHON_DIR -c \"import boto3\" 2>/dev/null; then
+    PYTHON_DIR=\\\$CONDA_PYTHON_DIR
+elif /usr/bin/python -c \"import boto3\" 2>/dev/null; then
     PYTHON_DIR='/usr/bin/python'
 else
-    # If no boto3 just quit because the script won't work
-    echo "No boto3 found in Python or Python3. Exiting..."
+    echo \"No boto3 found in Python or Python3. Exiting...\"
     exit 1
 fi
-echo "Found boto3 at $PYTHON_DIR"
-echo "Starting the SageMaker autostop script in cron"
-(crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
-
-
-echo "==============================================="
-echo "  Set Aliases ......"
-echo "==============================================="
-echo "Create sh profile  ..."
-echo "alias b='/bin/bash'" > ~/.profile
-source ~/.profile
-echo "alias c='clear'" | tee -a ~/.bashrc
-echo "alias b='/bin/bash'" | tee -a ~/.bashrc
-echo "alias cs='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
-echo "alias cls='conda env list'" | tee -a ~/.bashrc
-echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
-echo "alias sd='source deactivate'" | tee -a ~/.bashrc
+echo \"Starting the SageMaker autostop script in cron\"
+(crontab -l 2>/dev/null; echo \"*/5 * * * * \\\$PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time \\\$IDLE_TIME --ignore-connections >> /var/log/jupyter.log\") | crontab -
+EOF"
+sudo chmod +x /usr/local/bin/rc
+rc
 source ~/.bashrc
 
 
