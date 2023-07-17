@@ -6,6 +6,7 @@ echo "==============================================="
 cat >> ~/.bashrc <<EOF
 alias cat=ccat
 EOF
+echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 echo "alias c='clear'" | tee -a ~/.bashrc
 echo "alias b='/bin/bash'" | tee -a ~/.bashrc
 echo "alias cs='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
@@ -13,6 +14,24 @@ echo "alias cls='conda env list'" | tee -a ~/.bashrc
 echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
 echo "alias sd='source deactivate'" | tee -a ~/.bashrc
 echo "alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'" | tee -a ~/.bashrc
+
+
+echo "==============================================="
+echo "  Cofing dfimage ......"
+echo "==============================================="
+cat >> ~/.bashrc <<EOF
+alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage"  
+EOF
+source ~/.bashrc
+# dfimage -sV=1.36 nginx:latest 
+
+
+echo "==============================================="
+echo "  Install yq for yaml processing ......"
+echo "==============================================="
+echo 'yq() {
+  docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
+}' | tee -a ~/.bashrc && source ~/.bashrc
 
 
 echo "==============================================="
@@ -33,29 +52,46 @@ echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
 echo "==============================================="
 echo "  Custom Kernels ......"
 echo "==============================================="
+sudo -u ec2-user -i <<'EOF'
 unset SUDO_UID
+
 WORKING_DIR=/home/ec2-user/SageMaker/custom
 source "$WORKING_DIR/miniconda/bin/activate"
 
 for env in $WORKING_DIR/miniconda/envs/*; do
     BASENAME=$(basename "$env")
-    conda activate "$BASENAME"
-    python -m ipykernel install --user --name "$BASENAME"
+    # source activate "$BASENAME"
+    python -m ipykernel install --user --name "$BASENAME" --display-name "custom_$BASENAME"
+    # python -m ipykernel install --user --name "$BASENAME"    
 done
+
+# Optionally, uncomment these lines to disable SageMaker-provided Conda functionality.
+# echo "c.EnvironmentKernelSpecManager.use_conda_directly = False" >> /home/ec2-user/.jupyter/jupyter_notebook_config.py
+# cp /home/ec2-user/.condarc /home/ec2-user/.condarc.backup
+# rm /home/ec2-user/.condarc
+# if uncomment, will erase braket
+EOF
 
 
 echo "==============================================="
 echo "  Auto Stop ......"
 echo "==============================================="
-IDLE_TIME=10800
+# auto stop idle
+IDLE_TIME=10800 # 3600 28800
+echo "Detecting Python install with boto3 install"
+# Find which install has boto3 and use that to run the cron command. So will use default when available
+# Redirect stderr as it is unneeded
 CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
 if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then
     PYTHON_DIR=$CONDA_PYTHON_DIR
 elif /usr/bin/python -c "import boto3" 2>/dev/null; then
     PYTHON_DIR='/usr/bin/python'
 else
+    # If no boto3 just quit because the script won't work
     echo "No boto3 found in Python or Python3. Exiting..."
     exit 1
 fi
+echo "Found boto3 at $PYTHON_DIR"
 echo "Starting the SageMaker autostop script in cron"
 (crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
+

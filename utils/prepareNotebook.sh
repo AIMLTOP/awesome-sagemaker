@@ -82,15 +82,6 @@ sudo yum install -y session-manager-plugin.rpm
 session-manager-plugin
 
 
-# More tools
-echo "==============================================="
-echo "  Install yq for yaml processing ......"
-echo "==============================================="
-echo 'yq() {
-  docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
-}' | tee -a ~/.bashrc && source ~/.bashrc
-
-
 echo "==============================================="
 echo "  Install siege ......"
 echo "==============================================="
@@ -120,21 +111,12 @@ sudo yum -y install telnet
 
 
 echo "==============================================="
-echo "  Cofing dfimage ......"
-echo "==============================================="
-cat >> ~/.bashrc <<EOF
-alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage"  
-EOF
-source ~/.bashrc
-# dfimage -sV=1.36 nginx:latest 
-
-echo "==============================================="
 echo "  Docker Compose ......"
 echo "==============================================="
 #sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-docker-compose version
+sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $WORKING_DIR/docker-compose
+sudo chmod +x $WORKING_DIR/docker-compose
+$WORKING_DIR/docker-compose version
 
 
 echo "==============================================="
@@ -183,15 +165,10 @@ export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/late
 | cut -d : -f 2,3 \
 | tr -d \")
 # echo $S5CMD_URL
-wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
+wget $S5CMD_URL -O $WORKING_DIR/s5cmd.tar.gz
 sudo mkdir -p /opt/s5cmd/
-sudo tar xzvf /tmp/s5cmd.tar.gz -C /opt/s5cmd
-cat >> ~/.bashrc <<EOF
-export PATH="/opt/s5cmd:$PATH"
-alias s5='s5cmd'
-EOF
-source ~/.bashrc
-s5cmd version
+sudo tar xzvf $WORKING_DIR/s5cmd.tar.gz -C $WORKING_DIR/s5cmd
+$WORKING_DIR/s5cmd version
 
 
 echo "==============================================="
@@ -208,9 +185,9 @@ source activate JupyterSystemEnv # virtual environment directory and the virtual
 # python -m ipykernel install --user --name myenv --display-name "Python (myenv)"
 
 # jupyterlab-lsp
-pip install jupyterlab-lsp
-pip install 'python-lsp-server[all]'
-jupyter server extension enable --user --py jupyter_lsp
+# pip install jupyterlab-lsp
+# pip install 'python-lsp-server[all]'
+# jupyter server extension enable --user --py jupyter_lsp
 
 # S3 browser
 jupyter labextension install jupyterlab-s3-browser
@@ -251,30 +228,34 @@ echo "==============================================="
 # packages can be installed here.
 #   1. ipykernel is installed to ensure that the custom environment can be used as a Jupyter kernel   
 #   2. Ensure the Notebook Instance has internet connectivity to download the Miniconda installer
+sudo -u ec2-user -i <<'EOF'
 unset SUDO_UID
+
 # Install a separate conda installation via Miniconda
-# WORKING_DIR=/home/ec2-user/SageMaker/custom-miniconda
-# mkdir -p "$WORKING_DIR"
+WORKING_DIR=/home/ec2-user/SageMaker/custom
+mkdir -p "$WORKING_DIR"
 wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
 bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
 rm -rf "$WORKING_DIR/miniconda.sh"
+EOF
 echo "Download custom kernel scripts"
-# wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.9.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.9.sh
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 
 
 echo "==============================================="
 echo " VS Code ......"
 echo "==============================================="
 # https://aws.amazon.com/blogs/machine-learning/host-code-server-on-amazon-sagemaker/
-curl -L https://github.com/aws-samples/amazon-sagemaker-codeserver/releases/download/v0.1.5/amazon-sagemaker-codeserver-0.1.5.tar.gz -o /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz
-tar -xvzf /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz -d /home/ec2-user/SageMaker/custom/ 
-cd /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver/install-scripts/notebook-instances
-chmod +x *.sh
-sudo ./install-codeserver.sh
-sudo ./setup-codeserver.sh
-
-conda install -y -c conda-forge code-server
-code-server --auth none
+# curl -L https://github.com/aws-samples/amazon-sagemaker-codeserver/releases/download/v0.1.5/amazon-sagemaker-codeserver-0.1.5.tar.gz -o /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz
+# tar -xvzf /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz -d /home/ec2-user/SageMaker/custom/ 
+# cd /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver/install-scripts/notebook-instances
+# chmod +x *.sh
+# sudo ./install-codeserver.sh
+# sudo ./setup-codeserver.sh
+# Another way
+# conda install -y -c conda-forge code-server
+# code-server --auth none
 
 
 echo "==============================================="
@@ -282,26 +263,6 @@ echo "  Cost Saving ......"
 echo "==============================================="
 echo "Fetching the autostop script"
 wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
-# auto stop idle
-# IDLE_TIME=3600
-# IDLE_TIME=10800
-# # IDLE_TIME=28800
-# echo "Detecting Python install with boto3 install"
-# # Find which install has boto3 and use that to run the cron command. So will use default when available
-# # Redirect stderr as it is unneeded
-# CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
-# if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then
-#     PYTHON_DIR=$CONDA_PYTHON_DIR
-# elif /usr/bin/python -c "import boto3" 2>/dev/null; then
-#     PYTHON_DIR='/usr/bin/python'
-# else
-#     # If no boto3 just quit because the script won't work
-#     echo "No boto3 found in Python or Python3. Exiting..."
-#     exit 1
-# fi
-# echo "Found boto3 at $PYTHON_DIR"
-# echo "Starting the SageMaker autostop script in cron"
-# (crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
 
 
 echo "==============================================="
