@@ -8,7 +8,8 @@ source "$WORKING_DIR/miniconda/bin/activate"
 
 for env in $WORKING_DIR/miniconda/envs/*; do
     BASENAME=$(basename "$env")
-    # source activate "$BASENAME"
+    source activate "$BASENAME"
+    # conda activate "$BASENAME"
     python -m ipykernel install --user --name "$BASENAME" --display-name "custom_$BASENAME"
     # python -m ipykernel install --user --name "$BASENAME"    
 done
@@ -18,4 +19,13 @@ done
 # cp /home/ec2-user/.condarc /home/ec2-user/.condarc.backup
 # rm /home/ec2-user/.condarc
 # if uncomment, will erase braket
+
+echo "Restarting the Jupyter server.."
+# restart command is dependent on current running Amazon Linux and JupyterLab
+CURR_VERSION=$(cat /etc/os-release)
+if [[ $CURR_VERSION == *$"http://aws.amazon.com/amazon-linux-ami/"* ]]; then
+	sudo initctl restart jupyter-server --no-wait
+else
+	sudo systemctl --no-block restart jupyter-server.service
+fi
 EOF
