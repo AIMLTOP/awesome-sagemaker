@@ -22,10 +22,13 @@
   - [Architecture Best Practices](./getting_started.md#architecture-best-practices) 
   - [ML Platform Setup](./getting_started.md#ml-platform-setup)
 
-* [**Building ML Models**](building_ml_models.md) - Contains resources used for data preparation, running notebooks and training models
+* [**Data Preparation**](./data_preparation.md) - Understand the options to prepare data for machine learning  
+  - [Data Processing](./data_preparation.md#data-processing)  
+  - [Large Scale Data Processing](./data_preparation.md#large-scale-data-processing)   
+  - [Data Labeling](./data_preparation.md#data-labeling)
+
+* [**Building ML Models**](building_ml_models.md) - Contains resources for running notebooks and training models
   - [SDKs and Infrastructure-as-code](./building_ml_models.md#sdks--infrastructure-as-code)
-  - [Data Processing](./building_ml_models.md#data-processing)     
-  - [Data Labeling](./building_ml_models.md#data-labeling)
   - [Training](./building_ml_models.md#training)
 
 * [**Deploying ML Models**](deploying_ml_models.md) - Different ways to deploy models and their best practices
@@ -47,16 +50,15 @@
   - [AutoML](./low_code_no_code_ml.md#automl)
   - [Data Wrangler](./low_code_no_code_ml.md#data-wrangler)
 
-* [**ML Governance**](ml_governance.md) - Data governance, model governance, security, cost
-  - [Security](./ml_governance.md#security)
-  - [Cost Tracking and Control](./ml_governance.md#cost-tracking--control)
-
-* [**Responsible AI**](responsible_ai.md)    
-  - [Explainability & Bias Detection](./responsible_ai.md#explainability--bias-detection)
+* [**Generative AI**](generative_ai.md) - deploy and use generative AI models
+  - [Train and deploy Foundational Models](./generative_ai.md#train-and-deploy-foundational-models)
+  - [prompt engineering and few shot/zero shot learning](./generative_ai.md#prompt-engineering-and-few-shotzero-shot-learning)
+  - [Fine tune Foundational Models](https://github.com/aws-samples/awesome-sagemaker/blob/main/generative_ai.md#fine-tune-foundational-models)
+  - [Building Generative AI applications](./generative_ai.md#building-generative-ai-applications)
 
 * [**ML Domains**](ml_domains.md) - Deep dive on domains such as NLP, CV, Tabular, Audio and Reinforcement Learning
-  - [Large Language Model](./ml_domains.md#large-language-model)
-  - [Generative AI](./ml_domains.md#generative-ai)
+  - [Responsible AI](./ml_domains.md#responsible-ai)
+  - [ML Governance](./ml_domains.md#ml-governance) ([Model Management](./ml_domains.md#model-management), [Security](./ml_domains.md#security), [Cost Tracking & Control](./ml_domains.md#cost-tracking--control))
   - [Computer Vision](./ml_domains.md#computer-vision)
   - [Natural Language Processing](./ml_domains.md#natural-language-processing)
   - [R](./ml_domains.md#r)
