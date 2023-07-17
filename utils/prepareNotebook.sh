@@ -1,6 +1,8 @@
 # 参考
 # https://github.com/fmmasood/eks-cli-init-tools/blob/main/cli_tools.sh
-mkdir -p /home/ec2-user/SageMaker/custom
+WORKING_DIR=/home/ec2-user/SageMaker/custom
+mkdir -p "$WORKING_DIR"
+
 
 echo "==============================================="
 echo "  Config envs ......"
@@ -15,6 +17,17 @@ aws configure get default.region
 aws configure set region $AWS_REGION
 source ~/.bashrc
 aws sts get-caller-identity
+
+
+echo "==============================================="
+echo "  pyenv ......"
+echo "==============================================="
+# https://github.com/pyenv/pyenv-installer
+curl https://pyenv.run | bash
+# export PYENV_ROOT="$HOME/.pyenv"
+# command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
 
 
 # 辅助工具
@@ -87,15 +100,15 @@ siege -V
 #ab -c 500 -n 30000 http://$(kubectl get ing -n front-end --output=json | jq -r .items[].status.loadBalancer.ingress[].hostname)/
 
 
-# echo "==============================================="
-# echo "  Install Go ......"
-# echo "==============================================="
-# sudo yum install golang -y
-# export GOPATH=$(go env GOPATH)
-# echo 'export GOPATH='${GOPATH} >> ~/.bashrc
-# echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
-# source ~/.bashrc
-# go version
+echo "==============================================="
+echo "  Install Go ......"
+echo "==============================================="
+sudo yum install golang -y
+export GOPATH=$(go env GOPATH)
+echo 'export GOPATH='${GOPATH} >> ~/.bashrc
+echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
+source ~/.bashrc
+go version
 
 
 echo "==============================================="
@@ -237,6 +250,42 @@ pip install jupyterlab_execute_time
 source deactivate
 
 
+
+echo "==============================================="
+echo " Persistant Conda ......"
+echo "==============================================="
+# https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/persistent-conda-ebs/on-create.sh
+# installs a custom, persistent installation of conda on the Notebook Instance's EBS volume, and ensures
+# The on-create script downloads and installs a custom conda installation to the EBS volume via Miniconda. Any relevant
+# packages can be installed here.
+#   1. ipykernel is installed to ensure that the custom environment can be used as a Jupyter kernel   
+#   2. Ensure the Notebook Instance has internet connectivity to download the Miniconda installer
+unset SUDO_UID
+# Install a separate conda installation via Miniconda
+# WORKING_DIR=/home/ec2-user/SageMaker/custom-miniconda
+# mkdir -p "$WORKING_DIR"
+wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
+rm -rf "$WORKING_DIR/miniconda.sh"
+echo "Download custom kernel scripts"
+# wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
+
+
+echo "==============================================="
+echo " VS Code ......"
+echo "==============================================="
+# https://aws.amazon.com/blogs/machine-learning/host-code-server-on-amazon-sagemaker/
+curl -L https://github.com/aws-samples/amazon-sagemaker-codeserver/releases/download/v0.1.5/amazon-sagemaker-codeserver-0.1.5.tar.gz -o /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz
+tar -xvzf /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz -d /home/ec2-user/SageMaker/custom/ 
+cd /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver/install-scripts/notebook-instances
+chmod +x *.sh
+sudo ./install-codeserver.sh
+sudo ./setup-codeserver.sh
+
+conda install -y -c conda-forge code-server
+code-server --auth none
+
+
 echo "==============================================="
 echo "  Cost Saving ......"
 echo "==============================================="
@@ -277,6 +326,7 @@ echo "==============================================="
 # echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
 # echo "alias sd='source deactivate'" | tee -a ~/.bashrc
 # echo "alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'" | tee -a ~/.bashrc
+# sudo systemctl --no-block restart jupyter-server.service
 # source ~/.bashrc
 
 sudo bash -c "cat << EOF > /usr/local/bin/b
@@ -294,6 +344,24 @@ echo \"alias cls='conda env list'\" | tee -a ~/.bashrc
 echo \"alias sa='source activate JupyterSystemEnv'\" | tee -a ~/.bashrc
 echo \"alias sd='source deactivate'\" | tee -a ~/.bashrc
 echo \"alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'\" | tee -a ~/.bashrc
+
+echo export GOPATH=\\\$(go env GOPATH) | tee -a ~/.bashrc
+echo export PATH=\\\$PATH:\\\$GOPATH/bin | tee -a ~/.bashrc
+
+echo \"export PYENV_ROOT=\\\$HOME/.pyenv\" | tee -a ~/.bashrc
+echo \"export PATH=\\\$HOME/.pyenv/bin\:\\\$PATH\" | tee -a ~/.bashrc
+eval \"\\\$(\\\$HOME/.pyenv/bin/pyenv init -)\"
+
+unset SUDO_UID
+WORKING_DIR=/home/ec2-user/SageMaker/custom
+source \"\\\$WORKING_DIR/miniconda/bin/activate\"
+
+for env in \\\$WORKING_DIR/miniconda/envs/*; do
+    BASENAME=\\\$(basename \"\\\$env\")
+    conda activate \"\\\$BASENAME\"
+    python -m ipykernel install --user --name \"\\\$BASENAME\"
+done
+
 IDLE_TIME=10800
 CONDA_PYTHON_DIR=\\\$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
 if \\\$CONDA_PYTHON_DIR -c \"import boto3\" 2>/dev/null; then
@@ -310,6 +378,9 @@ EOF"
 sudo chmod +x /usr/local/bin/rc
 rc
 source ~/.bashrc
+
+# 不加 display-name，避免重复
+# python -m ipykernel install --user --name \"\\\$BASENAME\" --display-name \"Custom (\\\$BASENAME)\"
 
 
 # 最后再执行一次 source

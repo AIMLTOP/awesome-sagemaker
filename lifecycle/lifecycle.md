@@ -2,6 +2,14 @@
 
 - https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples
 
+
+Persistent Jupyter Kernels
+- https://medium.com/@haridada07/creating-persistent-python-kernels-for-sagemaker-63993138ae50
+- https://towardsdatascience.com/installing-a-persistent-julia-environment-on-sagemaker-c67acdde9d4b
+- The `/home/ec2-user/SageMaker` directory is the only path that persists between notebook instance sessions. 
+
+
+
 ## Backup 
 
 Create:
