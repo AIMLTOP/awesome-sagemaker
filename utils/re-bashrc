@@ -50,12 +50,6 @@ echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
 
 
 echo "==============================================="
-echo "  Custom Kernels ......"
-echo "==============================================="
-./re-kerenel
-
-
-echo "==============================================="
 echo "  Auto Stop ......"
 echo "==============================================="
 # auto stop idle

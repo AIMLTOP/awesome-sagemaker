@@ -268,27 +268,22 @@ echo "==============================================="
 echo "  Shell Scripts ......"
 echo "==============================================="
 echo "Donwload sh scripts ..."
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/re-path -O /home/ec2-user/SageMaker/custom/re-path
 wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/re-kernel -O /home/ec2-user/SageMaker/custom/re-kernel
 wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/re-bashrc -O /home/ec2-user/SageMaker/custom/re-bashrc
-
-echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
-# echo "alias b='/bin/bash'" > ~/.profile
-# source ~/.profile
-# echo "alias c='clear'" | tee -a ~/.bashrc
-# echo "alias b='/bin/bash'" | tee -a ~/.bashrc
-# echo "alias cs='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
-# echo "alias cls='conda env list'" | tee -a ~/.bashrc
-# echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
-# echo "alias sd='source deactivate'" | tee -a ~/.bashrc
-# echo "alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'" | tee -a ~/.bashrc
-# sudo systemctl --no-block restart jupyter-server.service
-# source ~/.bashrc
-
-
-# 最后再执行一次 source
 sudo chmod +x /home/ec2-user/SageMaker/custom/re*
 sudo chmod +x /home/ec2-user/SageMaker/custom/*.sh
 sudo chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
+
+
+echo "==============================================="
+echo "  Referesh custom path and kernel ......"
+echo "==============================================="
+./re-path
+./re-kernel
+
+
+# 最后再执行一次 source
 echo "source ~/.bashrc"
 shopt -s expand_aliases
 source ~/.bashrc
