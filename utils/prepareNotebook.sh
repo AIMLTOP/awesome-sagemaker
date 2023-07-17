@@ -166,8 +166,7 @@ export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/late
 | tr -d \")
 # echo $S5CMD_URL
 wget $S5CMD_URL -O $WORKING_DIR/s5cmd.tar.gz
-sudo mkdir -p /opt/s5cmd/
-sudo tar xzvf $WORKING_DIR/s5cmd.tar.gz -C $WORKING_DIR/s5cmd
+sudo tar xzvf $WORKING_DIR/s5cmd.tar.gz -C $WORKING_DIR
 $WORKING_DIR/s5cmd version
 
 
@@ -269,7 +268,9 @@ echo "==============================================="
 echo "  Shell Scripts ......"
 echo "==============================================="
 echo "Donwload sh scripts ..."
-wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/bashrc -O /home/ec2-user/SageMaker/custom/bashrc
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/re-kernel -O /home/ec2-user/SageMaker/custom/re-kernel
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/re-bashrc -O /home/ec2-user/SageMaker/custom/re-bashrc
+
 echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
 # echo "alias b='/bin/bash'" > ~/.profile
 # source ~/.profile
@@ -290,5 +291,4 @@ sudo chmod +x /home/ec2-user/SageMaker/custom/*.sh
 sudo chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 echo "source ~/.bashrc"
 shopt -s expand_aliases
-source ~/.profile
 source ~/.bashrc
