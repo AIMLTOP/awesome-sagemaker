@@ -6,7 +6,10 @@ PYTHON="3.8"
 conda create --yes --name "$KERNEL_NAME" python="$PYTHON"
 conda activate "$KERNEL_NAME"
 # pip install --quiet ipykernel
-python -m pip install --quiet ipykernel 
+conda install -c conda-forge nb_conda_kernels -y
+# conda install nb_conda_kernels -y
+conda install -n "$KERNEL_NAME" ipykernel ipywidgets -y
+python -m pip install "$KERNEL_NAME" --quiet ipykernel 
 # Customize these lines as necessary to install the required packages
 conda install --yes numpy
 pip install --quiet boto3

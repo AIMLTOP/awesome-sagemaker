@@ -241,6 +241,7 @@ bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda"
 rm -rf "$WORKING_DIR/miniconda.sh"
 EOF
 echo "Download custom kernel scripts"
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.10.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.10.sh
 wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.9.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.9.sh
 wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 

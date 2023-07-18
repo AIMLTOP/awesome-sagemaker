@@ -11,9 +11,6 @@ for env in $WORKING_DIR/miniconda/envs/*; do
     BASENAME=$(basename "$env")
     # source activate "$BASENAME"
     conda activate "$BASENAME"
-    conda install -c conda-forge nb_conda_kernels -y
-    # conda install nb_conda_kernels -y
-    conda install ipykernel -y
     python -m ipykernel install --user --name "$BASENAME" --display-name "Custom ($BASENAME)"
     # python -m ipykernel install --user --name "$BASENAME" 
     conda info --envs

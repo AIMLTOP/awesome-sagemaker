@@ -1,1 +1,1 @@
-echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
+sudo echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
