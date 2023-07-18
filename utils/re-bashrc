@@ -3,16 +3,27 @@
 echo "==============================================="
 echo "  Alias Scripts ......"
 echo "==============================================="
-cat >> ~/.bashrc <<EOF
-alias cat=ccat
-EOF
+# cat >> ~/.bashrc <<EOF
+# alias cat=ccat
+# EOF
+sudo bash -c "cat << EOF > /usr/local/bin/b
+#!/bin/bash
+/bin/bash
+EOF"
+sudo chmod +x /usr/local/bin/b
+# echo "alias b='/bin/bash'" | tee -a ~/.bashrc
+echo 'export WORKING_DIR=/home/ec2-user/SageMaker/custom' >> ~/.bashrc
 echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 echo "alias c='clear'" | tee -a ~/.bashrc
-echo "alias b='/bin/bash'" | tee -a ~/.bashrc
-echo "alias cs='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
+echo "alias s='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
+echo "alias cdc='cd /home/ec2-user/SageMaker/custom'" | tee -a ~/.bashrc
 echo "alias cls='conda env list'" | tee -a ~/.bashrc
-echo "alias sa='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
+echo "alias sa='source activate'" | tee -a ~/.bashrc
 echo "alias sd='source deactivate'" | tee -a ~/.bashrc
+echo "alias saj='source activate JupyterSystemEnv'" | tee -a ~/.bashrc
+echo "alias aa='conda activate'" | tee -a ~/.bashrc
+echo "alias ad='conda deactivate'" | tee -a ~/.bashrc
+echo "alias aaj='conda activate JupyterSystemEnv'" | tee -a ~/.bashrc
 echo "alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'" | tee -a ~/.bashrc
 
 
@@ -38,9 +49,9 @@ echo "==============================================="
 echo "  Path ......"
 echo "==============================================="
 # Go
-export GOPATH=$(go env GOPATH)
-echo 'export GOPATH='${GOPATH} >> ~/.bashrc
-echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
+# export GOPATH=$(go env GOPATH)
+# echo 'export GOPATH='${GOPATH} >> ~/.bashrc
+# echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
 # pyenv
 echo "export PYENV_ROOT=$HOME/.pyenv" | tee -a ~/.bashrc
 echo "export PATH=$HOME/.pyenv/bin\:$PATH" | tee -a ~/.bashrc
@@ -71,3 +82,9 @@ echo "Found boto3 at $PYTHON_DIR"
 echo "Starting the SageMaker autostop script in cron"
 (crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
 
+
+echo "==============================================="
+echo "  Referesh custom path and kernel ......"
+echo "==============================================="
+./re-path
+./re-kernel

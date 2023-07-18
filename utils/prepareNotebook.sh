@@ -94,8 +94,9 @@ siege -V
 echo "==============================================="
 echo "  Install Go ......"
 echo "==============================================="
-sudo yum install golang -y
-go version
+# sudo yum install golang -y
+# sudo yum install golang --installroot $WORKING_DIR/go -y
+# go version
 
 
 echo "==============================================="
@@ -221,6 +222,7 @@ source deactivate
 echo "==============================================="
 echo " Persistant Conda ......"
 echo "==============================================="
+# https://docs.conda.io/en/latest/miniconda.html
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/persistent-conda-ebs/on-create.sh
 # installs a custom, persistent installation of conda on the Notebook Instance's EBS volume, and ensures
 # The on-create script downloads and installs a custom conda installation to the EBS volume via Miniconda. Any relevant
@@ -233,7 +235,8 @@ unset SUDO_UID
 # Install a separate conda installation via Miniconda
 WORKING_DIR=/home/ec2-user/SageMaker/custom
 mkdir -p "$WORKING_DIR"
-wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+# wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
 bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
 rm -rf "$WORKING_DIR/miniconda.sh"
 EOF
@@ -274,16 +277,13 @@ wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/utils/re-b
 sudo chmod +x /home/ec2-user/SageMaker/custom/re*
 sudo chmod +x /home/ec2-user/SageMaker/custom/*.sh
 sudo chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
-
-
-echo "==============================================="
-echo "  Referesh custom path and kernel ......"
-echo "==============================================="
-./re-path
-./re-kernel
-
-
-# 最后再执行一次 source
+# 再执行一次 source
 echo "source ~/.bashrc"
 shopt -s expand_aliases
 source ~/.bashrc
+
+
+echo "==============================================="
+echo "  Referesh bashrc ......"
+echo "==============================================="
+./re-bashrc

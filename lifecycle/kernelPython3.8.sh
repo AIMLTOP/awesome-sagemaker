@@ -10,6 +10,10 @@ python -m pip install --quiet ipykernel
 # Customize these lines as necessary to install the required packages
 conda install --yes numpy
 pip install --quiet boto3
+# conda install --yes Pillow pandas numpy scipy matplotlib jupyter scikit-learn seaborn beautifulsoup4 sagemaker
+#conda install --yes Pillow==9.1.1 pandas==1.4.2 numpy==1.22.4 scipy==1.7.3
+# pip install tensorflow==2.6.2 tensorflow-datasets
+conda deactivate
 
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/persistent-conda-ebs/on-start.sh
 # Optionally, uncomment these lines to disable SageMaker-provided Conda functionality.'
