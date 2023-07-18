@@ -13,9 +13,10 @@ for env in $WORKING_DIR/miniconda/envs/*; do
     conda activate "$BASENAME"
     python -m ipykernel install --user --name "$BASENAME" --display-name "Custom ($BASENAME)"
     # python -m ipykernel install --user --name "$BASENAME" 
-    conda info --envs
-    jupyter kernelspec list
 done
+
+conda info --envs
+jupyter kernelspec list
 
 # Optionally, uncomment these lines to disable SageMaker-provided Conda functionality.
 # echo "c.EnvironmentKernelSpecManager.use_conda_directly = False" >> /home/ec2-user/.jupyter/jupyter_notebook_config.py
@@ -23,16 +24,17 @@ done
 # rm /home/ec2-user/.condarc
 # if uncomment, will erase braket
 
-echo "Restarting the Jupyter server.."
-# restart command is dependent on current running Amazon Linux and JupyterLab
-CURR_VERSION=$(cat /etc/os-release)
-if [[ $CURR_VERSION == *$"http://aws.amazon.com/amazon-linux-ami/"* ]]; then
-	echo "initctl restart jupyter-server --no-wait"
-    sudo initctl restart jupyter-server --no-wait
-else
-    echo "systemctl --no-block restart jupyter-server.service"
-	sudo systemctl --no-block restart jupyter-server.service
-fi
+# echo "Restarting the Jupyter server.."
+# # restart command is dependent on current running Amazon Linux and JupyterLab
+# CURR_VERSION=$(cat /etc/os-release)
+# if [[ $CURR_VERSION == *$"http://aws.amazon.com/amazon-linux-ami/"* ]]; then
+# 	echo "initctl restart jupyter-server --no-wait"
+#     sudo initctl restart jupyter-server --no-wait
+# else
+#     echo "systemctl --no-block restart jupyter-server.service"
+# 	sudo systemctl --no-block restart jupyter-server.service
+# fi
+
 EOF
 
 # cat /home/ec2-user/.local/share/jupyter/kernels/python_3.8/kernel.json

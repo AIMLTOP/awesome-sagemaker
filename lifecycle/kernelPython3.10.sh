@@ -4,7 +4,9 @@ WORKING_DIR=/home/ec2-user/SageMaker/custom
 source "$WORKING_DIR/miniconda/bin/activate"
 KERNEL_NAME="python_3.10"
 PYTHON="3.10"
-conda create --yes --prefix "$WORKING_DIR" --name "$KERNEL_NAME" python="$PYTHON" # --name -n
+# conda create --yes --prefix "$WORKING_DIR" --name "$KERNEL_NAME" python="$PYTHON" # --name -n
+# argument -n/--name: not allowed with argument -p/--prefix
+conda create --yes --prefix "$WORKING_DIR/miniconda/envs/$KERNEL_NAME" python="$PYTHON" # --name -n
 conda activate "$WORKING_DIR/$KERNEL_NAME"
 conda install -c conda-forge nb_conda_kernels -y
 # conda install nb_conda_kernels -y
