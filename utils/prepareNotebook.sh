@@ -196,13 +196,13 @@ python -m pip install jupyterlab-s3-browser
 jupyter serverextension enable --py jupyterlab_s3_browser
 
 # https://github.com/lckr/jupyterlab-variableInspector
-pip install lckr-jupyterlab-variableinspector
+# pip install lckr-jupyterlab-variableinspector
 
 # https://github.com/matplotlib/ipympl
 pip install ipympl
 
 # https://github.com/aquirdTurtle/Collapsible_Headings
-pip install aquirdturtle_collapsible_headings
+# pip install aquirdturtle_collapsible_headings
 
 # https://github.com/QuantStack/jupyterlab-drawio
 # pip install jupyterlab-drawio
@@ -246,9 +246,9 @@ wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/
 wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 
 
-echo "==============================================="
-echo " VS Code ......"
-echo "==============================================="
+# echo "==============================================="
+# echo " VS Code ......"
+# echo "==============================================="
 # https://aws.amazon.com/blogs/machine-learning/host-code-server-on-amazon-sagemaker/
 # curl -L https://github.com/aws-samples/amazon-sagemaker-codeserver/releases/download/v0.1.5/amazon-sagemaker-codeserver-0.1.5.tar.gz -o /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz
 # tar -xvzf /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz -d /home/ec2-user/SageMaker/custom/ 
@@ -287,4 +287,4 @@ source ~/.bashrc
 echo "==============================================="
 echo "  Referesh bashrc ......"
 echo "==============================================="
-./re-bashrc
+/home/ec2-user/SageMaker/custom/re-bashrc

@@ -86,5 +86,5 @@ echo "Starting the SageMaker autostop script in cron"
 echo "==============================================="
 echo "  Referesh custom path and kernel ......"
 echo "==============================================="
-./re-path
-./re-kernel
+/home/ec2-user/SageMaker/custom/re-path
+/home/ec2-user/SageMaker/custom/re-kernel
