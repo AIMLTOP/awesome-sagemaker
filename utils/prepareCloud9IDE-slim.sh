@@ -87,6 +87,17 @@ kubectl version --client
 echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L node.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone'" | tee -a ~/.bashrc
 echo "alias kk='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
 echo "alias kgp='kubectl get po -o wide'" | tee -a ~/.bashrc
+echo "alias kgd='kubectl get deployment -o wide'" | tee -a ~/.bashrc
+echo "alias kgs='kubectl get svc -o wide'" | tee -a ~/.bashrc
+echo "alias kdn='kubectl describe node'" | tee -a ~/.bashrc
+echo "alias kdp='kubectl describe po'" | tee -a ~/.bashrc
+echo "alias kdd='kubectl describe deployment'" | tee -a ~/.bashrc
+echo "alias kds='kubectl describe svc'" | tee -a ~/.bashrc
+echo 'export dry="--dry-run=client -o yaml"' | tee -a ~/.bashrc
+echo "alias ka='kubectl apply'" | tee -a ~/.bashrc
+echo "alias kr='kubectl run $dry'" | tee -a ~/.bashrc
+echo "alias ke='kubectl explain'" | tee -a ~/.bashrc
+echo "alias tk='kt -n karpenter deploy/karpenter'" | tee -a ~/.bashrc
 
 
 echo "==============================================="
@@ -146,7 +157,7 @@ echo "==============================================="
 echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo yum -y install jq gettext bash-completion moreutils
+sudo yum -y install jq gettext bash-completion moreutils tree zsh
 
 
 echo "==============================================="

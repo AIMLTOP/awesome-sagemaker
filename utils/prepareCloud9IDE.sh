@@ -136,6 +136,7 @@ echo 'export dry="--dry-run=client -o yaml"' | tee -a ~/.bashrc
 echo "alias ka='kubectl apply'" | tee -a ~/.bashrc
 echo "alias kr='kubectl run $dry'" | tee -a ~/.bashrc
 echo "alias ke='kubectl explain'" | tee -a ~/.bashrc
+echo "alias tk='kt -n karpenter deploy/karpenter'" | tee -a ~/.bashrc
 source ~/.bashrc
 
 
@@ -280,7 +281,7 @@ echo "==============================================="
 echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo yum -y install jq gettext bash-completion moreutils
+sudo yum -y install jq gettext bash-completion moreutils tree zsh
 
 
 echo "==============================================="

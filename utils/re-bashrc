@@ -64,7 +64,7 @@ echo "==============================================="
 echo "  Auto Stop ......"
 echo "==============================================="
 # auto stop idle
-IDLE_TIME=10800 # 3600 28800
+IDLE_TIME=6120 #10800 3600 28800
 echo "Detecting Python install with boto3 install"
 # Find which install has boto3 and use that to run the cron command. So will use default when available
 # Redirect stderr as it is unneeded
