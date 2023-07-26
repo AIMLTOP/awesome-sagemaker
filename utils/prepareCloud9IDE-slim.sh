@@ -19,6 +19,21 @@ download_and_verify () {
 cd /tmp/
 
 echo "==============================================="
+echo "  Config envs ......"
+echo "==============================================="
+export AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is not set
+echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bashrc
+echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bashrc
+aws configure set default.region ${AWS_REGION}
+aws configure get default.region
+aws configure set region $AWS_REGION
+source ~/.bashrc
+aws sts get-caller-identity
+
+
+echo "==============================================="
 echo "  Upgrade awscli to v2 ......"
 echo "==============================================="
 rm -fr awscliv2.zip aws
