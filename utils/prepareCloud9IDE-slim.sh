@@ -109,10 +109,13 @@ echo "alias kdp='kubectl describe po'" | tee -a ~/.bashrc
 echo "alias kdd='kubectl describe deployment'" | tee -a ~/.bashrc
 echo "alias kds='kubectl describe svc'" | tee -a ~/.bashrc
 echo 'export dry="--dry-run=client -o yaml"' | tee -a ~/.bashrc
-echo "alias ka='kubectl apply'" | tee -a ~/.bashrc
+echo "alias ka='kubectl apply -f'" | tee -a ~/.bashrc
 echo "alias kr='kubectl run $dry'" | tee -a ~/.bashrc
 echo "alias ke='kubectl explain'" | tee -a ~/.bashrc
 echo "alias tk='kt -n karpenter deploy/karpenter'" | tee -a ~/.bashrc
+echo "alias pk='k patch configmap config-logging -n karpenter --patch'" | tee -a ~/.bashrc
+# k patch configmap config-logging -n karpenter --patch 
+# pk '{"data":{"loglevel.controller":"info"}}'
 
 
 echo "==============================================="
