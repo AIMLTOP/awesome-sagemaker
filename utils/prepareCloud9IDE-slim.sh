@@ -29,6 +29,18 @@ echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bashrc
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
+export EKS_VPC_ID=$(aws eks describe-cluster --name ${EKS_CLUSTER_NAME} --query 'cluster.resourcesVpcConfig.vpcId' --output text)
+export EKS_PUB_SUBNET_01=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}" "Name=availability-zone, Values=${AWS_REGION}a" --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId' --output text)
+export EKS_PRI_SUBNET_01=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}" "Name=availability-zone, Values=${AWS_REGION}a" --query 'Subnets[?MapPublicIpOnLaunch==`false`].SubnetId' --output text)
+# Additional security groups
+export EKS_EXTRA_SG=$(aws eks describe-cluster --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME} | jq -r '.cluster.resourcesVpcConfig.securityGroupIds[0]')
+# Cluster security group
+export EKS_CLUSTER_SG=$(aws eks describe-cluster --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME} | jq -r '.cluster.resourcesVpcConfig.clusterSecurityGroupId')
+echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ~/.bashrc
+echo "export EKS_PUB_SUBNET_01=\"$EKS_PUB_SUBNET_01\"" >> ~/.bashrc
+echo "export EKS_PRI_SUBNET_01=\"$EKS_PRI_SUBNET_01\"" >> ~/.bashrc
+echo "export EKS_EXTRA_SG=${EKS_EXTRA_SG}" | tee -a ~/.bashrc
+echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ~/.bashrc
 source ~/.bashrc
 aws sts get-caller-identity
 
