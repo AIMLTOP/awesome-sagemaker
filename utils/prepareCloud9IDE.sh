@@ -18,8 +18,16 @@ download_and_verify () {
   rm "$out_file.sha256"
 }
 
-
 cd /tmp/
+
+
+echo "==============================================="
+echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
+echo "==============================================="
+# 放在最前面，后续提取字段需要用到 jq
+# moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
+sudo yum -y install jq gettext bash-completion moreutils tree zsh
+
 
 echo "==============================================="
 echo "  Config envs ......"
@@ -267,6 +275,29 @@ source ~/.bashrc
 
 
 echo "==============================================="
+echo "  Install ec2-instance-selector ......"
+echo "==============================================="
+# https://github.com/aws/amazon-ec2-instance-selector
+curl -Lo ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.4.1/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 && chmod +x ec2-instance-selector
+chmod +x ./ec2-instance-selector
+mkdir -p $HOME/bin && mv ./ec2-instance-selector $HOME/bin/ec2-instance-selector
+cat >> ~/.bashrc <<EOF
+alias nsel=ec2-instance-selector
+EOF
+source ~/.bashrc
+nsel --version
+# nsel --efa-support --gpu-memory-total-min 80 -r us-west-2 -o table-wide
+# nsel --efa-support --gpus 0 -r us-west-2 -o table-wide
+# ec2-instance-selector --memory 4 --vcpus 2 --cpu-architecture x86_64 -r us-east-1
+# ec2-instance-selector --network-performance 100 --usage-class spot -r us-east-1
+# ec2-instance-selector --memory 4 --vcpus 2 --cpu-architecture x86_64 -r us-east-1 -o table
+# ec2-instance-selector -r us-east-1 -o table-wide --max-results 10 --sort-by memory --sort-direction asc
+# ec2-instance-selector -r us-east-1 -o table-wide --max-results 10 --sort-by .MemoryInfo.SizeInMiB --sort-direction desc
+# ec2-instance-selector --max-results 1 -v
+# ec2-instance-selector -o interactive
+
+
+echo "==============================================="
 echo "  EKS Node Logs Collector (Linux) ......"
 echo "==============================================="
 # run this script on your eks node
@@ -287,6 +318,7 @@ cat >> ~/.bashrc <<EOF
 alias nfee='eks-node-viewer'
 EOF
 source ~/.bashrc
+nfee -h
 
 
 echo "==============================================="
@@ -331,13 +363,6 @@ rm -fr /tmp/sessionmanager-bundle*
 
 
 echo "==============================================="
-echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
-echo "==============================================="
-# moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo yum -y install jq gettext bash-completion moreutils tree zsh
-
-
-echo "==============================================="
 echo "  Install yq for yaml processing ......"
 echo "==============================================="
 sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
@@ -368,22 +393,6 @@ sudo yum -y install java-11-amazon-corretto
 #sudo update-alternatives --config javac
 java -version
 javac -version
-
-
-echo "==============================================="
-echo "  Install ec2-instance-selector ......"
-echo "==============================================="
-#curl -Lo ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.3.3/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 && chmod +x ec2-instance-selector
-# curl -Lo ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.4.0/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 && chmod +x ec2-instance-selector
-curl -Lo ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.4.1/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 && chmod +x ec2-instance-selector
-chmod +x ./ec2-instance-selector
-mkdir -p $HOME/bin && mv ./ec2-instance-selector $HOME/bin/ec2-instance-selector
-ec2-instance-selector --version
-# ec2-instance-selector -o interactive
-cat >> ~/.bashrc <<EOF
-alias ec2s=ec2-instance-selector
-EOF
-source ~/.bashrc
 
 
 echo "==============================================="
