@@ -171,7 +171,7 @@ alias k=kubectl
 complete -F __start_kubectl k
 EOF
 source ~/.bashrc
-kubectl version --client
+kubectl version --client --short
 # Enable some kubernetes aliases
 echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L node.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone'" | tee -a ~/.bashrc
 echo "alias kk='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
@@ -193,6 +193,14 @@ echo "alias pk='k patch configmap config-logging -n karpenter --patch'" | tee -a
 # pk '{"data":{"loglevel.controller":"info"}}'
 # k get po -l app.kubernetes.io/name=aws-node -n kube-system -o wide
 source ~/.bashrc
+
+
+echo "==============================================="
+echo "  Kustomize ......"
+echo "==============================================="
+curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash
+sudo mv -v kustomize /usr/local/bin
+kustomize version
 
 
 echo "==============================================="
@@ -263,11 +271,19 @@ kubectl plugin list
 echo "==============================================="
 echo "  Install helm ......"
 echo "==============================================="
+# https://helm.sh/docs/helm/helm_completion_bash/
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
 helm version
 helm repo add stable https://charts.helm.sh/stable
+# helm completion bash | sudo tee /etc/bash_completion.d/helm
+cat >> ~/.bashrc <<EOF
+source <(helm completion bash)
+alias h=helm
+complete -F __start_helm h
+EOF
+source ~/.bashrc
 
 
 echo "==============================================="
@@ -319,6 +335,7 @@ source ~/.bashrc
 nsel --version
 # nsel --efa-support --gpu-memory-total-min 80 -r us-west-2 -o table-wide
 # nsel --efa-support --gpus 0 -r us-west-2 -o table-wide
+# nsel --base-instance-type m7i-flex.xlarge -o table-wide
 # ec2-instance-selector --memory 4 --vcpus 2 --cpu-architecture x86_64 -r us-east-1
 # ec2-instance-selector --network-performance 100 --usage-class spot -r us-east-1
 # ec2-instance-selector --memory 4 --vcpus 2 --cpu-architecture x86_64 -r us-east-1 -o table
@@ -374,10 +391,10 @@ echo "==============================================="
 echo "  EKS Pod Information Collector ......"
 echo "==============================================="
 # https://github.com/awslabs/amazon-eks-ami/tree/master/log-collector-script/linux
-sudo curl -o /usr/local/bin/epic https://raw.githubusercontent.com/aws-samples/eks-pod-information-collector/main/eks-pod-information-collector.sh
-sudo chmod +x /usr/local/bin/epic
-# epic -p <Pod_Name> -n <Pod_Namespace>
-# epic --podname <Pod_Name> --namespace <Pod_Namespace>
+sudo curl -o /usr/local/bin/plog https://raw.githubusercontent.com/aws-samples/eks-pod-information-collector/main/eks-pod-information-collector.sh
+sudo chmod +x /usr/local/bin/plog
+# plog -p <Pod_Name> -n <Pod_Namespace>
+# plog --podname <Pod_Name> --namespace <Pod_Namespace>
 
 
 echo "==============================================="

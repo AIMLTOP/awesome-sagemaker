@@ -333,3 +333,9 @@ echo "==============================================="
 # npm install -g aws-cdk@1.199.0
 # npm install -g aws-cdk@1.199.0 --force
 cdk --version
+
+
+# echo "==============================================="
+# echo "  KubeVela ......"
+# echo "==============================================="
+# https://kubevela.io/docs/installation/standalone/#local
