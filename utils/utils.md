@@ -1,5 +1,52 @@
 
 
+## /tmp
+
+- https://unix.stackexchange.com/questions/71622/what-are-correct-permissions-for-tmp-i-unintentionally-set-it-all-public-recu
+
+```shell
+chmod 1777 /tmp
+find /tmp \
+     -mindepth 1 \
+     -name '.*-unix' -exec chmod 1777 {} + -prune -o \
+     -exec chmod go-rwx {} +
+```
+
+## KK
+
+- https://earthly.dev/blog/jq-select/
+
+
+```shell
+export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items|=sort_by(.metadata.creationTimestamp) | .items[]' | jq -r '[ \"printf\", \"%-50s %-19s %-19s %-2s %-2s %-6s %-15s %s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), (.metadata.creationTimestamp | sub(\"Z\";\"\") | sub(\"T\";\" \")), (if ((.status.conditions | map(select(.status == \"True\"))[0].type) == \"Ready\") then \"✔\" else \"?\" end), (.metadata.labels.\"topology.kubernetes.io/zone\" | split(\"-\")[2]), (.metadata.labels.\"node.kubernetes.io/instance-type\" | sub(\"arge\";\"\")), (if .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" then .metadata.labels.\"karpenter.k8s.aws/instance-cpu\"+\"核\"+(.metadata.labels.\"karpenter.k8s.aws/instance-memory\" | tonumber/1024 | tostring+\"G\")+(.metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" | tonumber/1000 | tostring+\"Gbps\") else .status.capacity.cpu+\"核\"+(.status.capacity.memory | sub(\"Ki\";\"\") | tonumber/1024/1024 | floor+1 | tostring+\"G\")+\"\" end),  (if .metadata.labels.\"karpenter.sh/capacity-type\" == \"on-demand\" or .metadata.labels.\"eks.amazonaws.com/capacityType\" == \"ON_DEMAND\" then \"按需\" else \"SPOT\" end), (.metadata.labels.\"karpenter.sh/provisioner-name\" // \" *系统节点-勿删*\") ] | @sh')\""
+
+
+export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items|=sort_by(.metadata.creationTimestamp) | .items[]' | jq -r '[ \"printf\", \"%-50s %-19s %-19s %-2s %-2s %-6s %-15s %s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), (.metadata.creationTimestamp | sub(\"Z\";\"\") | sub(\"T\";\" \")), (if (.status.conditions[] | select(.status == \"True\") | .type) == \"Ready\" then \"✔\" else \"?\" end), (.metadata.labels.\"topology.kubernetes.io/zone\" | split(\"-\")[2]), (.metadata.labels.\"node.kubernetes.io/instance-type\" | sub(\"arge\";\"\")), (if .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" then .metadata.labels.\"karpenter.k8s.aws/instance-cpu\"+\"核\"+(.metadata.labels.\"karpenter.k8s.aws/instance-memory\" | tonumber/1024 | tostring+\"G\")+(.metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" | tonumber/1000 | tostring+\"Gbps\") else .status.capacity.cpu+\"核\"+(.status.capacity.memory | sub(\"Ki\";\"\") | tonumber/1024/1024 | floor+1 | tostring+\"G\")+\"\" end),  (if .metadata.labels.\"karpenter.sh/capacity-type\" == \"on-demand\" or .metadata.labels.\"eks.amazonaws.com/capacityType\" == \"ON_DEMAND\" then \"按需\" else \"SPOT\" end), (.metadata.labels.\"karpenter.sh/provisioner-name\" // \" *系统节点-勿删*\") ] | @sh')\""
+
+export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items[]' | jq -r '[ \"printf\", \"%-45s %s %-12s %-11s %-5s %-6s %-6s %-10s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), .metadata.labels.\"topology.kubernetes.io/zone\", .metadata.labels.\"node.kubernetes.io/instance-type\", .metadata.labels.\"karpenter.k8s.aws/instance-cpu\", .metadata.labels.\"karpenter.k8s.aws/instance-memory\", .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\", (.metadata.labels.\"karpenter.sh/capacity-type\"), .metadata.labels.\"karpenter.sh/provisioner-name\" ] | @sh')\""
+
+kubectl get nodes -o json | jq -jr '.items[] | .metadata.name, "\t", .spec.providerID, "\n"'
+
+kubectl get nodes -o json | jq -jr '.items[] | .metadata.name, "\t", (.spec.providerID | split("/")[4]), .metadata.labels."karpenter.sh/capacity-type", .metadata.labels.node.kubernetes.io/instance-type,"\n"'
+
+kubectl get nodes -o json | jq -jr '.items[] | .metadata.name, "\t", (.spec.providerID | split("/")[4]), "\t", .metadata.labels."node.kubernetes.io/instance-type", "\t", .metadata.labels."karpenter.k8s.aws/instance-network-bandwidth", "\t",  .metadata.labels."topology.kubernetes.io/zone", "\t", (.metadata.labels."karpenter.sh/capacity-type"=="spot" |  // .metadata.labels."eks.amazonaws.com/capacityType"), "\t", (.metadata.labels."karpenter.sh/provisioner-name" // "\t" ), "\t", "\n"'
+
+
+eval "$(kubectl get nodes -o json | jq '.items[]' | jq -r '[ "printf", "%-45s %-22s %-15s %-10s %10s %-10s %-12s %-12s %s\\n", .metadata.name, (.spec.providerID | split("/")[4]), .metadata.labels."node.kubernetes.io/instance-type", .metadata.labels."karpenter.k8s.aws/instance-cpu", .metadata.labels."karpenter.k8s.aws/instance-memory", .metadata.labels."karpenter.k8s.aws/instance-network-bandwidth", .metadata.labels."topology.kubernetes.io/zone", (.metadata.labels."karpenter.sh/capacity-type"), .metadata.labels."karpenter.sh/provisioner-name" ] | @sh')"
+
+eval "$(kubectl get nodes -o json | jq '.items[]' | jq -r '[ "printf", "%-45s %s %-12s %-11s %-5s %-6s %-6s %-10s %s\\n", .metadata.name, (.spec.providerID | split("/")[4]), .metadata.labels."topology.kubernetes.io/zone", .metadata.labels."node.kubernetes.io/instance-type", .metadata.labels."karpenter.k8s.aws/instance-cpu", .metadata.labels."karpenter.k8s.aws/instance-memory", .metadata.labels."karpenter.k8s.aws/instance-network-bandwidth", (.metadata.labels."karpenter.sh/capacity-type"), .metadata.labels."karpenter.sh/provisioner-name" ] | @sh')"
+
+
+kubectl get nodes -o json | jq -jr '.items[] | to_entries[] | [.metadata.name, .metadata.labels."karpenter.sh/capacity-type", .metadata.labels."node.kubernetes.io/instance-type", .metadata.labels."topology.kubernetes.io/zone" ] | @tsv'  
+
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'
+
+
+kubectl get nodes -o json | jq -jr --tab '.items[] | .metadata.name, "\t" , map(.spec.providerID | split("/")[0]) , "\n"'
+
+ --sort-by=.metadata.creationTimestamp
+```
+
 ## Bash in Bash
 
 Simple Example

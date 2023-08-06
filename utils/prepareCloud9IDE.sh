@@ -173,8 +173,12 @@ EOF
 source ~/.bashrc
 kubectl version --client --short
 # Enable some kubernetes aliases
-echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L node.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone'" | tee -a ~/.bashrc
-echo "alias kk='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
+# echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L node.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone'" | tee -a ~/.bashrc
+# echo "alias kk='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
+echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
+export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items|=sort_by(.metadata.creationTimestamp) | .items[]' | jq -r '[ \"printf\", \"%-50s %-19s %-19s %-1s %-2s %-6s %-15s %s %s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), (.metadata.creationTimestamp | sub(\"Z\";\"\")), (if ((.status.conditions | map(select(.status == \"True\"))[0].type) == \"Ready\") then \"✔\" else \"?\" end), (.metadata.labels.\"topology.kubernetes.io/zone\" | split(\"-\")[2]), (.metadata.labels.\"node.kubernetes.io/instance-type\" | sub(\"arge\";\"\")), (if .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" then .metadata.labels.\"karpenter.k8s.aws/instance-cpu\"+\"核\"+(.metadata.labels.\"karpenter.k8s.aws/instance-memory\" | tonumber/1024 | tostring+\"G\")+(.metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" | tonumber/1000 | tostring+\"Gbps\") else .status.capacity.cpu+\"核\"+(.status.capacity.memory | sub(\"Ki\";\"\") | tonumber/1024/1024 | floor+1 | tostring+\"G\")+\"\" end), (.metadata.labels.\"beta.kubernetes.io/arch\" | sub(\"64\";\"\") | sub(\"amd\";\"x86\")), (if .metadata.labels.\"karpenter.sh/capacity-type\" == \"on-demand\" or .metadata.labels.\"eks.amazonaws.com/capacityType\" == \"ON_DEMAND\" then \"按需\" else \"SPOT\" end), (.metadata.labels.\"karpenter.sh/provisioner-name\" // \" *系统节点-勿删*\") ] | @sh')\""
+echo ${KUBECTL_KARPENTER} > kk && chmod +x kk
+sudo mv -v kk /usr/bin
 echo "alias kgp='kubectl get po -o wide'" | tee -a ~/.bashrc
 echo "alias kgd='kubectl get deployment -o wide'" | tee -a ~/.bashrc
 echo "alias kgs='kubectl get svc -o wide'" | tee -a ~/.bashrc
@@ -193,6 +197,9 @@ echo "alias pk='k patch configmap config-logging -n karpenter --patch'" | tee -a
 # pk '{"data":{"loglevel.controller":"info"}}'
 # k get po -l app.kubernetes.io/name=aws-node -n kube-system -o wide
 source ~/.bashrc
+# https://kubernetes.io/docs/reference/kubectl/jsonpath/
+# JSONPATH='{range .items[*]} {@.metadata.name}{"\t"} {@.spec.providerID}) {"\n"}{end}'
+# k get no -o jsonpath="${JSONPATH}"
 
 
 echo "==============================================="
