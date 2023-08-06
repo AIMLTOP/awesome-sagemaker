@@ -176,6 +176,7 @@ kubectl version --client --short
 # echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L node.kubernetes.io/instance-type -L eks.amazonaws.com/nodegroup -L topology.kubernetes.io/zone'" | tee -a ~/.bashrc
 # echo "alias kk='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
 echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
+# https://jqlang.github.io/jq/manual/#basic-filters
 export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items|=sort_by(.metadata.creationTimestamp) | .items[]' | jq -r '[ \"printf\", \"%-50s %-19s %-19s %-1s %-2s %-6s %-15s %s %s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), (.metadata.creationTimestamp | sub(\"Z\";\"\")), (if ((.status.conditions | map(select(.status == \"True\"))[0].type) == \"Ready\") then \"✔\" else \"?\" end), (.metadata.labels.\"topology.kubernetes.io/zone\" | split(\"-\")[2]), (.metadata.labels.\"node.kubernetes.io/instance-type\" | sub(\"arge\";\"\")), (if .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" then .metadata.labels.\"karpenter.k8s.aws/instance-cpu\"+\"核\"+(.metadata.labels.\"karpenter.k8s.aws/instance-memory\" | tonumber/1024 | tostring+\"G\")+(.metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" | tonumber/1000 | tostring+\"Gbps\") else .status.capacity.cpu+\"核\"+(.status.capacity.memory | sub(\"Ki\";\"\") | tonumber/1024/1024 | floor+1 | tostring+\"G\")+\"\" end), (.metadata.labels.\"beta.kubernetes.io/arch\" | sub(\"64\";\"\") | sub(\"amd\";\"x86\")), (if .metadata.labels.\"karpenter.sh/capacity-type\" == \"on-demand\" or .metadata.labels.\"eks.amazonaws.com/capacityType\" == \"ON_DEMAND\" then \"按需\" else \"SPOT\" end), (.metadata.labels.\"karpenter.sh/provisioner-name\" // \" *系统节点-勿删*\") ] | @sh')\""
 echo ${KUBECTL_KARPENTER} > kk && chmod +x kk
 sudo mv -v kk /usr/bin
@@ -466,6 +467,11 @@ sudo yum install fio ioping -y
 # fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=fiotest --filename=testfio8gb --bs=1MB --iodepth=64 --size=8G --readwrite=randrw --rwmixread=50 --numjobs=4 --group_reporting --runtime=30
 # IOping to test the latency
 # sudo ioping -c 100 /efs
+# vegeta https://github.com/tsenart/vegeta
+curl -L "https://github.com/tsenart/vegeta/releases/download/v12.10.0/vegeta_12.10.0_linux_amd64.tar.gz" -o "/tmp/vegeta.tar.gz"
+sudo tar xvzf /tmp/vegeta.tar.gz -C /usr/local/bin/
+sudo chmod 755 /usr/local/bin/vegeta
+vegeta -version
 
 
 echo "==============================================="
@@ -517,6 +523,12 @@ echo "==============================================="
 wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
 chmod +x /tmp/resize-ebs.sh
 /tmp/resize-ebs.sh 100
+
+
+echo "==============================================="
+echo "  Update root PATH ......"
+echo "==============================================="
+echo "export PATH=\$PATH:\$HOME/.local/bin:\$HOME/bin:/usr/local/bin" | sudo tee -a /root/.bashrc
 
 
 echo "==============================================="

@@ -84,3 +84,11 @@ echo "==============================================="
 echo "  mwaa-local-runner ......"
 echo "==============================================="
 # https://dev.to/aws/getting-mwaa-local-runner-up-on-aws-cloud9-1nhd
+
+
+echo "==============================================="
+echo "  postgresql ......"
+echo "==============================================="
+# https://catalog.workshops.aws/performance-tuning/en-US/30-environment
+sudo amazon-linux-extras install -y python3.8 postgresql14
+sudo yum install -y jq postgresql-contrib
