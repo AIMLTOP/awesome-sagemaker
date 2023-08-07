@@ -157,6 +157,7 @@ cat >> ~/.bashrc <<EOF
 alias e=eksctl
 complete -F __start_eksctl e
 EOF
+echo "alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'" | tee -a ~/.bashrc
 
 
 echo "==============================================="
@@ -177,9 +178,9 @@ kubectl version --client --short
 # echo "alias kk='kubectl get nodes -L beta.kubernetes.io/arch -L eks.amazonaws.com/capacityType -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
 echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'" | tee -a ~/.bashrc
 # https://jqlang.github.io/jq/manual/#basic-filters
-export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items|=sort_by(.metadata.creationTimestamp) | .items[]' | jq -r '[ \"printf\", \"%-50s %-19s %-19s %-1s %-2s %-6s %-15s %s %s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), (.metadata.creationTimestamp | sub(\"Z\";\"\")), (if ((.status.conditions | map(select(.status == \"True\"))[0].type) == \"Ready\") then \"✔\" else \"?\" end), (.metadata.labels.\"topology.kubernetes.io/zone\" | split(\"-\")[2]), (.metadata.labels.\"node.kubernetes.io/instance-type\" | sub(\"arge\";\"\")), (if .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" then .metadata.labels.\"karpenter.k8s.aws/instance-cpu\"+\"核\"+(.metadata.labels.\"karpenter.k8s.aws/instance-memory\" | tonumber/1024 | tostring+\"G\")+(.metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" | tonumber/1000 | tostring+\"Gbps\") else .status.capacity.cpu+\"核\"+(.status.capacity.memory | sub(\"Ki\";\"\") | tonumber/1024/1024 | floor+1 | tostring+\"G\")+\"\" end), (.metadata.labels.\"beta.kubernetes.io/arch\" | sub(\"64\";\"\") | sub(\"amd\";\"x86\")), (if .metadata.labels.\"karpenter.sh/capacity-type\" == \"on-demand\" or .metadata.labels.\"eks.amazonaws.com/capacityType\" == \"ON_DEMAND\" then \"按需\" else \"SPOT\" end), (.metadata.labels.\"karpenter.sh/provisioner-name\" // \" *系统节点-勿删*\") ] | @sh')\""
-echo ${KUBECTL_KARPENTER} > kk && chmod +x kk
-sudo mv -v kk /usr/bin
+# export KUBECTL_KARPENTER="eval \"\$(kubectl get nodes -o json | jq '.items|=sort_by(.metadata.creationTimestamp) | .items[]' | jq -r '[ \"printf\", \"%-50s %-19s %-19s %-1s %-2s %-6s %-15s %s %s %s\\n\", .metadata.name, (.spec.providerID | split(\"/\")[4]), (.metadata.creationTimestamp | sub(\"Z\";\"\")), (if ((.status.conditions | map(select(.status == \"True\"))[0].type) == \"Ready\") then \"✔\" else \"?\" end), (.metadata.labels.\"topology.kubernetes.io/zone\" | split(\"-\")[2]), (.metadata.labels.\"node.kubernetes.io/instance-type\" | sub(\"arge\";\"\")), (if .metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" then .metadata.labels.\"karpenter.k8s.aws/instance-cpu\"+\"核\"+(.metadata.labels.\"karpenter.k8s.aws/instance-memory\" | tonumber/1024 | tostring+\"G\")+(.metadata.labels.\"karpenter.k8s.aws/instance-network-bandwidth\" | tonumber/1000 | tostring+\"Gbps\") else .status.capacity.cpu+\"核\"+(.status.capacity.memory | sub(\"Ki\";\"\") | tonumber/1024/1024 | floor+1 | tostring+\"G\")+\"\" end), (.metadata.labels.\"beta.kubernetes.io/arch\" | sub(\"64\";\"\") | sub(\"amd\";\"x86\")), (if .metadata.labels.\"karpenter.sh/capacity-type\" == \"on-demand\" or .metadata.labels.\"eks.amazonaws.com/capacityType\" == \"ON_DEMAND\" then \"按需\" else \"SPOT\" end), (.metadata.labels.\"karpenter.sh/provisioner-name\" // \" *节点组*\") ] | @sh')\""
+# echo ${KUBECTL_KARPENTER} > kk && chmod +x kk
+# sudo mv -v kk /usr/bin
 echo "alias kgp='kubectl get po -o wide'" | tee -a ~/.bashrc
 echo "alias kgd='kubectl get deployment -o wide'" | tee -a ~/.bashrc
 echo "alias kgs='kubectl get svc -o wide'" | tee -a ~/.bashrc
@@ -201,6 +202,38 @@ source ~/.bashrc
 # https://kubernetes.io/docs/reference/kubectl/jsonpath/
 # JSONPATH='{range .items[*]} {@.metadata.name}{"\t"} {@.spec.providerID}) {"\n"}{end}'
 # k get no -o jsonpath="${JSONPATH}"
+# 强制删除
+# kubectl get node -o name node-name | xargs -i kubectl patch {} -p '{"metadata":{"finalizers":[]}}' --type=merge
+
+
+echo "==============================================="
+echo "  AWS do EKS: Manage EKS using the do-framework"
+echo "==============================================="
+mkdir -p ~/environment/do
+git clone https://github.com/CLOUDCNTOP/aws-do-eks.git ~/environment/do/aws-do-eks
+chmod +x ~/environment/do/aws-do-eks/Container-Root/eks/ops/*.sh
+cat >> ~/.bashrc <<EOF
+export PATH="~/environment/do/aws-do-eks/Container-Root/eks/ops:$PATH"
+alias kk='kubectl-karpenter.sh'
+alias kdp='pod-describe.sh'
+alias kln='nodes-list.sh'
+#alias kln='nodes-types-list.sh'
+alias klp='pods-list.sh'
+alias kl='pod-logs.sh'
+alias l='ls -CF'
+alias la='ls -A'
+alias ll='ls -alh --color=auto'
+alias lp='pods-list.sh'
+alias ls='ls --color=auto'
+alias nv='eks-node-viewer'
+alias pe='pod-exec.sh'
+alias pl='pod-logs.sh'
+alias tx='torchx'
+alias wn='watch-nodes.sh'
+#alias wn='watch-node-types.sh'
+alias wp='watch-pods.sh'
+EOF
+source ~/.bashrc
 
 
 echo "==============================================="
@@ -342,6 +375,7 @@ EOF
 source ~/.bashrc
 nsel --version
 # nsel --efa-support --gpu-memory-total-min 80 -r us-west-2 -o table-wide
+# aws ec2 describe-instance-types --filters Name=network-info.efa-supported,Values=true --query "InstanceTypes[*].[InstanceType]" --output text | sort
 # nsel --efa-support --gpus 0 -r us-west-2 -o table-wide
 # nsel --base-instance-type m7i-flex.xlarge -o table-wide
 # ec2-instance-selector --memory 4 --vcpus 2 --cpu-architecture x86_64 -r us-east-1

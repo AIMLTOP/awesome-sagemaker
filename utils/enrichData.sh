@@ -1,9 +1,15 @@
 #!/bin/bash
 
 echo "==============================================="
-echo "  Prepare bigdata folder ......"
+echo "  Prepare the data folder ......"
 echo "==============================================="
-mkdir -p ~/environment/bigdata
+mkdir -p ~/environment/do
+
+
+echo "==============================================="
+echo "  Data on Amazon EKS (DoEKS) ......"
+echo "==============================================="
+git clone https://github.com/CLOUDCNTOP/data-on-eks.git ~/environment/do/data-on-eks
 
 
 echo "==============================================="
@@ -38,10 +44,10 @@ echo "==============================================="
 echo "  Kafka ......"
 echo "==============================================="
 wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz -O /tmp/kafka_2.12-2.8.1.tgz
-tar -xzf /tmp/kafka_2.12-2.8.1.tgz -C ~/environment/bigdata/
-sudo chown -R ec2-user ~/environment/bigdata
+tar -xzf /tmp/kafka_2.12-2.8.1.tgz -C ~/environment/do/
+sudo chown -R ec2-user ~/environment/do
 cat >> ~/.bashrc <<EOF
-export PATH="~/environment/bigdata/kafka_2.12-2.8.1/bin:$PATH"
+export PATH="~/environment/do/kafka_2.12-2.8.1/bin:$PATH"
 EOF
 source ~/.bashrc
 # ln -s kafka_2.12-2.8.1 kafka
@@ -50,7 +56,7 @@ source ~/.bashrc
 echo "==============================================="
 echo "  Install Cruise Control ......"
 echo "==============================================="
-git clone https://github.com/linkedin/cruise-control.git ~/environment/bigdata/cruise-control && cd ~/environment/bigdata/cruise-control/
+git clone https://github.com/linkedin/cruise-control.git ~/environment/do/cruise-control && cd ~/environment/do/cruise-control/
 ./gradlew jar copyDependantLibs
 mkdir logs; touch logs/kafka-cruise-control.out
 # export MSK_ARN=`aws kafka list-clusters|grep ClusterArn|cut -d ':' -f 2-|cut -d ',' -f 1 | sed -e 's/\"//g'`
@@ -73,11 +79,11 @@ source ~/.bashrc
 # # echo "prometheus.server.endpoint=localhost:9090" >> config/cruisecontrol.properties
 # update capacityCores.json
 # # start 
-# cd ~/environment/bigdata/cruise-control/
+# cd ~/environment/do/cruise-control/
 # ./kafka-cruise-control-start.sh -daemon config/cruisecontrol.properties
 wget https://github.com/linkedin/cruise-control-ui/releases/download/v0.3.4/cruise-control-ui-0.3.4.tar.gz  -O /tmp/cruise-control-ui-0.3.4.tar.gz
-sudo tar xzvf /tmp/cruise-control-ui-0.3.4.tar.gz -C ~/environment/bigdata/cruise-control/
-sudo chown -R ec2-user ~/environment/bigdata/cruise-control/
+sudo tar xzvf /tmp/cruise-control-ui-0.3.4.tar.gz -C ~/environment/do/cruise-control/
+sudo chown -R ec2-user ~/environment/do/cruise-control/
 
 
 echo "==============================================="
