@@ -42,16 +42,26 @@ aws configure get default.region
 aws configure set region $AWS_REGION
 export EKS_VPC_ID=$(aws eks describe-cluster --name ${EKS_CLUSTER_NAME} --query 'cluster.resourcesVpcConfig.vpcId' --output text)
 export EKS_VPC_CIDR=$(aws ec2 describe-vpcs --vpc-ids $EKS_VPC_ID --query 'Vpcs[0].{CidrBlock:CidrBlock}' --output text)
-
 # export EKS_PUB_SUBNET_01=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}" "Name=availability-zone, Values=${AWS_REGION}a" --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId' --output text)
 # export EKS_PRI_SUBNET_01=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}" "Name=availability-zone, Values=${AWS_REGION}a" --query 'Subnets[?MapPublicIpOnLaunch==`false`].SubnetId' --output text)
 # public 子网 注意 filter 区分大小写
-EKS_PUB_SUBNET_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}"  "Name=tag:Name,Values=*ublic*" | jq '.Subnets | sort_by(.AvailabilityZone)' | jq '.[] .SubnetId')
+# EKS_PUB_SUBNET_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}"  "Name=tag:Name,Values=*ublic*" | jq '.Subnets | sort_by(.AvailabilityZone)' | jq '.[] .SubnetId')
+# SUB_IDX=1
+# for subnet in $EKS_PUB_SUBNET_LIST
+# do
+# 	#export EKS_PUB_SUBNET_$SUB_IDX=$(echo "$subnet" | tr -d '"') # 去掉双引号
+# 	echo "export EKS_PUB_SUBNET_$SUB_IDX=$subnet" >> ~/.bashrc
+# 	((SUB_IDX++))
+# done
+EKS_PUBAZ_INFO_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}"  "Name=tag:Name,Values=*ublic*" | jq '.Subnets | sort_by(.AvailabilityZone)' | jq '.[] | .SubnetId+","+.AvailabilityZone+","+.AvailabilityZoneId')
 SUB_IDX=1
-for subnet in $EKS_PUB_SUBNET_LIST
+for pubazinfo in $EKS_PUBAZ_INFO_LIST
 do
-	#export EKS_PUB_SUBNET_$SUB_IDX=$(echo "$subnet" | tr -d '"') # 去掉双引号
-	echo "export EKS_PUB_SUBNET_$SUB_IDX=$subnet" >> ~/.bashrc
+	export info_str=$(echo "$pubazinfo" | tr -d '"') # 去掉双引号
+  IFS=',' read -ra info_array <<< "$info_str"
+	echo "export EKS_PUB_SUBNET_$SUB_IDX=${info_array[0]}" >> ~/.bashrc
+	echo "export EKS_AZ_$SUB_IDX=${info_array[1]}" >> ~/.bashrc
+	echo "export EKS_AZ_ID_$SUB_IDX=${info_array[2]}" >> ~/.bashrc
 	((SUB_IDX++))
 done
 # private 子网
@@ -121,6 +131,7 @@ source ~/.bashrc
 aws --version
 # container way
 # https://aws.amazon.com/blogs/developer/new-aws-cli-v2-docker-images-available-on-amazon-ecr-public/
+# https://github.com/richarvey/aws-docker-toolkit
 # docker run --rm -it public.ecr.aws/aws-cli/aws-cli:2.9.1 --version aws-cli/2.9.1 Python/3.9.11 Linux/5.10.47-linuxkit docker/aarch64.amzn.2 prompt/off
 # Mac
 # curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "/tmp/AWSCLIV2.pkg"
@@ -157,7 +168,11 @@ cat >> ~/.bashrc <<EOF
 alias e=eksctl
 complete -F __start_eksctl e
 EOF
-echo "alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'" | tee -a ~/.bashrc
+echo "alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'" | tee -a ~/.bashrc
+# scale system node group 
+echo "alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'" | tee -a ~/.bashrc
+# scale node group by name
+echo "alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name'" | tee -a ~/.bashrc
 
 
 echo "==============================================="
@@ -192,9 +207,12 @@ echo 'export dry="--dry-run=client -o yaml"' | tee -a ~/.bashrc
 echo "alias ka='kubectl apply -f'" | tee -a ~/.bashrc
 echo "alias kr='kubectl run $dry'" | tee -a ~/.bashrc
 echo "alias ke='kubectl explain'" | tee -a ~/.bashrc
-echo "alias tk='kt -n karpenter deploy/karpenter'" | tee -a ~/.bashrc # tail karpenter
-echo "alias tl='kt -n kube-system deploy/aws-load-balancer-controller '" | tee -a ~/.bashrc # tail lbc
 echo "alias pk='k patch configmap config-logging -n karpenter --patch'" | tee -a ~/.bashrc
+# tail logs
+echo "alias tk='kt karpenter -n karpenter'" | tee -a ~/.bashrc # tail karpenter
+echo "alias tlbc='kt aws-load-balancer-controller -n kube-system'" | tee -a ~/.bashrc # tail lbc
+echo "alias tebs='kt ebs-csi-controller -n kube-system'" | tee -a ~/.bashrc # tail lbc
+echo "alias tefs='kt efs-csi-controller -n kube-system'" | tee -a ~/.bashrc # tail lbc
 # k patch configmap config-logging -n karpenter --patch 
 # pk '{"data":{"loglevel.controller":"info"}}'
 # k get po -l app.kubernetes.io/name=aws-node -n kube-system -o wide
@@ -549,6 +567,8 @@ export PATH="/opt/s5cmd:$PATH"
 EOF
 source ~/.bashrc
 s5cmd version
+# mv/sync 等注意要加单引号
+# s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
 
 
 echo "==============================================="
@@ -579,6 +599,7 @@ EOF
 # .bashrc
 cat >> ~/.bashrc <<EOF
 alias c=clear
+alias z='zip -r ../1.zip .'
 alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
 export TERM=xterm-256color
