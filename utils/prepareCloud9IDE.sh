@@ -197,6 +197,7 @@ echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/ca
 # echo ${KUBECTL_KARPENTER} > kk && chmod +x kk
 # sudo mv -v kk /usr/bin
 echo "alias kgp='kubectl get po -o wide'" | tee -a ~/.bashrc
+echo "alias kga='kubectl get all'" | tee -a ~/.bashrc
 echo "alias kgd='kubectl get deployment -o wide'" | tee -a ~/.bashrc
 echo "alias kgs='kubectl get svc -o wide'" | tee -a ~/.bashrc
 echo "alias kdn='kubectl describe node'" | tee -a ~/.bashrc
@@ -229,11 +230,12 @@ echo "  AWS do EKS: Manage EKS using the do-framework"
 echo "==============================================="
 mkdir -p ~/environment/do
 git clone https://github.com/CLOUDCNTOP/aws-do-eks.git ~/environment/do/aws-do-eks
+chmod +x ~/environment/do/aws-do-eks/utils/*.sh
 chmod +x ~/environment/do/aws-do-eks/Container-Root/eks/ops/*.sh
 cat >> ~/.bashrc <<EOF
-export PATH="~/environment/do/aws-do-eks/Container-Root/eks/ops:$PATH"
+export PATH="~/environment/do/aws-do-eks/utils:~/environment/do/aws-do-eks/Container-Root/eks/ops:$PATH"
 alias kk='kubectl-karpenter.sh'
-alias kdp='pod-describe.sh'
+#alias kdp='pod-describe.sh'
 alias kln='nodes-list.sh'
 #alias kln='nodes-types-list.sh'
 alias klp='pods-list.sh'
@@ -551,6 +553,23 @@ sudo yum install dos2unix -y
 
 
 echo "==============================================="
+echo " S3 Mountpoint ......"
+echo "==============================================="
+# sudo yum install fuse fuse-devel cmake3 clang-devel -y
+# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/sh.rustup.rs
+# sh /tmp/sh.rustup.rs
+# source "$HOME/.cargo/env"
+# git clone --recurse-submodules https://github.com/awslabs/mountpoint-s3.git /tmp/mountpoint-s3
+# cd /tmp/mountpoint-s3
+# cargo build --release
+# sudo cp ./target/release/mount-s3 /usr/local/bin/
+wget https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm -O /tmp/mount-s3.rpm 
+sudo yum install -y /tmp/mount-s3.rpm
+echo "alias ms3='mount-s3'" | tee -a ~/.bashrc
+# mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
+
+
+echo "==============================================="
 echo " s5cmd ......"
 echo "==============================================="
 #https://github.com/peak/s5cmd
@@ -567,6 +586,7 @@ export PATH="/opt/s5cmd:$PATH"
 EOF
 source ~/.bashrc
 s5cmd version
+echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # mv/sync 等注意要加单引号
 # s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
 
@@ -576,7 +596,7 @@ echo "  Expand disk space ......"
 echo "==============================================="
 wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
 chmod +x /tmp/resize-ebs.sh
-/tmp/resize-ebs.sh 100
+/tmp/resize-ebs.sh 200
 
 
 echo "==============================================="

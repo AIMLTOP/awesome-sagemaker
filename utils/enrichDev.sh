@@ -3,13 +3,32 @@ echo "  Upgrade Python to 3.8 ......"
 echo "==============================================="
 sudo amazon-linux-extras install python3.8 -y
 python -m ensurepip --upgrade --user
+# which python3.8
 # sudo yum update -y
-cat >> ~/.bashrc <<EOF
-alias python='/usr/bin/python3.8'
-EOF
-source ~/.bashrc
+# cat >> ~/.bashrc <<EOF
+# alias python='/usr/bin/python3.8'
+# alias pip3='/usr/bin/pip3.8'
+# EOF
+# source ~/.bashrc
 # Install pip
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; python get-pip.py; rm -f get-pip.py
+# curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; python get-pip.py; rm -f get-pip.py
+# sudo mv ~/.local/bin/pip3 ~/.local/bin/pip3_backup
+# sudo mv /usr/bin/pip /usr/bin/pip_backup
+# sudo mv /usr/bin/pip3 /usr/bin/pip3_backup
+# sudo mv /usr/bin/python3 /usr/bin/python3_backup
+# alternatives [options] --install link name path priority [--slave link name path]... [--initscript service]
+# sudo alternatives --install /usr/bin/python python /usr/bin/python3.8 1
+# sudo alternatives --install /usr/bin/pip pip /usr/bin/pip3.8 1
+# sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+# sudo ln -s /usr/bin/pip3.8 /usr/bin/pip3
+# compile install
+# sudo yum install -y gcc openssl-devel bzip2-devel libffi-devel zlib-devel make tar gzip ca-certificates procps net-tools which vim wget libgomp htop jq bind-utils bc pciutils
+# sudo cd /opt && \
+#     wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz && \
+#     tar xzf Python-3.8.12.tgz && \
+#     cd Python-3.8.12 && ./configure --enable-optimizations && \
+#     make altinstall
+# sudo alternatives --install /usr/bin/python python /usr/local/bin/python3.8 1; alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.8 1
 
 
 echo "==============================================="
@@ -235,19 +254,6 @@ sudo yum install lynx -y
 # git clone https://github.com/CLOUDCNTOP/aws-cloudwatch-dashboard-generator.git
 # cd aws-cloudwatch-dashboard-generator
 # pip install -r r_requirements.txt
-
-
-# echo "==============================================="
-# echo " S3 Mountpoint ......"
-# echo "==============================================="
-# sudo yum install fuse fuse-devel cmake3 clang-devel -y
-# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/sh.rustup.rs
-# sh /tmp/sh.rustup.rs
-# source "$HOME/.cargo/env"
-# git clone --recurse-submodules https://github.com/awslabs/mountpoint-s3.git /tmp/mountpoint-s3
-# cd /tmp/mountpoint-s3
-# cargo build --release
-# sudo cp ./target/release/mount-s3 /usr/local/bin/
 
 
 echo "==============================================="
