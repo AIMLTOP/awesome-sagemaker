@@ -34,9 +34,11 @@ echo "  Config envs ......"
 echo "==============================================="
 export AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+export AZS=($(aws ec2 describe-availability-zones --query 'AvailabilityZones[].ZoneName' --output text --region $AWS_REGION))
 test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is not set
 echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bashrc
 echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bashrc
+echo "export AZS=${AZS}" | tee -a ~/.bashrc
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
@@ -162,12 +164,15 @@ curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$
 tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 sudo mv /tmp/eksctl /usr/local/bin
 eksctl version
-# 配置自动完成
+# 配置自动完成 eksctl bash-completion
 cat >> ~/.bashrc <<EOF
 . <(eksctl completion bash)
 alias e=eksctl
 complete -F __start_eksctl e
 EOF
+# eksctl completion bash >> ~/.bash_completion
+# . /etc/profile.d/bash_completion.sh
+# . ~/.bash_completion
 echo "alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'" | tee -a ~/.bashrc
 # scale system node group 
 echo "alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'" | tee -a ~/.bashrc
@@ -327,6 +332,13 @@ kubectl plugin list
 # kubectl eks ssm <name-of-the-node>
 # kubectl eks nodes
 # kubectl eks suggest-ami
+# sudo required
+# Install kubens, kubectx - sudo required
+# sudo -s
+# git clone https://github.com/ahmetb/kubectx /opt/kubectx
+# ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+# ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+# exit
 
 
 echo "==============================================="
@@ -345,6 +357,10 @@ alias h=helm
 complete -F __start_helm h
 EOF
 source ~/.bashrc
+# helm completion bash >> ~/.bash_completion
+# . /etc/profile.d/bash_completion.sh
+# . ~/.bash_completion
+# source <(helm completion bash)
 
 
 echo "==============================================="
@@ -589,6 +605,16 @@ s5cmd version
 echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # mv/sync 等注意要加单引号
 # s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
+
+
+# echo "==============================================="
+# echo " KMS ......"
+# echo "==============================================="
+# # Create KMS
+# aws kms create-alias --alias-name alias/quick-eks --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
+# # Set CMK ARN
+# export MASTER_ARN=$(aws kms describe-key --key-id alias/quick-eks --query KeyMetadata.Arn --output text)
+# echo "export MASTER_ARN=${MASTER_ARN}" | tee -a ~/.bashrc
 
 
 echo "==============================================="

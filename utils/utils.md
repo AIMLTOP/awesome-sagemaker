@@ -1,5 +1,9 @@
 
 
+## JQ
+
+替换 "，可以考虑直接在提取的时候用  `jq -r`
+
 ## /tmp
 
 - https://unix.stackexchange.com/questions/71622/what-are-correct-permissions-for-tmp-i-unintentionally-set-it-all-public-recu
@@ -45,6 +49,12 @@ kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP
 kubectl get nodes -o json | jq -jr --tab '.items[] | .metadata.name, "\t" , map(.spec.providerID | split("/")[0]) , "\n"'
 
  --sort-by=.metadata.creationTimestamp
+```
+
+## ENV
+
+```
+EKS_PUB_SUBNET_01=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}" "Name=availability-zone, Values=${AWS_REGION}a" --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId' --output text)
 ```
 
 ## Bash in Bash
