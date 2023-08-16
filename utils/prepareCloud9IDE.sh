@@ -4,6 +4,7 @@
 
 #https://github.com/aws-samples/aws-do-eks
 #https://github.com/aws-samples/aws-do-eks/tree/main/Container-Root/eks/ops/setup
+# https://catalog.us-east-1.prod.workshops.aws/workshops/5f769b4f-8b4a-4308-81df-4af63687fa44/en-US/011-setup
 
 download_and_verify () {
   url=$1
@@ -119,11 +120,15 @@ echo "  Upgrade awscli to v2 ......"
 echo "==============================================="
 sudo mv /bin/aws /bin/aws1
 sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
-ls -l /usr/local/bin/aws
-rm -fr awscliv2.zip aws
+# ls -l /usr/local/bin/aws
+# rm -fr awscliv2.zip aws
+rm -rf /usr/local/bin/aws 2> /dev/null
+rm -rf /usr/local/aws-cli 2> /dev/null
+rm -rf aws awscliv2.zip 2> /dev/null
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
 unzip /tmp/awscliv2.zip -d /tmp
 sudo /tmp/aws/install
+# sudo ./aws/install --update
 which aws_completer
 echo $SHELL
 cat >> ~/.bashrc <<EOF
@@ -368,6 +373,7 @@ echo "  Install k9s a Kubernetes CLI To Manage Your Clusters In Style ......"
 echo "==============================================="
 # 参考 https://segmentfault.com/a/1190000039755239
 curl -sS https://webinstall.dev/k9s | bash
+# check pod -> Shift + : and type pod and click Enter
 
 
 echo "==============================================="
@@ -548,7 +554,16 @@ echo "==============================================="
 echo "  Network Utilites ......"
 echo "==============================================="
 #https://repost.aws/knowledge-center/network-issue-vpc-onprem-ig
-sudo yum -y install telnet mtr traceroute
+sudo yum -y install telnet mtr traceroute nc
+# nc --listen 8000 # SERVER (in shell one)
+# cat <<< "request" > /dev/tcp/127.0.0.1/8000 # CLIENT (in shell two)
+# SERVER (hit Ctrl+C to break)
+# while true; do nc --listen 8000; done
+# CLIENT
+# cat <<< "request 1" > /dev/tcp/127.0.0.1/8000 && sleep 1
+# echo "request 2" > /dev/tcp/127.0.0.1/8000 && sleep 1
+# nc 127.0.0.1 8000 <<< "request 3" && sleep 1
+# nc localhost 8000 <<< "request 4"
 
 
 echo "==============================================="
@@ -631,6 +646,13 @@ echo "==============================================="
 echo "export PATH=\$PATH:\$HOME/.local/bin:\$HOME/bin:/usr/local/bin" | sudo tee -a /root/.bashrc
 
 
+# echo "==============================================="
+# echo "  Terminal Prompt ......"
+# echo "==============================================="
+# echo "export PS1='$ '" >> ~/.bashrc
+# source ~/.bashrc
+
+
 echo "==============================================="
 echo "  More Aliases ......"
 echo "==============================================="
@@ -649,6 +671,7 @@ alias z='zip -r ../1.zip .'
 alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
 export TERM=xterm-256color
+export PS1='$ '
 EOF
 source ~/.bashrc
 # journalctl -u kubelet | grep error 

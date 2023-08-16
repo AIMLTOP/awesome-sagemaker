@@ -136,6 +136,13 @@ sudo mv ./kind /usr/local/bin/kind
 # sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 # rm argocd-linux-amd64
 # argocd version --client
+export ARGO_VERSION="v3.4.9"
+curl -sLO https://github.com/argoproj/argo-workflows/releases/download/${ARGO_VERSION}/argo-linux-amd64.gz
+gunzip argo-linux-amd64.gz
+chmod +x argo-linux-amd64
+sudo mv ./argo-linux-amd64 /usr/local/bin/argo
+argo version
+rm -fr argo-linux-amd64.gz
 
 
 echo "==============================================="
