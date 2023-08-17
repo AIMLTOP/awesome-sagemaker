@@ -207,6 +207,8 @@ echo "alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/ca
 # echo ${KUBECTL_KARPENTER} > kk && chmod +x kk
 # sudo mv -v kk /usr/bin
 echo "alias kgp='kubectl get po -o wide'" | tee -a ~/.bashrc
+# sort -k 8 to sort by the NODE column
+# kgp | sort -k 8
 echo "alias kga='kubectl get all'" | tee -a ~/.bashrc
 echo "alias kgd='kubectl get deployment -o wide'" | tee -a ~/.bashrc
 echo "alias kgs='kubectl get svc -o wide'" | tee -a ~/.bashrc
@@ -218,6 +220,9 @@ echo 'export dry="--dry-run=client -o yaml"' | tee -a ~/.bashrc
 echo "alias ka='kubectl apply -f'" | tee -a ~/.bashrc
 echo "alias kr='kubectl run $dry'" | tee -a ~/.bashrc
 echo "alias ke='kubectl explain'" | tee -a ~/.bashrc
+# kubectl explain pod.spec | head
+# kubectl explain pod.spec | grep required -A 3
+# kubectl explain pod.spec.containers | grep required- -A 2 
 echo "alias pk='k patch configmap config-logging -n karpenter --patch'" | tee -a ~/.bashrc
 # tail logs
 echo "alias tk='kt karpenter -n karpenter'" | tee -a ~/.bashrc # tail karpenter
@@ -233,6 +238,12 @@ source ~/.bashrc
 # k get no -o jsonpath="${JSONPATH}"
 # 强制删除
 # kubectl get node -o name node-name | xargs -i kubectl patch {} -p '{"metadata":{"finalizers":[]}}' --type=merge
+# Get a list of just the kubectl config subcommands
+# kubectl config --help
+# kubectl config 2>&1 | grep "Available Commands" -A 15
+# Get a collated list of the kinds of objects which are namespaced and which are not
+#kubectl api-resources | awk 'BEGIN{ns="";nonns=""};/true/{ns=ns FS $1};/false/{nonns=nonns FS $1};END{print "namespaced: " ns; print ""; print "non-namespaced:" nonns}'
+
 
 
 echo "==============================================="
@@ -637,7 +648,7 @@ echo "  Expand disk space ......"
 echo "==============================================="
 wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
 chmod +x /tmp/resize-ebs.sh
-/tmp/resize-ebs.sh 200
+/tmp/resize-ebs.sh 300
 
 
 echo "==============================================="
@@ -651,6 +662,8 @@ echo "export PATH=\$PATH:\$HOME/.local/bin:\$HOME/bin:/usr/local/bin" | sudo tee
 # echo "==============================================="
 # echo "export PS1='$ '" >> ~/.bashrc
 # source ~/.bashrc
+# echo $$ # current shell PID
+# ls -l /proc/$$/
 
 
 echo "==============================================="
@@ -671,11 +684,10 @@ alias z='zip -r ../1.zip .'
 alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
 export TERM=xterm-256color
-export PS1='$ '
 EOF
 source ~/.bashrc
 # journalctl -u kubelet | grep error 
 # 最后再执行一次 source
 echo "source .bashrc"
 shopt -s expand_aliases
-source ~/.bashrc
+. ~/.bashrc

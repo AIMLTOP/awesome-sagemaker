@@ -87,3 +87,13 @@ mkdir /home/ec2-user/environment/notebooks
 # sudo su
 # cd /home/ec2-user/environment/notebooks
 # jupyter notebook --allow-root
+
+
+# echo "==============================================="
+# echo "  Stable Diffusion ......"
+# echo "==============================================="
+# https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
+# wget https://raw.githubusercontent.com/awslabs/stable-diffusion-aws-extension/main/install.sh -O ~/environment/aiml/install-sd.sh
+# sh ~/environment/aiml/install-sd.sh
+# CPU
+~/environment/aiml/stable-diffusion-webui/webui.sh --skip-torch-cuda-test

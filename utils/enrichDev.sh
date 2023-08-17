@@ -3,6 +3,8 @@ echo "  Upgrade Python to 3.8 ......"
 echo "==============================================="
 sudo amazon-linux-extras install python3.8 -y
 python -m ensurepip --upgrade --user
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
+sudo update-alternatives --set python3 /usr/local/bin/python3.8
 # which python3.8
 # sudo yum update -y
 # cat >> ~/.bashrc <<EOF
