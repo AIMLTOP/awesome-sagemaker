@@ -101,6 +101,7 @@ echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ~/.bashrc
 echo "export EKS_EXTRA_SG=${EKS_EXTRA_SG}" | tee -a ~/.bashrc
 echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ~/.bashrc
 echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ~/.bashrc
+echo "export EKS_CUSTOMNETWORK_SG=" | tee -a ~/.bashrc
 echo "export EKS_OIDC_URL=${EKS_OIDC_URL}" | tee -a ~/.bashrc
 source ~/.bashrc
 aws sts get-caller-identity
@@ -637,10 +638,10 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # echo " KMS ......"
 # echo "==============================================="
 # # Create KMS
-# aws kms create-alias --alias-name alias/quick-eks --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
+aws kms create-alias --alias-name alias/quick-eks --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
 # # Set CMK ARN
-# export MASTER_ARN=$(aws kms describe-key --key-id alias/quick-eks --query KeyMetadata.Arn --output text)
-# echo "export MASTER_ARN=${MASTER_ARN}" | tee -a ~/.bashrc
+export EKS_MASTER_ARN=$(aws kms describe-key --key-id alias/quick-eks --query KeyMetadata.Arn --output text)
+echo "export EKS_MASTER_ARN=${EKS_MASTER_ARN}" | tee -a ~/.bashrc
 
 
 echo "==============================================="
