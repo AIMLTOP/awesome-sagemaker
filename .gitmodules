@@ -1,0 +1,3 @@
+[submodule "aigc/stable-diffusion-aws-extension"]
+	path = aigc/stable-diffusion-aws-extension
+	url = https://github.com/AIMLTOP/stable-diffusion-aws-extension.git
