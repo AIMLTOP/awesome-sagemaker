@@ -93,7 +93,8 @@ mkdir /home/ec2-user/environment/notebooks
 # echo "  Stable Diffusion ......"
 # echo "==============================================="
 # https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
-# wget https://raw.githubusercontent.com/awslabs/stable-diffusion-aws-extension/main/install.sh -O ~/environment/aiml/install-sd.sh
-# sh ~/environment/aiml/install-sd.sh
-# CPU
-~/environment/aiml/stable-diffusion-webui/webui.sh --skip-torch-cuda-test
+wget https://raw.githubusercontent.com/awslabs/stable-diffusion-aws-extension/main/install.sh -O ~/environment/aiml/install-sd.sh
+sh ~/environment/aiml/install-sd.sh
+# CPU 如果遇到 pip 找不到错误，尝试更新到 Python 3.8+，然后重启
+~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --no-half --listen
+# ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen

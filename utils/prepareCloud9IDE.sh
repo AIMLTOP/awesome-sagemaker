@@ -5,6 +5,7 @@
 #https://github.com/aws-samples/aws-do-eks
 #https://github.com/aws-samples/aws-do-eks/tree/main/Container-Root/eks/ops/setup
 # https://catalog.us-east-1.prod.workshops.aws/workshops/5f769b4f-8b4a-4308-81df-4af63687fa44/en-US/011-setup
+# https://catalog.us-east-1.prod.workshops.aws/workshops/a804b9ba-e84c-4fc7-9a02-13309894f563/en-US
 
 download_and_verify () {
   url=$1
@@ -20,6 +21,15 @@ download_and_verify () {
 }
 
 cd /tmp/
+
+
+echo "==============================================="
+echo "  Config yum ......"
+echo "==============================================="
+# reset yum history
+sudo yum history new
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 
 
 echo "==============================================="
