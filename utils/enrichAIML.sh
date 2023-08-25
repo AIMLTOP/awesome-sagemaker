@@ -7,15 +7,41 @@ yum update -y
 
 
 echo "==============================================="
-echo "  Dev tools & Anaconda3 ......"
+echo "  Dev tools ......"
 echo "==============================================="
 yum -y groupinstall "Development tools"
 yum -y install openssl-devel bzip2-devel expat-devel gdbm-devel readline-devel sqlite-devel
-# wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
-# bash Anaconda3-2021.05-Linux-x86_64.sh -b -p /home/ec2-user/anaconda3
-wget -O /tmp/Anaconda3-2021.05-Linux-x86_64.sh https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
-bash /tmp/Anaconda3-2021.05-Linux-x86_64.sh -b -p /home/ec2-user/environment/anaconda3
+
+
+echo "==============================================="
+echo "  Anaconda3 ......"
+echo "==============================================="
+## 2021
+# # wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+# # bash Anaconda3-2021.05-Linux-x86_64.sh -b -p /home/ec2-user/anaconda3
+# wget -O /tmp/Anaconda3-2021.05-Linux-x86_64.sh https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+# bash /tmp/Anaconda3-2021.05-Linux-x86_64.sh -b -p /home/ec2-user/environment/anaconda3
+## 2022
+wget -O /tmp/Anaconda3-2022.10-Linux-x86_64.sh https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /home/ec2-user/environment/aiml/anaconda3
+cat >> ~/.bashrc <<EOF
+export PATH="/home/ec2-user/environment/aiml/anaconda3/bin:\$PATH"
+EOF
 source ~/.bashrc
+conda config --show
+conda info --envs
+# conda init
+## create a new conda environment
+# conda create -y -n builder --override-channels --strict-channel-priority -c conda-forge -c nodefaults jupyterlab=3 cookiecutter nodejs jupyter-packaging git build
+## remove environment
+# conda remove -n builder --all
+## switch environment
+# conda activate builder
+## start jupyter lab
+## Preview Running Application -> Pop Out Into New Window (建议 ChromeFirefox 页面无法展示)
+# . /home/ec2-user/environment/aiml/anaconda3/etc/profile.d/conda.sh
+# conda activate builder
+# jupyter lab --port=8080 --ServerApp.allow_remote_access=True
 
 
 echo "==============================================="
@@ -53,7 +79,7 @@ EOF
 # f="sed -i \"1 i\\c.NotebookApp.ip='*'\" /root/.jupyter/jupyter_notebook_config.py"
 # echo $f | cat >> /home/ec2-user/jupytersetup.sh
 
-echo "eval \"\$(/home/ec2-user/environment/anaconda3/bin/conda shell.bash hook)\"" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+echo "eval \"\$(/home/ec2-user/environment/aiml/anaconda3/bin/conda shell.bash hook)\"" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
 echo "conda init" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
 echo "jupyter notebook --generate-config" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
 

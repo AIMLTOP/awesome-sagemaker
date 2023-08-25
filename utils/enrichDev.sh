@@ -1,38 +1,43 @@
 echo "==============================================="
-echo "  Upgrade Python to 3.8 ......"
+echo "  Upgrade Python ......"
 echo "==============================================="
-sudo amazon-linux-extras install python3.8 -y
-python -m ensurepip --upgrade --user
-sudo pip3 install --upgrade pip
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
-sudo update-alternatives --set python3 /usr/local/bin/python3.8
-# sudo ln -s /usr/local/bin/pip3 /usr/bin
-# which python3.8
-# sudo yum update -y
-# cat >> ~/.bashrc <<EOF
-# alias python='/usr/bin/python3.8'
-# alias pip3='/usr/bin/pip3.8'
-# EOF
-# source ~/.bashrc
-# Install pip
-# curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; python get-pip.py; rm -f get-pip.py
-# sudo mv ~/.local/bin/pip3 ~/.local/bin/pip3_backup
-# sudo mv /usr/bin/pip /usr/bin/pip_backup
-# sudo mv /usr/bin/pip3 /usr/bin/pip3_backup
-# sudo mv /usr/bin/python3 /usr/bin/python3_backup
-# alternatives [options] --install link name path priority [--slave link name path]... [--initscript service]
-# sudo alternatives --install /usr/bin/python python /usr/bin/python3.8 1
-# sudo alternatives --install /usr/bin/pip pip /usr/bin/pip3.8 1
-# sudo ln -s /usr/bin/python3.8 /usr/bin/python3
-# sudo ln -s /usr/bin/pip3.8 /usr/bin/pip3
-# compile install
-# sudo yum install -y gcc openssl-devel bzip2-devel libffi-devel zlib-devel make tar gzip ca-certificates procps net-tools which vim wget libgomp htop jq bind-utils bc pciutils
-# sudo cd /opt && \
-#     wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz && \
-#     tar xzf Python-3.8.12.tgz && \
-#     cd Python-3.8.12 && ./configure --enable-optimizations && \
-#     make altinstall
-# sudo alternatives --install /usr/bin/python python /usr/local/bin/python3.8 1; alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.8 1
+## use amazon-linux-extras to install python 3.8
+# sudo amazon-linux-extras install python3.8 -y
+# python -m ensurepip --upgrade --user
+# sudo pip3 install --upgrade pip
+# sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
+# sudo update-alternatives --set python3 /usr/local/bin/python3.8
+
+## use pyenv to install python 3.9 (about 5 minutes to finish)
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+cat << 'EOT' >> ~/.bashrc
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+EOT
+source ~/.bashrc
+sudo yum -y update
+sudo yum -y install bzip2-devel
+sudo yum -y install xz-devel
+pyenv install 3.9.15
+pyenv global 3.9.15
+export PATH="$HOME/.pyenv/shims:$PATH"
+source ~/.bash_profile
+python --version
+
+
+echo "==============================================="
+echo "  NodeJS ......"
+echo "==============================================="
+# npm list --depth=0
+## Redoc https://github.com/Redocly/redoc
+# npm i
+# npm run watch
+
+
+echo "==============================================="
+echo "  Cloudscape ......"
+echo "==============================================="
+# https://cloudscape.design/get-started/integration/using-cloudscape-components/
 
 
 echo "==============================================="

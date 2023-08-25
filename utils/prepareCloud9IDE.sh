@@ -37,7 +37,7 @@ echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ..
 echo "==============================================="
 # 放在最前面，后续提取字段需要用到 jq
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo yum -y install jq gettext bash-completion moreutils tree zsh
+sudo yum -y install jq gettext bash-completion moreutils tree zsh xsel xclip
 
 
 echo "==============================================="
@@ -254,7 +254,11 @@ source ~/.bashrc
 # kubectl config 2>&1 | grep "Available Commands" -A 15
 # Get a collated list of the kinds of objects which are namespaced and which are not
 #kubectl api-resources | awk 'BEGIN{ns="";nonns=""};/true/{ns=ns FS $1};/false/{nonns=nonns FS $1};END{print "namespaced: " ns; print ""; print "non-namespaced:" nonns}'
-
+# force delete
+# TO_REMOVE_NS=kubesphere-monitoring-system
+# kubectl get namespace "${TO_REMOVE_NS}" -o json \
+#   | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/" \
+#   | kubectl replace --raw /api/v1/namespaces/${TO_REMOVE_NS}/finalize -f -
 
 
 echo "==============================================="
@@ -640,8 +644,9 @@ EOF
 source ~/.bashrc
 s5cmd version
 echo "alias s5='s5cmd'" | tee -a ~/.bashrc
-# mv/sync 等注意要加单引号
+# mv/sync 等注意要加单引号，注意区域配置
 # s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
+# s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
 
 
 # echo "==============================================="
@@ -660,6 +665,7 @@ echo "==============================================="
 wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
 chmod +x /tmp/resize-ebs.sh
 /tmp/resize-ebs.sh 300
+df -ah
 
 
 echo "==============================================="
@@ -669,12 +675,14 @@ echo "export PATH=\$PATH:\$HOME/.local/bin:\$HOME/bin:/usr/local/bin" | sudo tee
 
 
 # echo "==============================================="
-# echo "  Terminal Prompt ......"
+# echo "  Shell Utils ......"
 # echo "==============================================="
 # echo "export PS1='$ '" >> ~/.bashrc
 # source ~/.bashrc
 # echo $$ # current shell PID
 # ls -l /proc/$$/
+# Port Forwarding
+# ssh -i xxx.pem -L 8888:127.0.0.1:8888 ec2-user@my-remote-server.host
 
 
 echo "==============================================="
