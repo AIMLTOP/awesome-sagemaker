@@ -20,6 +20,11 @@ download_and_verify () {
   rm "$out_file.sha256"
 }
 
+mkdir -p ~/environment/do
+mkdir -p ~/environment/system
+mkdir -p ~/environment/scale
+mkdir -p ~/environment/otel
+mkdir -p ~/environment/test
 cd /tmp/
 
 
@@ -182,12 +187,12 @@ source ~/.bashrc
 # kubectl get namespace "${TO_REMOVE_NS}" -o json \
 #   | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/" \
 #   | kubectl replace --raw /api/v1/namespaces/${TO_REMOVE_NS}/finalize -f -
+# watch -n 10 kubectl get pods --all-namespaces
 
 
 echo "==============================================="
 echo "  AWS do EKS: Manage EKS using the do-framework"
 echo "==============================================="
-mkdir -p ~/environment/do
 git clone https://github.com/CLOUDCNTOP/aws-do-eks.git ~/environment/do/aws-do-eks
 chmod +x ~/environment/do/aws-do-eks/utils/*.sh
 chmod +x ~/environment/do/aws-do-eks/Container-Root/eks/ops/*.sh
@@ -503,7 +508,7 @@ echo "==============================================="
 echo "  Network Utilites ......"
 echo "==============================================="
 #https://repost.aws/knowledge-center/network-issue-vpc-onprem-ig
-sudo yum -y install telnet mtr traceroute nc
+sudo yum -y install telnet mtr traceroute nc httpie
 # nc --listen 8000 # SERVER (in shell one)
 # cat <<< "request" > /dev/tcp/127.0.0.1/8000 # CLIENT (in shell two)
 # SERVER (hit Ctrl+C to break)

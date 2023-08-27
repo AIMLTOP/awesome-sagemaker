@@ -9,7 +9,8 @@ export AZS=($(aws ec2 describe-availability-zones --query 'AvailabilityZones[].Z
 test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is not set
 echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bashrc
 echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bashrc
-echo "export AZS=${AZS}" | tee -a ~/.bashrc
+# echo "export AZS=${AZS}" | tee -a ~/.bashrc
+echo "export AZS=(${AZS[@]})" | tee -a ~/.bashrc
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION

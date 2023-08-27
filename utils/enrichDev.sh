@@ -28,10 +28,35 @@ python --version
 echo "==============================================="
 echo "  NodeJS ......"
 echo "==============================================="
+# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+# . ~/.nvm/nvm.sh
+# nvm install 16
+# node -e "console.log('Running Node.js ' + process.version)"
+## utils
 # npm list --depth=0
 ## Redoc https://github.com/Redocly/redoc
 # npm i
 # npm run watch
+
+
+echo "==============================================="
+echo "  SAM ......"
+echo "==============================================="
+cd /tmp
+wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+sudo ./sam-installation/install
+sam --version
+cd -
+
+
+echo "==============================================="
+echo "  cargo ......"
+echo "==============================================="
+curl https://sh.rustup.rs -sSf | sh
+source ~/.bashrc
+sudo yum install -y openssl-devel
+cargo install drill
 
 
 echo "==============================================="
