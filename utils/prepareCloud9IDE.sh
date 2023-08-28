@@ -508,7 +508,8 @@ echo "==============================================="
 echo "  Network Utilites ......"
 echo "==============================================="
 #https://repost.aws/knowledge-center/network-issue-vpc-onprem-ig
-sudo yum -y install telnet mtr traceroute nc httpie
+sudo yum -y install telnet mtr traceroute nc 
+pip3 install httpie
 # nc --listen 8000 # SERVER (in shell one)
 # cat <<< "request" > /dev/tcp/127.0.0.1/8000 # CLIENT (in shell two)
 # SERVER (hit Ctrl+C to break)
