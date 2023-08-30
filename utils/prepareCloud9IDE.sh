@@ -347,6 +347,12 @@ source ~/.bashrc
 
 
 echo "==============================================="
+echo "  Install ccat ......"
+echo "==============================================="
+go install github.com/owenthereal/ccat@latest
+
+
+echo "==============================================="
 echo "  Install kubetail ......"
 echo "==============================================="
 curl -o /tmp/kubetail https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
@@ -617,6 +623,9 @@ echo "export PATH=\$PATH:\$HOME/.local/bin:\$HOME/bin:/usr/local/bin" | sudo tee
 echo "==============================================="
 echo "  More Aliases ......"
 echo "==============================================="
+# cat >> ~/.bashrc <<EOF
+# alias cat=ccat
+# EOF
 # .vimrc
 cat > ~/.vimrc <<EOF
 set number

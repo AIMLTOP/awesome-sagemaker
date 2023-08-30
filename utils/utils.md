@@ -3,6 +3,13 @@
 ## Python
 
 ```shell
+# https://github.com/pyenv/pyenv-installer
+# curl https://pyenv.run | bash
+# export PYENV_ROOT="$HOME/.pyenv"
+# command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
+
 sudo ln -s /usr/local/bin/pip3 /usr/bin
 which python3.8
 sudo yum update -y

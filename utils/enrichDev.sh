@@ -1,4 +1,15 @@
 echo "==============================================="
+echo "  pyenv ......"
+echo "==============================================="
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+cat << 'EOT' >> ~/.bashrc
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+EOT
+source ~/.bashrc
+
+
+echo "==============================================="
 echo "  Upgrade Python ......"
 echo "==============================================="
 ## use amazon-linux-extras to install python 3.8
@@ -7,17 +18,9 @@ echo "==============================================="
 # sudo pip3 install --upgrade pip
 # sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
 # sudo update-alternatives --set python3 /usr/local/bin/python3.8
-
 ## use pyenv to install python 3.9 (about 5 minutes to finish)
-git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-cat << 'EOT' >> ~/.bashrc
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-EOT
-source ~/.bashrc
 sudo yum -y update
-sudo yum -y install bzip2-devel
-sudo yum -y install xz-devel
+sudo yum -y install bzip2-devel xz-devel
 pyenv install 3.9.15
 pyenv global 3.9.15
 export PATH="$HOME/.pyenv/shims:$PATH"
@@ -37,6 +40,20 @@ echo "==============================================="
 ## Redoc https://github.com/Redocly/redoc
 # npm i
 # npm run watch
+#v18 got error
+#node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by node)
+#node: /lib64/libc.so.6: version `GLIBC_2.28' not found (required by node)
+#nvm uninstall v18.12.1
+#curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+#source ~/.bashrc
+##nvm install --lts
+#nvm install 16
+#node -e "console.log('Running Node.js ' + process.version)"
+#npm install -g esbuild
+## perfer yum
+curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+sudo yum install nodejs gcc-c++ make -y
+node -v
 
 
 echo "==============================================="
@@ -386,3 +403,18 @@ cdk --version
 # echo "  KubeVela ......"
 # echo "==============================================="
 # https://kubevela.io/docs/installation/standalone/#local
+
+
+# echo "==============================================="
+# echo " VS Code ......"
+# echo "==============================================="
+# https://aws.amazon.com/blogs/machine-learning/host-code-server-on-amazon-sagemaker/
+# curl -L https://github.com/aws-samples/amazon-sagemaker-codeserver/releases/download/v0.1.5/amazon-sagemaker-codeserver-0.1.5.tar.gz -o /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz
+# tar -xvzf /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz -d /home/ec2-user/SageMaker/custom/ 
+# cd /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver/install-scripts/notebook-instances
+# chmod +x *.sh
+# sudo ./install-codeserver.sh
+# sudo ./setup-codeserver.sh
+# Another way
+# conda install -y -c conda-forge code-server
+# code-server --auth none
