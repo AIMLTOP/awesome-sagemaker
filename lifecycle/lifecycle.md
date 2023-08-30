@@ -1,6 +1,8 @@
 ## 参考
 
 - https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples
+- https://github.com/aws/aws-jupyter-proxy
+- https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/proxy-for-jupyter/on-start.sh
 
 
 Persistent Jupyter Kernels

@@ -91,7 +91,7 @@ wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
 sudo mkdir -p /opt/s5cmd/
 sudo tar xzvf /tmp/s5cmd.tar.gz -C /opt/s5cmd
 cat >> ~/.bashrc <<EOF
-export PATH="/opt/s5cmd:$PATH"
+export PATH="/opt/s5cmd:\$PATH"
 EOF
 source ~/.bashrc
 s5cmd version
@@ -128,10 +128,23 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 
 
+# echo "==============================================="
+# echo "  Stable Diffusion ......"
+# echo "==============================================="
+# https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
+wget https://raw.githubusercontent.com/TipTopBin/stable-diffusion-aws-extension/main/install.sh -O /home/ec2-user/SageMaker/custom/install-sd.sh
+sh /home/ec2-user/SageMaker/custom/install-sd.sh
+#~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --no-half --listen
+# ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen
+
+
+
 echo "==============================================="
-echo "  Alias and Path ......"
+echo "  Env, Alias and Path ......"
 echo "==============================================="
-echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom' >> ~/.bashrc
+# Tag to Env
+# https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
+echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/.bashrc
 sudo bash -c "cat << EOF > /usr/local/bin/b
 #!/bin/bash
 /bin/bash

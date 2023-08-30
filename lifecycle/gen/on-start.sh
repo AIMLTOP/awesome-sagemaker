@@ -5,10 +5,14 @@ sudo -u ec2-user -i <<'EOF'
 
 bash /home/ec2-user/SageMaker/custom/prepareNotebook.sh & # execute asynchronously
 
+echo "Config Git ..."
+git config --global alias.clone-all 'clone --recurse-submodules'
+git config --global alias.pull-all 'pull --recurse-submodules'
+
 echo "Install Extensions ... "
 LAB_EXTENSION_NAME=jupyterlab-s3-browser
-PIP_PACKAGE_NAME=ipywidgets
 NB_EXTENSION_NAME=widgetsnbextension
+#SERVER_EXTENSION_NAME=aws-jupyter-proxy
 
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
 
@@ -16,8 +20,14 @@ jupyter labextension install $LAB_EXTENSION_NAME
 python -m pip install $LAB_EXTENSION_NAME
 jupyter serverextension enable --py $LAB_EXTENSION_NAME
 
-pip install $PIP_PACKAGE_NAME
+pip install ipywidgets
 jupyter nbextension enable $NB_EXTENSION_NAME --py --sys-prefix
+
+#pip install $SERVER_EXTENSION_NAME
+#jupyter serverextension enable --py aws_jupyter_proxy --sys-prefix
+pip uninstall --yes nbserverproxy
+pip install git+https://github.com/aimhubio/jupyter-server-proxy
+# initctl restart jupyter-server --no-wait
 
 source /home/ec2-user/anaconda3/bin/deactivate
 EOF

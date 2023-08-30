@@ -574,7 +574,7 @@ wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
 sudo mkdir -p /opt/s5cmd/
 sudo tar xzvf /tmp/s5cmd.tar.gz -C /opt/s5cmd
 cat >> ~/.bashrc <<EOF
-export PATH="/opt/s5cmd:$PATH"
+export PATH="/opt/s5cmd:\$PATH"
 EOF
 source ~/.bashrc
 s5cmd version
