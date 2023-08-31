@@ -584,9 +584,9 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
 
 
-# echo "==============================================="
-# echo " KMS ......"
-# echo "==============================================="
+echo "==============================================="
+echo " KMS ......"
+echo "==============================================="
 # # Create KMS
 aws kms create-alias --alias-name alias/quick-eks --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
 # # Set CMK ARN

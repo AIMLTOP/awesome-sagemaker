@@ -128,15 +128,17 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 
 
-# echo "==============================================="
-# echo "  Stable Diffusion ......"
-# echo "==============================================="
+echo "==============================================="
+echo "  Stable Diffusion ......"
+echo "==============================================="
+## AWS Extension
 # https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
-wget https://raw.githubusercontent.com/TipTopBin/stable-diffusion-aws-extension/main/install.sh -O /home/ec2-user/SageMaker/custom/install-sd.sh
-sh /home/ec2-user/SageMaker/custom/install-sd.sh
+#wget https://raw.githubusercontent.com/TipTopBin/stable-diffusion-aws-extension/main/install.sh -O /home/ec2-user/SageMaker/custom/install-sd.sh
+#sh /home/ec2-user/SageMaker/custom/install-sd.sh
 #~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --no-half --listen
 # ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen
-
+## Docker
+# https://github.com/TipTopBin/stable-diffusion-webui-docker.git
 
 
 echo "==============================================="

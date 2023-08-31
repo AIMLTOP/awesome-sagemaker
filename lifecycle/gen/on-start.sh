@@ -25,8 +25,10 @@ jupyter nbextension enable $NB_EXTENSION_NAME --py --sys-prefix
 
 #pip install $SERVER_EXTENSION_NAME
 #jupyter serverextension enable --py aws_jupyter_proxy --sys-prefix
+# https://aimstack.readthedocs.io/en/latest/using/sagemaker_notebook_ui.html
 pip uninstall --yes nbserverproxy
 pip install git+https://github.com/aimhubio/jupyter-server-proxy
+pip install aim
 # initctl restart jupyter-server --no-wait
 
 source /home/ec2-user/anaconda3/bin/deactivate
