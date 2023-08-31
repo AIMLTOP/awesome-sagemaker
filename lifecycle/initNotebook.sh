@@ -4,6 +4,7 @@
 # https://github.com/fmmasood/eks-cli-init-tools/blob/main/cli_tools.sh
 WORKING_DIR=/home/ec2-user/SageMaker/custom
 mkdir -p "$WORKING_DIR"
+mkdir -p /home/ec2-user/SageMaker/lab
 
 
 echo "==============================================="
@@ -157,6 +158,7 @@ echo 'export WORKING_DIR=/home/ec2-user/SageMaker/custom' >> ~/.bashrc
 echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 echo "alias c='clear'" | tee -a ~/.bashrc
 echo "alias 2s='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
+echo "alias 2a='cd /home/ec2-user/SageMaker/awesome'" | tee -a ~/.bashrc
 echo "alias 2c='cd /home/ec2-user/SageMaker/custom'" | tee -a ~/.bashrc
 echo "alias sa='source activate'" | tee -a ~/.bashrc
 echo "alias sd='source deactivate'" | tee -a ~/.bashrc

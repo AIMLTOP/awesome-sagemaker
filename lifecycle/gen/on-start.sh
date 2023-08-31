@@ -3,7 +3,7 @@ set -eux
 
 sudo -u ec2-user -i <<'EOF'
 
-bash /home/ec2-user/SageMaker/custom/prepareNotebook.sh & # execute asynchronously
+bash /home/ec2-user/SageMaker/custom/initNotebook.sh & # execute asynchronously
 
 echo "Config Git ..."
 git config --global alias.clone-all 'clone --recurse-submodules'
@@ -33,6 +33,11 @@ pip install aim
 
 source /home/ec2-user/anaconda3/bin/deactivate
 EOF
+
+
+echo "Pull code ..."
+cd ~/SageMaker/awesome
+nohup git pull --recurse-submodules > /dev/null 2>&1 &
 
 
 echo "Auto stop to save cost ..."
