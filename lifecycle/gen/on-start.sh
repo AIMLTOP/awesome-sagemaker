@@ -1,13 +1,42 @@
 #!/bin/bash
 set -eux
 
+# Under ec2-user
 sudo -u ec2-user -i <<'EOF'
 
 bash /home/ec2-user/SageMaker/custom/initNotebook.sh & # execute asynchronously
 
-echo "Config Git ..."
+echo "Config Git and pull code ..."
 git config --global alias.clone-all 'clone --recurse-submodules'
 git config --global alias.pull-all 'pull --recurse-submodules'
+cd ~/SageMaker/awesome
+nohup git pull --recurse-submodules > /dev/null 2>&1 &
+
+cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
+{
+    // Notifications
+    // @jupyterlab/apputils-extension:notification
+    // Notifications settings.
+    // *******************************************
+
+    // Fetch official Jupyter news
+    // Whether to fetch news from Jupyter news feed. If `true`, it will make a request to a website.
+    "fetchNews": "false"
+}
+EoL
+
+cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings <<EoL
+{
+    // Theme
+    // @jupyterlab/apputils-extension:themes
+    // Theme manager settings.
+    // *************************************
+
+    // Selected Theme
+    // Application-level visual styling theme
+    "theme": "JupyterLab Dark"
+}
+EoL
 
 echo "Install Extensions ... "
 LAB_EXTENSION_NAME=jupyterlab-s3-browser
@@ -35,11 +64,7 @@ source /home/ec2-user/anaconda3/bin/deactivate
 EOF
 
 
-echo "Pull code ..."
-cd ~/SageMaker/awesome
-nohup git pull --recurse-submodules > /dev/null 2>&1 &
-
-
+# Under root
 echo "Auto stop to save cost ..."
 IDLE_TIME=10700
 CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)

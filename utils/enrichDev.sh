@@ -194,6 +194,10 @@ chmod +x argo-linux-amd64
 sudo mv ./argo-linux-amd64 /usr/local/bin/argo
 argo version
 rm -fr argo-linux-amd64.gz
+# # Install Argo Rollout
+# sudo curl -Lo /usr/local/bin/kubectl-argo-rollouts https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+# sudo chmod +x /usr/local/bin/kubectl-argo-rollouts
+
 
 
 echo "==============================================="

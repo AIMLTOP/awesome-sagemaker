@@ -5,6 +5,8 @@
 WORKING_DIR=/home/ec2-user/SageMaker/custom
 mkdir -p "$WORKING_DIR"
 mkdir -p /home/ec2-user/SageMaker/lab
+mkdir -p /home/ec2-user/SageMaker/tmp
+chmod -R 777 /home/ec2-user/SageMaker/tmp
 
 
 echo "==============================================="
@@ -65,9 +67,12 @@ echo "==============================================="
 echo "  Docker Compose ......"
 echo "==============================================="
 #sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $WORKING_DIR/docker-compose
-sudo chmod +x $WORKING_DIR/docker-compose
-$WORKING_DIR/docker-compose version
+sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+# sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $WORKING_DIR/docker-compose
+# sudo chmod +x $WORKING_DIR/docker-compose
+# $WORKING_DIR/docker-compose version
 
 
 echo "==============================================="
@@ -129,9 +134,9 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 
 
-echo "==============================================="
-echo "  Stable Diffusion ......"
-echo "==============================================="
+# echo "==============================================="
+# echo "  Stable Diffusion ......"
+# echo "==============================================="
 ## AWS Extension
 # https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
 #wget https://raw.githubusercontent.com/TipTopBin/stable-diffusion-aws-extension/main/install.sh -O /home/ec2-user/SageMaker/custom/install-sd.sh
@@ -140,6 +145,17 @@ echo "==============================================="
 # ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen
 ## Docker
 # https://github.com/TipTopBin/stable-diffusion-webui-docker.git
+
+
+echo "==============================================="
+echo "  Setup Disk Space ......"
+echo "==============================================="
+# https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers-troubleshooting.html
+mkdir -p ~/.sagemaker
+cat > ~/.sagemaker/config.yaml <<EOF
+local:
+  container_root: /home/ec2-user/SageMaker/tmp
+EOF
 
 
 echo "==============================================="
@@ -160,6 +176,8 @@ echo "alias c='clear'" | tee -a ~/.bashrc
 echo "alias 2s='cd /home/ec2-user/SageMaker'" | tee -a ~/.bashrc
 echo "alias 2a='cd /home/ec2-user/SageMaker/awesome'" | tee -a ~/.bashrc
 echo "alias 2c='cd /home/ec2-user/SageMaker/custom'" | tee -a ~/.bashrc
+echo "alias 2d='cd /home/ec2-user/SageMaker/awesome/do'" | tee -a ~/.bashrc
+echo "alias 2l='cd /home/ec2-user/SageMaker/lab'" | tee -a ~/.bashrc
 echo "alias sa='source activate'" | tee -a ~/.bashrc
 echo "alias sd='source deactivate'" | tee -a ~/.bashrc
 # echo "alias sd='conda deactivate'" | tee -a ~/.bashrc

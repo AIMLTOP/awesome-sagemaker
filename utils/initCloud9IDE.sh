@@ -641,6 +641,7 @@ alias z='zip -r ../1.zip .'
 alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
 export TERM=xterm-256color
+#export TERM=xterm-color
 EOF
 source ~/.bashrc
 # journalctl -u kubelet | grep error 
