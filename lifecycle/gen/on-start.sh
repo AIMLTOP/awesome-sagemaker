@@ -84,6 +84,9 @@ cat > /home/ec2-user/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/t
 }
 EoL
 
+chown -R ec2-user /home/ec2-user/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings
+chown -R ec2-user /home/ec2-user/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings
+
 echo "Restart jupyter-server ..."
 sudo systemctl daemon-reload
 sudo systemctl restart jupyter-server
