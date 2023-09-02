@@ -1,0 +1,3 @@
+[submodule "do/sd-aws-extension"]
+	path = do/sd-aws-extension
+	url = https://github.com/TipTopBin/stable-diffusion-aws-extension.git
