@@ -1,3 +1,0 @@
-[submodule "do/sage-examples"]
-	path = do/sage-examples
-	url = https://github.com/TipTopBin/amazon-sagemaker-examples.git
