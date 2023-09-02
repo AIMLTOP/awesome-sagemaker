@@ -4,6 +4,8 @@ set -eux
 # Under ec2-user
 sudo -u ec2-user -i <<'EOF'
 
+echo "Donwload and init ..."
+wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/initNotebook.sh -O /home/ec2-user/SageMaker/custom/initNotebook.sh
 bash /home/ec2-user/SageMaker/custom/initNotebook.sh & # execute asynchronously
 
 echo "Config Git and pull code ..."
@@ -11,32 +13,6 @@ git config --global alias.clone-all 'clone --recurse-submodules'
 git config --global alias.pull-all 'pull --recurse-submodules'
 cd ~/SageMaker/awesome
 nohup git pull --recurse-submodules > /dev/null 2>&1 &
-
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
-{
-    // Notifications
-    // @jupyterlab/apputils-extension:notification
-    // Notifications settings.
-    // *******************************************
-
-    // Fetch official Jupyter news
-    // Whether to fetch news from Jupyter news feed. If `true`, it will make a request to a website.
-    "fetchNews": "false"
-}
-EoL
-
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings <<EoL
-{
-    // Theme
-    // @jupyterlab/apputils-extension:themes
-    // Theme manager settings.
-    // *************************************
-
-    // Selected Theme
-    // Application-level visual styling theme
-    "theme": "JupyterLab Dark"
-}
-EoL
 
 echo "Install Extensions ... "
 LAB_EXTENSION_NAME=jupyterlab-s3-browser
@@ -81,6 +57,32 @@ echo "Found boto3 at $PYTHON_DIR"
 echo "Starting the SageMaker autostop script in cron"
 (crontab -l 2>/dev/null; echo "*/5 * * * * $PYTHON_DIR /home/ec2-user/SageMaker/custom/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/jupyter.log") | crontab -
 
+
+cat > /home/ec2-user/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
+{
+    // Notifications
+    // @jupyterlab/apputils-extension:notification
+    // Notifications settings.
+    // *******************************************
+
+    // Fetch official Jupyter news
+    // Whether to fetch news from Jupyter news feed. If `true`, it will make a request to a website.
+    "fetchNews": "false"
+}
+EoL
+
+cat > /home/ec2-user/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings <<EoL
+{
+    // Theme
+    // @jupyterlab/apputils-extension:themes
+    // Theme manager settings.
+    // *************************************
+
+    // Selected Theme
+    // Application-level visual styling theme
+    "theme": "JupyterLab Dark"
+}
+EoL
 
 echo "Restart jupyter-server ..."
 sudo systemctl daemon-reload
