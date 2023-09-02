@@ -1,6 +1,3 @@
 [submodule "do/sage-examples"]
 	path = do/sage-examples
 	url = https://github.com/TipTopBin/amazon-sagemaker-examples.git
-[submodule "do/sd-webui-docker"]
-	path = do/sd-webui-docker
-	url = https://github.com/TipTopBin/stable-diffusion-webui-docker.git
