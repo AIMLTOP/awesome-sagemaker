@@ -172,6 +172,7 @@ sudo chmod +x /usr/local/bin/b
 cat >> ~/.bashrc <<EOF
 alias c=clear
 alias z='zip -r ../1.zip .'
+alias g=git
 alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
 alias gpa='git pull-all'
