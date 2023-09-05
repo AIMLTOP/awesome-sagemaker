@@ -394,12 +394,15 @@ sudo docker run -d \
 
 
 echo "==============================================="
-echo "  CDK Version 1.x ......"
+echo "  CDK ......"
 echo "==============================================="
+## switch back to CDK 1.x
 # https://www.npmjs.com/package/aws-cdk?activeTab=versions
 # npm uninstall aws-cdk
 # npm install -g aws-cdk@1.199.0
 # npm install -g aws-cdk@1.199.0 --force
+## Upgrade to latest version
+# sudo npm install -g aws-cdk
 cdk --version
 
 

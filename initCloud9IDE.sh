@@ -585,6 +585,12 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 
 
 echo "==============================================="
+echo " A Data Migration Tool (abbr. ADMT) ......"
+echo "==============================================="
+# https://github.com/TipTopBin/data-migration-tool-for-s3
+
+
+echo "==============================================="
 echo " KMS ......"
 echo "==============================================="
 # # Create KMS

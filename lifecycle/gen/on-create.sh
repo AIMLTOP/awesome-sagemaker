@@ -5,6 +5,8 @@ sudo -u ec2-user -i <<'EOF'
 
 cd ~/SageMaker
 nohup git clone --recurse-submodules https://github.com/TipTopBin/awesome-sagemaker.git awesome > /dev/null 2>&1 &
+nohup git clone --recurse-submodules https://github.com/TipTopBin/amazon-sagemaker-examples.git examples > /dev/null 2>&1 &
+
 # ps -ef | grep awesome
 
 echo "Fetching the helper script"

@@ -13,6 +13,8 @@ git config --global alias.clone-all 'clone --recurse-submodules'
 git config --global alias.pull-all 'pull --recurse-submodules'
 cd ~/SageMaker/awesome
 nohup git pull --recurse-submodules > /dev/null 2>&1 &
+cd ~/SageMaker/examples
+nohup git pull --recurse-submodules > /dev/null 2>&1 &
 
 mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
 cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
