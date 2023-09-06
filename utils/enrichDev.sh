@@ -3,15 +3,18 @@ echo "  pyenv ......"
 echo "==============================================="
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 cat << 'EOT' >> ~/.bashrc
+export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 EOT
+# echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
 source ~/.bashrc
 
 
 echo "==============================================="
 echo "  Upgrade Python ......"
 echo "==============================================="
+# https://gist.github.com/094459/3eba3e5f4fb1ccaef1cb12044412f90b
 ## use amazon-linux-extras to install python 3.8
 # sudo amazon-linux-extras install python3.8 -y
 # python -m ensurepip --upgrade --user
@@ -26,6 +29,10 @@ pyenv global 3.9.15
 export PATH="$HOME/.pyenv/shims:$PATH"
 source ~/.bash_profile
 python --version
+## pyenv-virtualenv
+git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+. ~/.bashrc
 
 
 echo "==============================================="

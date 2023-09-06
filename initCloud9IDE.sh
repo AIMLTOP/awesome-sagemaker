@@ -42,7 +42,7 @@ echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ..
 echo "==============================================="
 # 放在最前面，后续提取字段需要用到 jq
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo yum -y install jq gettext bash-completion moreutils tree zsh xsel xclip
+sudo yum -y install jq gettext bash-completion moreutils tree zsh xsel xclip amazon-efs-utils
 
 
 echo "==============================================="
