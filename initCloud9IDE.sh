@@ -648,6 +648,7 @@ alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
 export TERM=xterm-256color
 #export TERM=xterm-color
+alias 2e='cd /home/ec2-user/environment'
 EOF
 source ~/.bashrc
 # journalctl -u kubelet | grep error 
