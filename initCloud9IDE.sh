@@ -107,7 +107,8 @@ PLATFORM=$(uname -s)_$ARCH
 curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz" 
 tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 sudo mv /tmp/eksctl /usr/local/bin
-eksctl version
+# eksctl version
+eksctl info
 # 配置自动完成 eksctl bash-completion
 cat >> ~/.bashrc <<EOF
 . <(eksctl completion bash)
