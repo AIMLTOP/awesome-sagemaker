@@ -175,7 +175,8 @@ alias z='zip -r ../1.zip .'
 alias g=git
 alias ll='ls -alh --color=auto'
 alias jc=/bin/journalctl
-alias gpa='git pull-all'
+# alias gpa='git pull-all'
+alias gpa='git pull-all && git submodule update --remote'
 alias gca='git clone-all'
 export TERM=xterm-256color
 #export TERM=xterm-color
