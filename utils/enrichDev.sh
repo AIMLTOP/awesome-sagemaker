@@ -1,3 +1,16 @@
+
+echo "==============================================="
+echo "  Install Maven ......"
+echo "==============================================="
+wget https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -O /tmp/apache-maven-3.8.6-bin.tar.gz
+sudo tar xzvf /tmp/apache-maven-3.8.6-bin.tar.gz -C /opt
+cat >> ~/.bashrc <<EOF
+export PATH="/opt/apache-maven-3.8.6/bin:$PATH"
+EOF
+source ~/.bashrc
+mvn --version
+
+
 echo "==============================================="
 echo "  pyenv ......"
 echo "==============================================="
@@ -58,9 +71,9 @@ echo "==============================================="
 #node -e "console.log('Running Node.js ' + process.version)"
 #npm install -g esbuild
 ## perfer yum
-curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
-sudo yum install nodejs gcc-c++ make -y
-node -v
+# curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+# sudo yum install nodejs gcc-c++ make -y
+# node -v
 
 
 echo "==============================================="
@@ -81,12 +94,6 @@ curl https://sh.rustup.rs -sSf | sh
 source ~/.bashrc
 sudo yum install -y openssl-devel
 cargo install drill
-
-
-echo "==============================================="
-echo "  Cloudscape ......"
-echo "==============================================="
-# https://cloudscape.design/get-started/integration/using-cloudscape-components/
 
 
 echo "==============================================="
@@ -153,18 +160,6 @@ sh -c "$(curl -sSL https://git.io/install-kubent)"
 
 
 echo "==============================================="
-echo "  Install Maven ......"
-echo "==============================================="
-wget https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -O /tmp/apache-maven-3.8.6-bin.tar.gz
-sudo tar xzvf /tmp/apache-maven-3.8.6-bin.tar.gz -C /opt
-cat >> ~/.bashrc <<EOF
-export PATH="/opt/apache-maven-3.8.6/bin:$PATH"
-EOF
-source ~/.bashrc
-mvn --version
-
-
-echo "==============================================="
 echo "  Install kubescape ......"
 echo "==============================================="
 # curl -s https://raw.githubusercontent.com/armosec/kubescape/master/install.sh | /bin/bash
@@ -187,9 +182,9 @@ sudo mv ./kind /usr/local/bin/kind
 # flux --version
 
 
-# echo "==============================================="
-# echo "  Install argocd ......"
-# echo "==============================================="
+echo "==============================================="
+echo "  Install argocd ......"
+echo "==============================================="
 # curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
 # sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 # rm argocd-linux-amd64
@@ -204,7 +199,6 @@ rm -fr argo-linux-amd64.gz
 # # Install Argo Rollout
 # sudo curl -Lo /usr/local/bin/kubectl-argo-rollouts https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
 # sudo chmod +x /usr/local/bin/kubectl-argo-rollouts
-
 
 
 echo "==============================================="
@@ -385,16 +379,16 @@ echo "==============================================="
 echo " kuboard ......"
 echo "==============================================="
 # https://kuboard.cn/install/v3/install-built-in.html#%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92
-LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
-sudo docker run -d \
-  --restart=unless-stopped \
-  --name=kuboard \
-  -p 80:80/tcp \
-  -p 10081:10081/tcp \
-  -e KUBOARD_ENDPOINT="http://${LOCAL_IPV4}:80" \
-  -e KUBOARD_AGENT_SERVER_TCP_PORT="10081" \
-  -v /root/kuboard-data:/data \
-  eipwork/kuboard:v3
+# LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+# sudo docker run -d \
+#   --restart=unless-stopped \
+#   --name=kuboard \
+#   -p 80:80/tcp \
+#   -p 10081:10081/tcp \
+#   -e KUBOARD_ENDPOINT="http://${LOCAL_IPV4}:80" \
+#   -e KUBOARD_AGENT_SERVER_TCP_PORT="10081" \
+#   -v /root/kuboard-data:/data \
+#   eipwork/kuboard:v3
   # 也可以使用镜像 swr.cn-east-2.myhuaweicloud.com/kuboard/kuboard:v3 ，可以更快地完成镜像下载。
   # 请不要使用 127.0.0.1 或者 localhost 作为内网 IP \
   # Kuboard 不需要和 K8S 在同一个网段，Kuboard Agent 甚至可以通过代理访问 Kuboard Server \
@@ -432,3 +426,9 @@ cdk --version
 # Another way
 # conda install -y -c conda-forge code-server
 # code-server --auth none
+
+
+echo "==============================================="
+echo "  Cloudscape ......"
+echo "==============================================="
+# https://cloudscape.design/get-started/integration/using-cloudscape-components/
