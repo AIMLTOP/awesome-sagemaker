@@ -51,29 +51,25 @@ echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
 echo "==============================================="
 echo "  NodeJS ......"
 echo "==============================================="
+## nvm
 # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-# . ~/.nvm/nvm.sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+. ~/.nvm/nvm.sh
+nvm -v
+## LTS
+## nvm install --lts
+## node v16
 # nvm install 16
-# node -e "console.log('Running Node.js ' + process.version)"
-## utils
-# npm list --depth=0
+## node v17
+nvm install 17
+node -e "console.log('Running Node.js ' + process.version)"
+#nvm uninstall 17
+## npm
+npm list --depth=0
 ## Redoc https://github.com/Redocly/redoc
 # npm i
 # npm run watch
-#v18 got error
-#node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by node)
-#node: /lib64/libc.so.6: version `GLIBC_2.28' not found (required by node)
-#nvm uninstall v18.12.1
-#curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-#source ~/.bashrc
-##nvm install --lts
-#nvm install 16
-#node -e "console.log('Running Node.js ' + process.version)"
-#npm install -g esbuild
-## perfer yum
-# curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
-# sudo yum install nodejs gcc-c++ make -y
-# node -v
+# npm install -g esbuild
 
 
 echo "==============================================="
@@ -90,10 +86,10 @@ cd -
 echo "==============================================="
 echo "  cargo ......"
 echo "==============================================="
-curl https://sh.rustup.rs -sSf | sh
-source ~/.bashrc
-sudo yum install -y openssl-devel
-cargo install drill
+# curl https://sh.rustup.rs -sSf | sh
+# source ~/.bashrc
+# sudo yum install -y openssl-devel
+# cargo install drill
 
 
 echo "==============================================="

@@ -1,5 +1,23 @@
 
 
+## Node
+
+```
+v18 got error
+
+#node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by node)
+#node: /lib64/libc.so.6: version `GLIBC_2.28' not found (required by node)
+```
+
+
+```shell
+## yum
+# DEPRECATION way
+# curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
+# sudo yum install nodejs gcc-c++ make -y
+# node -v
+```
+
 ## Python
 
 ```shell
@@ -44,7 +62,7 @@ sudo alternatives --install /usr/bin/python python /usr/local/bin/python3.8 1; a
 
 替换 "，可以考虑直接在提取的时候用  `jq -r`
 
-## /tmp
+## tmp
 
 - https://unix.stackexchange.com/questions/71622/what-are-correct-permissions-for-tmp-i-unintentionally-set-it-all-public-recu
 
