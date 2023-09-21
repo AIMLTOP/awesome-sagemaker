@@ -1,9 +1,0 @@
-[submodule "do/sd-aws-extension"]
-	path = do/sd-aws-extension
-	url = https://github.com/TipTopBin/stable-diffusion-aws-extension.git
-[submodule "do/sd-webui-docker"]
-	path = do/sd-webui-docker
-	url = https://github.com/TipTopBin/stable-diffusion-webui-docker.git
-[submodule "do/sa-agent"]
-	path = do/sa-agent
-	url = https://github.com/TipTopBin/building-gen-ai-agent-on-aws.git
