@@ -117,21 +117,21 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # # packages can be installed here.
 # #   1. ipykernel is installed to ensure that the custom environment can be used as a Jupyter kernel   
 # #   2. Ensure the Notebook Instance has internet connectivity to download the Miniconda installer
-# sudo -u ec2-user -i <<'EOF'
-# unset SUDO_UID
+sudo -u ec2-user -i <<'EOF'
+unset SUDO_UID
 
-# # Install a separate conda installation via Miniconda
-# WORKING_DIR=/home/ec2-user/SageMaker/custom
-# mkdir -p "$WORKING_DIR"
-# # wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
-# wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
-# bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
-# rm -rf "$WORKING_DIR/miniconda.sh"
-# EOF
-# echo "Download custom kernel scripts"
-# wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.10.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.10.sh
-# wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.9.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.9.sh
-# wget https://raw.githubusercontent.com/AIMLTOP/awesome-sagemaker/main/lifecycle/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
+# Install a separate conda installation via Miniconda
+WORKING_DIR=/home/ec2-user/SageMaker/custom
+mkdir -p "$WORKING_DIR"
+# wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
+rm -rf "$WORKING_DIR/miniconda.sh"
+EOF
+echo "Download custom kernel scripts"
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/kernel/kernelPython3.10.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.10.sh
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/kernel/kernelPython3.9.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.9.sh
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/kernel/kernelPython3.8.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.8.sh
 
 
 # echo "==============================================="
