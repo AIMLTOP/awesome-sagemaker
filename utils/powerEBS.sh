@@ -32,7 +32,9 @@ while [ \
 done
 
 #Check if we're on an NVMe filesystem
-if [ $(readlink -f /dev/xvda) = "/dev/xvda" ]; then
+# if [ $(readlink -f /dev/xvda) = "/dev/xvda" ]; then
+if test -b /dev/xvda; then
+  echo "Volume type /dev/xvda"
   # Rewrite the partition table so that the partition takes up all the space that it can.
   sudo growpart /dev/xvda 1
 
@@ -47,6 +49,7 @@ if [ $(readlink -f /dev/xvda) = "/dev/xvda" ]; then
   fi
 
 else
+  echo "Volume type /dev/nvme0n1"
   # Rewrite the partition table so that the partition takes up all the space that it can.
   sudo growpart /dev/nvme0n1 1
 
