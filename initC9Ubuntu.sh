@@ -2,8 +2,8 @@
 
 # set -e
 mkdir -p ~/environment/do
-mkdir -p ~/environment/system
 mkdir -p ~/environment/efs
+# mkdir -p ~/environment/system
 mkdir -p ~/environment/scale
 mkdir -p ~/environment/otel
 mkdir -p ~/environment/test
@@ -11,12 +11,12 @@ cd /tmp/
 sudo apt-get update
 
 echo "==============================================="
-echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
+echo "  Install utilities ......"
 echo "==============================================="
 # 放在最前面，后续提取字段需要用到 jq
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 # amazon-efs-utils
-sudo apt install jq gettext bash-completion moreutils tree zsh xsel xclip wget git build-essential net-tools libgl1 needrestart -y
+sudo apt install jq gettext bash-completion moreutils tree zsh xsel xclip wget git git-lfs build-essential net-tools libgl1 needrestart nfs-common  -y
 
 
 echo "==============================================="
@@ -376,14 +376,16 @@ cat >> ~/.bashrc <<EOF
 alias c=clear
 alias z='zip -r ../1.zip .'
 alias ll='ls -alh --color=auto'
+alias sc=/bin/systemctl
 alias jc=/bin/journalctl
 export TERM=xterm-256color
 #export TERM=xterm-color
-alias 2e='cd /home/ec2-user/environment'
+alias 2e='cd ~/environment'
 EOF
 source ~/.bashrc
 # journalctl -u kubelet | grep error 
 # 最后再执行一次 source
+sudo mount -a
 echo "source .bashrc"
 shopt -s expand_aliases
 . ~/.bashrc
