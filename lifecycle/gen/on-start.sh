@@ -6,7 +6,8 @@ sudo -u ec2-user -i <<'EOF'
 
 echo "Donwload and init ..."
 wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/initNotebook.sh -O /home/ec2-user/SageMaker/custom/initNotebook.sh
-bash /home/ec2-user/SageMaker/custom/initNotebook.sh & # execute asynchronously
+# bash /home/ec2-user/SageMaker/custom/initNotebook.sh &
+nohup /home/ec2-user/SageMaker/custom/initNotebook.sh > /home/ec2-user/SageMaker/custom/initNotebook.log 2>&1 & # execute asynchronously
 
 echo "Config Git and pull code ..."
 git config --global alias.clone-all 'clone --recurse-submodules'
