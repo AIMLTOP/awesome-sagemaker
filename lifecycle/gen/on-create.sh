@@ -13,8 +13,6 @@ echo "Fetching the helper script"
 mkdir -p /home/ec2-user/SageMaker/custom
 wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
 
-chmod +x /home/ec2-user/SageMaker/custom/*.sh
-chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 EOF
 
 # Under root

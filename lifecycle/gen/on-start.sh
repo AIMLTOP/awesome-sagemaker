@@ -6,6 +6,10 @@ sudo -u ec2-user -i <<'EOF'
 
 echo "Donwload and init ..."
 wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/initNotebook.sh -O /home/ec2-user/SageMaker/custom/initNotebook.sh
+
+chmod +x /home/ec2-user/SageMaker/custom/*.sh
+chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
+
 # bash /home/ec2-user/SageMaker/custom/initNotebook.sh &
 nohup /home/ec2-user/SageMaker/custom/initNotebook.sh > /home/ec2-user/SageMaker/custom/initNotebook.log 2>&1 & # execute asynchronously
 
