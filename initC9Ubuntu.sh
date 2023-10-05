@@ -5,7 +5,7 @@ mkdir -p ~/environment/do
 mkdir -p ~/environment/efs
 # mkdir -p ~/environment/system
 mkdir -p ~/environment/scale
-mkdir -p ~/environment/otel
+mkdir -p ~/environment/o11y
 mkdir -p ~/environment/test
 cd /tmp/
 sudo apt-get update

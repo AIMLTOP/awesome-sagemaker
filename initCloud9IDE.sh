@@ -601,13 +601,13 @@ export EKS_MASTER_ARN=$(aws kms describe-key --key-id alias/quick-eks --query Ke
 echo "export EKS_MASTER_ARN=${EKS_MASTER_ARN}" | tee -a ~/.bashrc
 
 
-echo "==============================================="
-echo "  Expand disk space ......"
-echo "==============================================="
-wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
-chmod +x /tmp/resize-ebs.sh
-/tmp/resize-ebs.sh 300
-df -ah
+# echo "==============================================="
+# echo "  Expand disk space ......"
+# echo "==============================================="
+# wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
+# chmod +x /tmp/resize-ebs.sh
+# /tmp/resize-ebs.sh 300
+# df -ah
 
 
 echo "==============================================="
