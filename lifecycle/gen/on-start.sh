@@ -63,8 +63,7 @@ pip install ipywidgets
 jupyter nbextension enable $NB_EXTENSION_NAME --py --sys-prefix
 
 pip install amazon-codewhisperer-jupyterlab-ext
-jupyterserverextension enable amazon_codewhisperer_jupyterlab_ext
-
+jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
 
 #pip install $SERVER_EXTENSION_NAME
 #jupyter serverextension enable --py aws_jupyter_proxy --sys-prefix
