@@ -62,6 +62,10 @@ jupyter serverextension enable --py $LAB_EXTENSION_NAME
 pip install ipywidgets
 jupyter nbextension enable $NB_EXTENSION_NAME --py --sys-prefix
 
+pip install amazon-codewhisperer-jupyterlab-ext
+jupyterserverextension enable amazon_codewhisperer_jupyterlab_ext
+
+
 #pip install $SERVER_EXTENSION_NAME
 #jupyter serverextension enable --py aws_jupyter_proxy --sys-prefix
 # https://aimstack.readthedocs.io/en/latest/using/sagemaker_notebook_ui.html
@@ -94,4 +98,4 @@ echo "Starting the SageMaker autostop script in cron"
 
 echo "Restart jupyter-server ..."
 sudo systemctl daemon-reload
-sudo systemctl restart jupyter-server
+sudo systemctl restart jupyter-server --no-wait
