@@ -172,13 +172,17 @@ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scr
 chmod 700 get_helm.sh
 ./get_helm.sh
 helm version
-helm repo add stable https://charts.helm.sh/stable
 cat >> ~/.bashrc <<EOF
 source <(helm completion bash)
 alias h=helm
 complete -F __start_helm h
 EOF
 source ~/.bashrc
+helm repo add stable https://charts.helm.sh/stable
+helm repo add eks https://aws.github.io/eks-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
 
 
 echo "==============================================="
