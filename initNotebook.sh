@@ -107,9 +107,9 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
 
 
-# echo "==============================================="
-# echo " Persistant Conda ......"
-# echo "==============================================="
+echo "==============================================="
+echo " Persistant Conda ......"
+echo "==============================================="
 # # https://docs.conda.io/en/latest/miniconda.html
 # # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/persistent-conda-ebs/on-create.sh
 # # installs a custom, persistent installation of conda on the Notebook Instance's EBS volume, and ensures
@@ -117,7 +117,13 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 # # packages can be installed here.
 # #   1. ipykernel is installed to ensure that the custom environment can be used as a Jupyter kernel   
 # #   2. Ensure the Notebook Instance has internet connectivity to download the Miniconda installer
-sudo -u ec2-user -i <<'EOF'
+
+CONDA_DIRECTORY="/home/ec2-user/SageMaker/custom/miniconda"
+if [ -d "$CONDA_DIRECTORY" ]; then
+    echo "$CONDA_DIRECTORY exists."
+else
+    echo "Setup Persistant Conda."
+    sudo -u ec2-user -i <<'EOF'
 unset SUDO_UID
 
 # Install a separate conda installation via Miniconda
@@ -128,6 +134,8 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O "$
 bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
 rm -rf "$WORKING_DIR/miniconda.sh"
 EOF
+fi
+
 echo "Download custom kernel scripts"
 wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/kernel/kernelPython3.10.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.10.sh
 wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/kernel/kernelPython3.9.sh -O /home/ec2-user/SageMaker/custom/kernelPython3.9.sh
