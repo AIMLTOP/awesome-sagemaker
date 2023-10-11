@@ -21,9 +21,10 @@ download_and_verify () {
 }
 
 mkdir -p ~/environment/do
-mkdir -p ~/environment/system
+# mkdir -p ~/environment/system
+mkdir -p ~/environment/efs
 mkdir -p ~/environment/scale
-mkdir -p ~/environment/otel
+mkdir -p ~/environment/o11y
 mkdir -p ~/environment/test
 cd /tmp/
 
@@ -347,10 +348,10 @@ echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
 source ~/.bashrc
 
 
-echo "==============================================="
-echo "  Install ccat ......"
-echo "==============================================="
-go install github.com/owenthereal/ccat@latest
+# echo "==============================================="
+# echo "  Install ccat ......"
+# echo "==============================================="
+# go install github.com/owenthereal/ccat@latest
 
 
 echo "==============================================="
@@ -448,11 +449,11 @@ echo "==============================================="
 curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "/tmp/session-manager-plugin.rpm"
 sudo yum install -y /tmp/session-manager-plugin.rpm
 session-manager-plugin
-# Mac
-curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/mac/sessionmanager-bundle.zip" -o "/tmp/sessionmanager-bundle.zip"
-unzip /tmp/sessionmanager-bundle.zip -d /tmp
-sudo /tmp/sessionmanager-bundle/install -i /usr/local/sessionmanagerplugin -b /usr/local/bin/session-manager-plugin
-rm -fr /tmp/sessionmanager-bundle*
+# # Mac
+# curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/mac/sessionmanager-bundle.zip" -o "/tmp/sessionmanager-bundle.zip"
+# unzip /tmp/sessionmanager-bundle.zip -d /tmp
+# sudo /tmp/sessionmanager-bundle/install -i /usr/local/sessionmanagerplugin -b /usr/local/bin/session-manager-plugin
+# rm -fr /tmp/sessionmanager-bundle*
 
 
 echo "==============================================="
@@ -591,23 +592,23 @@ echo "==============================================="
 # https://github.com/TipTopBin/data-migration-tool-for-s3
 
 
-echo "==============================================="
-echo " KMS ......"
-echo "==============================================="
-# # Create KMS
-aws kms create-alias --alias-name alias/quick-eks --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
-# # Set CMK ARN
-export EKS_MASTER_ARN=$(aws kms describe-key --key-id alias/quick-eks --query KeyMetadata.Arn --output text)
-echo "export EKS_MASTER_ARN=${EKS_MASTER_ARN}" | tee -a ~/.bashrc
+# echo "==============================================="
+# echo " KMS ......"
+# echo "==============================================="
+# # # Create KMS
+# aws kms create-alias --alias-name alias/quick-eks --target-key-id $(aws kms create-key --query KeyMetadata.Arn --output text)
+# # # Set CMK ARN
+# export EKS_MASTER_ARN=$(aws kms describe-key --key-id alias/quick-eks --query KeyMetadata.Arn --output text)
+# echo "export EKS_MASTER_ARN=${EKS_MASTER_ARN}" | tee -a ~/.bashrc
 
 
-# echo "==============================================="
-# echo "  Expand disk space ......"
-# echo "==============================================="
-# wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
-# chmod +x /tmp/resize-ebs.sh
-# /tmp/resize-ebs.sh 300
-# df -ah
+echo "==============================================="
+echo "  Expand disk space ......"
+echo "==============================================="
+wget https://raw.githubusercontent.com/DATACNTOP/streaming-analytics/main/utils/scripts/resize-ebs.sh -O /tmp/resize-ebs.sh
+chmod +x /tmp/resize-ebs.sh
+/tmp/resize-ebs.sh 300
+df -ah
 
 
 echo "==============================================="

@@ -10,6 +10,7 @@ mkdir -p ~/environment/test
 cd /tmp/
 sudo apt-get update
 
+
 echo "==============================================="
 echo "  Install utilities ......"
 echo "==============================================="
@@ -17,6 +18,21 @@ echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 # amazon-efs-utils
 sudo apt install jq gettext bash-completion moreutils tree zsh xsel xclip wget git git-lfs build-essential net-tools libgl1 needrestart nfs-common  -y
+sudo apt-get install -y software-properties-common apt-transport-https
+
+
+# echo "==============================================="
+# echo "  Update Bash to 5.2 ......"
+# echo "==============================================="
+# # wget https://ftp.gnu.org/gnu/bash/bash-5.2.15.tar.gz
+# wget http://archive.ubuntu.com/ubuntu/pool/main/b/bash/bash_5.2.15-2ubuntu1.dsc http://archive.ubuntu.com/ubuntu/pool/main/b/bash/bash_5.2.15.orig.tar.gz http://archive.ubuntu.com/ubuntu/pool/main/b/bash/bash_5.2.15-2ubuntu1.debian.tar.xz
+# dpkg-source -x bash_5.2.15-2ubuntu1.dsc
+# cd bash-5.2.15
+# # dpkg-checkbuilddeps
+# ./configure
+# make
+# sudo make install
+# chsh -s /bin/bash
 
 
 echo "==============================================="
