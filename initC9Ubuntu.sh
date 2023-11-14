@@ -370,6 +370,30 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 
 
 echo "==============================================="
+echo " Ask bedrock ......"
+echo "==============================================="
+pip install ask-bedrock
+echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
+# ask-bedrock converse
+# ask-bedrock configure
+
+
+echo "==============================================="
+echo " k8sgpt ......"
+echo "==============================================="
+curl -LO https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.19/k8sgpt_amd64.deb
+sudo dpkg -i k8sgpt_amd64.deb
+echo "alias kb='k8sgpt'" | tee -a ~/.bashrc
+# k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
+# k8sgpt auth list
+# k8sgpt auth default -p amazonbedrock
+# k8sgpt analyze -e -b amazonbedrock
+# export AWS_ACCESS_KEY=
+# export AWS_SECRET_ACCESS_KEY=
+# export AWS_DEFAULT_REGION=
+
+
+echo "==============================================="
 echo " A Data Migration Tool (abbr. ADMT) ......"
 echo "==============================================="
 # https://github.com/TipTopBin/data-migration-tool-for-s3

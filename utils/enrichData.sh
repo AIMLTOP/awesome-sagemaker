@@ -98,3 +98,11 @@ echo "==============================================="
 # https://catalog.workshops.aws/performance-tuning/en-US/30-environment
 sudo amazon-linux-extras install -y python3.8 postgresql14
 sudo yum install -y jq postgresql-contrib
+
+
+echo "==============================================="
+echo "  mysql ......"
+echo "==============================================="
+# wget -c https://dev.mysql.com/get/Downloads/MySQL-Shell/mysql-shell-8.0.32-linux-glibc2.12-x86-64bit.tar.gz
+# tar -xf mysql-shell-8.0.32-linux-glibc2.12-x86-64bit.tar.gz
+# mysqlsh
