@@ -587,6 +587,14 @@ echo "alias s5='s5cmd'" | tee -a ~/.bashrc
 
 
 echo "==============================================="
+echo " k8sgpt ......"
+echo "==============================================="
+curl https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.21/k8sgpt_Linux_x86_64.tar.gz -o "/tmp/k8sgpt_Linux_x86_64.tar.gz"
+sudo tar -xvf /tmp/k8sgpt_Linux_x86_64.tar.gz -C /usr/local/bin
+echo "alias kb='k8sgpt'" | tee -a ~/.bashrc
+
+
+echo "==============================================="
 echo " A Data Migration Tool (abbr. ADMT) ......"
 echo "==============================================="
 # https://github.com/TipTopBin/data-migration-tool-for-s3

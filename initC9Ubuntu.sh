@@ -381,7 +381,7 @@ echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
 echo "==============================================="
 echo " k8sgpt ......"
 echo "==============================================="
-curl -LO https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.19/k8sgpt_amd64.deb
+curl -LO https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.21/k8sgpt_amd64.deb
 sudo dpkg -i k8sgpt_amd64.deb
 echo "alias kb='k8sgpt'" | tee -a ~/.bashrc
 # k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
