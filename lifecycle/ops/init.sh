@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# https://github.com/fmmasood/eks-cli-init-tools/blob/main/cli_tools.sh
 WORKING_DIR=/home/ec2-user/SageMaker/custom
 mkdir -p "$WORKING_DIR"/bin
 
@@ -27,9 +26,24 @@ sudo yum -y install bash-completion jq gettext moreutils
 
 
 echo "==============================================="
+echo "  Upgrade awscli to v2 ......"
+echo "==============================================="
+if [ ! -f $WORKING_DIR/bin/awscliv2.zip ]; then
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip -qq awscliv2.zip
+fi
+sudo $WORKING_DIR/bin/aws/install --update
+rm -f /home/ec2-user/anaconda3/envs/JupyterSystemEnv/bin/aws
+sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
+ls -l /usr/local/bin/aws
+
+
+echo "==============================================="
 echo "  Install session-manager ......"
 echo "==============================================="
-curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
+if [ ! -f $WORKING_DIR/bin/session-manager-plugin.rpm ]; then
+  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$WORKING_DIR/bin/session-manager-plugin.rpm"
+fi
 sudo yum install -y session-manager-plugin.rpm
 session-manager-plugin
 
@@ -59,14 +73,17 @@ echo "==============================================="
 echo " s5cmd ......"
 echo "==============================================="
 #https://github.com/peak/s5cmd
-export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/latest \
-| grep "browser_download_url.*_Linux-64bit.tar.gz" \
-| cut -d : -f 2,3 \
-| tr -d \")
-# echo $S5CMD_URL
-wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
-sudo mkdir -p /opt/s5cmd/
-sudo tar xzvf /tmp/s5cmd.tar.gz -C $WORKING_DIR/bin
+if [ ! -f $WORKING_DIR/bin/s5cmd ]; then
+    echo "Setup s5cmd"
+    export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/latest \
+    | grep "browser_download_url.*_Linux-64bit.tar.gz" \
+    | cut -d : -f 2,3 \
+    | tr -d \")
+    # echo $S5CMD_URL
+    wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
+    sudo mkdir -p /opt/s5cmd/
+    sudo tar xzvf /tmp/s5cmd.tar.gz -C $WORKING_DIR/bin
+fi
 # mv/sync 等注意要加单引号，注意区域配置
 # s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
 # s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
@@ -89,15 +106,10 @@ echo "==============================================="
 # Tag to Env
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/.bashrc
-sudo bash -c "cat << EOF > /usr/local/bin/b
-#!/bin/bash
-/bin/bash
-EOF"
-sudo chmod +x /usr/local/bin/b
-
 AWS_COMPLETER=$(which aws_completer)
 echo $SHELL
 cat >> ~/.bashrc <<EOF
+alias b='/bin/bash'
 alias c=clear
 alias z='zip -r ../1.zip .'
 alias g=git
@@ -117,6 +129,5 @@ alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
 alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
 EOF
-# echo "alias b='/bin/bash'" | tee -a ~/.bashrc
-echo "" | tee -a ~/.bashrc
+
 source ~/.bashrc

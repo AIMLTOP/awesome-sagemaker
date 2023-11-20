@@ -33,7 +33,6 @@ sudo amazon-linux-extras install epel -y
 sudo yum -y install bash-completion jq gettext moreutils
 
 
-# 更新 awscli 并配置自动完成
 echo "==============================================="
 echo "  Upgrade awscli to v2 ......"
 echo "==============================================="

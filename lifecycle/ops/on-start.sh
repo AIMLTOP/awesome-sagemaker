@@ -1,14 +1,6 @@
 #!/bin/bash
 set -eux
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip -qq awscliv2.zip
-sudo ./aws/install --update
-rm -rf aws
-rm awscliv2.zip
-rm -f /home/ec2-user/anaconda3/envs/JupyterSystemEnv/bin/aws
-
-
 # Under ec2-user
 sudo -u ec2-user -i <<'EOF'
 
@@ -18,8 +10,7 @@ wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycl
 chmod +x /home/ec2-user/SageMaker/custom/*.sh
 chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 
-# bash /home/ec2-user/SageMaker/custom/initNotebook.sh &
-nohup /home/ec2-user/SageMaker/custom/initNotebook.sh > /home/ec2-user/SageMaker/custom/initNotebook.log 2>&1 & # execute asynchronously
+nohup /home/ec2-user/SageMaker/custom/init.sh > /home/ec2-user/SageMaker/custom/init.log 2>&1 & # execute asynchronously
 
 mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
 cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
@@ -84,6 +75,5 @@ echo "Starting the SageMaker autostop script in cron"
 
 
 echo "Restarting the Jupyter server.."
-
 sudo systemctl daemon-reload
 sudo systemctl restart jupyter-server
