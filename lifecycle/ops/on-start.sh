@@ -5,7 +5,7 @@ set -eux
 sudo -u ec2-user -i <<'EOF'
 
 echo "Donwload and init ..."
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/init.sh -O /home/ec2-user/SageMaker/custom/init.sh
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/lifecycle/ops/init.sh -O /home/ec2-user/SageMaker/custom/init.sh
 
 chmod +x /home/ec2-user/SageMaker/custom/*.sh
 chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R

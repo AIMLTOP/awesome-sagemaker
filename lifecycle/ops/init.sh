@@ -106,10 +106,14 @@ echo "==============================================="
 # Tag to Env
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/.bashrc
+sudo bash -c "cat << EOF > /usr/local/bin/b
+#!/bin/bash
+/bin/bash
+EOF"
+sudo chmod +x /usr/local/bin/b
 AWS_COMPLETER=$(which aws_completer)
 echo $SHELL
 cat >> ~/.bashrc <<EOF
-alias b='/bin/bash'
 alias c=clear
 alias z='zip -r ../1.zip .'
 alias g=git
