@@ -22,7 +22,7 @@ echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ..
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
-sudo yum -y install bash-completion jq gettext moreutils
+sudo yum -y install bash-completion jq gettext moreutils openssl
 
 
 echo "==============================================="
@@ -101,6 +101,68 @@ EOF
 
 
 echo "==============================================="
+echo "  Container related ......"
+echo "==============================================="
+ARCH=amd64 # for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
+PLATFORM=$(uname -s)_$ARCH
+if [ ! -f $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz ]; then
+  curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz" -o $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz
+  tar -xzf eksctl_$PLATFORM.tar.gz -C $WORKING_DIR/bin
+fi
+eksctl version
+
+if [ ! -f $WORKING_DIR/bin/kubectl ]; then
+  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  mv kubectl /tmp/
+  sudo install -o root -g root -m 0755 /tmp/kubectl $WORKING_DIR/bin/kubectl
+fi
+
+if [ ! -f $WORKING_DIR/bin/get_helm.sh ]; then
+  curl -fsSL -o $WORKING_DIR/bin/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+  chmod 700 $WORKING_DIR/bin/get_helm.sh
+fi
+$WORKING_DIR/bin/get_helm.sh
+helm version
+helm repo add eks https://aws.github.io/eks-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+helm repo update
+# docker logout public.ecr.aws
+helm registry logout public.ecr.aws
+
+if [ ! -f $WORKING_DIR/bin/kubectl-karpenter.sh ]; then
+  curl -fsSL -o $WORKING_DIR/bin/kubectl-karpenter.sh https://raw.githubusercontent.com/TipTopBin/aws-do-eks/main/utils/kubectl-karpenter.sh
+  chmod +x $WORKING_DIR/bin/kubectl-karpenter.sh
+fi
+
+
+echo "==============================================="
+echo " Ask bedrock ......"
+echo "==============================================="
+pip install ask-bedrock
+echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
+# aws configure --profile bedrock
+# ask-bedrock converse
+# ask-bedrock configure
+
+
+echo "==============================================="
+echo " k8sgpt ......"
+echo "==============================================="
+curl -LO https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.21/k8sgpt_amd64.deb
+sudo dpkg -i k8sgpt_amd64.deb
+echo "alias kb='k8sgpt'" | tee -a ~/.bashrc
+# k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
+# k8sgpt auth list
+# k8sgpt auth default -p amazonbedrock
+# k8sgpt analyze -e -b amazonbedrock
+# export AWS_ACCESS_KEY=
+# export AWS_SECRET_ACCESS_KEY=
+# export AWS_DEFAULT_REGION=
+
+
+echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
 # Tag to Env
@@ -117,7 +179,10 @@ cat >> ~/.bashrc <<EOF
 alias c=clear
 alias z='zip -r ../1.zip .'
 alias g=git
+alias l='ls -CF'
+alias la='ls -A'
 alias ll='ls -alh --color=auto'
+alias ls='ls --color=auto'
 alias jc=/bin/journalctl
 # alias gpa='git pull-all'
 alias gpa='git pull-all && git submodule update --remote'
@@ -132,6 +197,36 @@ alias s5='s5cmd'
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
 alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
+
+source <(kubectl completion bash)
+alias k=kubectl
+complete -F __start_kubectl k
+alias kk='kubectl-karpenter.sh'
+alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'
+alias kgp='kubectl get po -o wide'
+alias kga='kubectl get all'
+alias kgd='kubectl get deployment -o wide'
+alias kgs='kubectl get svc -o wide'
+alias ka='kubectl apply -f'
+alias ke='kubectl explain'
+export dry="--dry-run=client -o yaml"
+alias kr='kubectl run \$dry'
+alias tk='kt karpenter -n karpenter'
+alias tlbc='kt aws-load-balancer-controller -n kube-system'
+alias tebs='kt ebs-csi-controller -n kube-system'
+alias tefs='kt efs-csi-controller -n kube-system'
+
+. <(eksctl completion bash)
+alias e=eksctl
+complete -F __start_eksctl e
+alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
+alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
+alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name'
 EOF
+
+if [ -f /home/ec2-user/SageMaker/custom/bashrc ]
+then
+  cat /home/ec2-user/SageMaker/custom/bashrc >> ~/.bashrc
+fi
 
 source ~/.bashrc

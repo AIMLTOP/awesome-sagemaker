@@ -53,6 +53,12 @@ pip install amazon-codewhisperer-jupyterlab-ext
 jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
 
 source /home/ec2-user/anaconda3/bin/deactivate
+
+
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/infra/env.sh -O /home/ec2-user/SageMaker/custom/env.sh
+chmod +x /home/ec2-user/SageMaker/custom/env.sh
+nohup /home/ec2-user/SageMaker/custom/env.sh > /home/ec2-user/SageMaker/custom/env.log 2>&1 & # execute asynchronously
+
 EOF
 
 
