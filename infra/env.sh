@@ -40,7 +40,7 @@ do
 	((SUB_IDX++))
 done
 # pod 子网
-EKS_POD_SUBNET_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}"  "Name=tag:Name,Values=*${NAME_PREFIX}-Pod*" "Name=cidr-block,Values=*100.64.*" | jq '.Subnets | sort_by(.AvailabilityZone)' | jq '.[] .SubnetId')
+EKS_POD_SUBNET_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}"  "Name=tag:Name,Values=*${NAME_PREFIX}-Pod*" "Name=cidr-block,Values=*100.66.*" | jq '.Subnets | sort_by(.AvailabilityZone)' | jq '.[] .SubnetId')
 SUB_IDX=1
 for subnet in $EKS_POD_SUBNET_LIST
 do

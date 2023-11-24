@@ -136,6 +136,13 @@ if [ ! -f $WORKING_DIR/bin/kubectl-karpenter.sh ]; then
   chmod +x $WORKING_DIR/bin/kubectl-karpenter.sh
 fi
 
+curl -sS https://webinstall.dev/k9s | bash
+
+if [ ! -f $WORKING_DIR/bin/kubetail ]; then
+  curl -o $WORKING_DIR/bin/kubetail https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
+  chmod +x $WORKING_DIR/bin/kubetail
+fi
+
 
 echo "==============================================="
 echo " Ask bedrock ......"
@@ -165,6 +172,10 @@ echo "alias kb='k8sgpt'" | tee -a ~/.bashrc
 echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/infra/env.sh -O /home/ec2-user/SageMaker/custom/env.sh
+chmod +x /home/ec2-user/SageMaker/custom/env.sh
+/home/ec2-user/SageMaker/custom/env.sh
+
 # Tag to Env
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/.bashrc
@@ -176,6 +187,7 @@ sudo chmod +x /usr/local/bin/b
 AWS_COMPLETER=$(which aws_completer)
 echo $SHELL
 cat >> ~/.bashrc <<EOF
+alias ..='source ~/.bashrc'
 alias c=clear
 alias z='zip -r ../1.zip .'
 alias g=git
@@ -202,6 +214,7 @@ source <(kubectl completion bash)
 alias k=kubectl
 complete -F __start_kubectl k
 alias kk='kubectl-karpenter.sh'
+alias kt=kubetail
 alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'
 alias kgp='kubectl get po -o wide'
 alias kga='kubectl get all'
@@ -230,3 +243,18 @@ then
 fi
 
 source ~/.bashrc
+
+if [ -f /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ]
+then
+  sudo cp /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa
+  chmod 400 ~/.ssh/id_rsa
+  ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+fi
+
+
+echo "==============================================="
+echo "  EKS Cluster ......"
+echo "==============================================="
+if [ ! -z "$EKS_CLUSTER_NAME" ]; then
+    aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+fi
