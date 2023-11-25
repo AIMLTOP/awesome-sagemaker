@@ -29,13 +29,15 @@ echo "==============================================="
 echo "  Upgrade awscli to v2 ......"
 echo "==============================================="
 if [ ! -f $WORKING_DIR/bin/awscliv2.zip ]; then
-  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  unzip -qq awscliv2.zip
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$WORKING_DIR/bin/awscliv2.zip"
+  # unzip -qq awscliv2.zip -C
+  unzip -o $WORKING_DIR/bin/awscliv2.zip -d $WORKING_DIR/bin
 fi
 sudo $WORKING_DIR/bin/aws/install --update
 rm -f /home/ec2-user/anaconda3/envs/JupyterSystemEnv/bin/aws
 sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
 ls -l /usr/local/bin/aws
+aws --version
 
 
 echo "==============================================="
