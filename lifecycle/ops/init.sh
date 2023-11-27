@@ -237,12 +237,25 @@ complete -F __start_eksctl e
 alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
 alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
 alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name'
+
+bashrc_files=(bashrc)
+path="/home/ec2-user/SageMaker/custom/"
+for file in \${bashrc_files[@]}
+do 
+    file_to_load=\$path\$file
+    if [ -f "\$file_to_load" ];
+    then
+        . \$file_to_load
+        echo "loaded \$file_to_load"
+    fi
+done
 EOF
 
-if [ -f /home/ec2-user/SageMaker/custom/bashrc ]
-then
-  cat /home/ec2-user/SageMaker/custom/bashrc >> ~/.bashrc
-fi
+# if [ -f /home/ec2-user/SageMaker/custom/bashrc ]
+# then
+#   cat /home/ec2-user/SageMaker/custom/bashrc >> ~/.bashrc
+# fi
+
 
 source ~/.bashrc
 
