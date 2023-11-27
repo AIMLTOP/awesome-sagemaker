@@ -109,7 +109,7 @@ ARCH=amd64 # for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
 PLATFORM=$(uname -s)_$ARCH
 if [ ! -f $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz ]; then
   curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz" -o $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz
-  tar -xzf eksctl_$PLATFORM.tar.gz -C $WORKING_DIR/bin
+  tar -xzf $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz -C $WORKING_DIR/bin
 fi
 eksctl version
 
