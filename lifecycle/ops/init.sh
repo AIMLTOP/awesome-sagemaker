@@ -22,7 +22,7 @@ echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ..
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
-sudo yum -y install bash-completion jq gettext moreutils openssl
+sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils
 
 
 echo "==============================================="
@@ -264,7 +264,8 @@ if [ -f /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ]
 then
   sudo cp /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa
   chmod 400 ~/.ssh/id_rsa
-  ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+  cp /home/ec2-user/SageMaker/custom/id_rsa_pub_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa.pub
+  # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
 fi
 
 echo "==============================================="
@@ -287,3 +288,64 @@ echo "==============================================="
 if [ ! -z "$EKS_CLUSTER_NAME" ]; then
     aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
 fi
+
+
+echo "==============================================="
+echo "  S3 Bucket ......"
+echo "==============================================="
+export IA_S3_BUCKET=ia-${ACCOUNT_ID}-${AWS_REGION}
+# Check if bucket exists 
+bucket_exists=$(aws s3api head-bucket --bucket ${IA_S3_BUCKET} --region ${AWS_REGION} 2>/dev/null)
+# Create bucket if not exists
+if [ $? -ne 0 ]; then
+  echo "Bucket ${IA_S3_BUCKET} does not exist, creating..."
+  if [ ${AWS_REGION} == 'us-east-1' ]
+  then
+    aws s3api create-bucket --bucket ${IA_S3_BUCKET} --region ${AWS_REGION}
+  else
+    aws s3api create-bucket --bucket ${IA_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration LocationConstraint=${AWS_REGION}
+  fi  
+else
+  echo "Bucket ${IA_S3_BUCKET} already exists"  
+fi
+
+echo "export IA_S3_BUCKET=\"$IA_S3_BUCKET\"" >> ~/.bashrc
+
+
+echo "==============================================="
+echo "  EFS ......"
+echo "==============================================="
+if [ ! -z "$EFS_FS_ID" ]; then
+  mkdir -p /home/ec2-user/SageMaker/efs
+  # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
+  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs efs _netdev,tls 0 0" | sudo tee -a /etc/fstab  
+fi
+sudo mount -a
+sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
+#sudo chmod 777 /home/ec2-user/SageMaker/efs*
+
+
+##--------------------- Check ENVs -------------------##
+source ~/.bashrc
+
+echo -e " EKS_CLUSTER_NAME: $EKS_CLUSTER_NAME\n" \
+  "EKS_VERSION: $EKS_VERSION\n" \
+  "EKS_MASTER_ARN: ${EKS_MASTER_ARN}\n" \
+  "SAGE_NB_NAME: $SAGE_NB_NAME\n" \
+  "SAGE_LC_NAME: $SAGE_LC_NAME\n" \
+  "SAGE_ROLE_NAME: $SAGE_ROLE_NAME\n" \
+  "SAGE_ROLE_ARN: $SAGE_ROLE_ARN\n" \
+  "IA_S3_BUCKET: $IA_S3_BUCKET\n" \
+  "EFS_FS_NAME: ${EFS_FS_NAME}\n" \
+  "EFS_FS_ID: ${EFS_FS_ID}\n" \
+  "EFS_PV_DEFAULT: $EFS_PV_DEFAULT\n" \
+  "EFS_CLAIM_DEFAULT: $EFS_CLAIM_DEFAULT\n" \
+  "EFS_PV_OTEL: $EFS_PV_OTEL\n" \
+  "EFS_CLAIM_OTEL: $EFS_CLAIM_OTEL\n" \
+  "EMR_VIRTUAL_CLUSTER_NAME: $EMR_VIRTUAL_CLUSTER_NAME\n" \
+  "EMR_VIRTUAL_CLUSTER_NS: $EMR_VIRTUAL_CLUSTER_NS\n" \
+  "EMR_VIRTUAL_CLUSTER_ID: $EMR_VIRTUAL_CLUSTER_ID\n" \
+  "ECR_DATAML_REPO: $ECR_DATAML_REPO\n" \
+  "ELB_NLB_ARN: $ELB_NLB_ARN\n"
+
+echo " done"
