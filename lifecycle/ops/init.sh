@@ -267,6 +267,19 @@ then
   ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
 fi
 
+echo "==============================================="
+echo "  Resource Metadata ......"
+echo "==============================================="
+export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
+export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
+export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
+export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})
+
+echo "export SAGE_NB_NAME=\"$SAGE_NB_NAME\"" >> ~/.bashrc
+echo "export SAGE_LC_NAME=\"$SAGE_LC_NAME\"" >> ~/.bashrc
+echo "export SAGE_ROLE_NAME=\"$SAGE_ROLE_NAME\"" >> ~/.bashrc
+echo "export SAGE_ROLE_ARN=\"$SAGE_ROLE_ARN\"" >> ~/.bashrc
+
 
 echo "==============================================="
 echo "  EKS Cluster ......"
