@@ -37,6 +37,7 @@ sudo $WORKING_DIR/bin/aws/install --update
 rm -f /home/ec2-user/anaconda3/envs/JupyterSystemEnv/bin/aws
 sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
 ls -l /usr/local/bin/aws
+source ~/.bashrc
 aws --version
 
 
@@ -46,7 +47,7 @@ echo "==============================================="
 if [ ! -f $WORKING_DIR/bin/session-manager-plugin.rpm ]; then
   curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$WORKING_DIR/bin/session-manager-plugin.rpm"
 fi
-sudo yum install -y session-manager-plugin.rpm
+sudo yum install -y $WORKING_DIR/bin/session-manager-plugin.rpm
 session-manager-plugin
 
 
