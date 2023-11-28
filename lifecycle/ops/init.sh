@@ -311,6 +311,15 @@ fi
 
 echo "export IA_S3_BUCKET=\"$IA_S3_BUCKET\"" >> ~/.bashrc
 
+if [ ! -f $WORKING_DIR/bin/mount-s3.rpm ]; then
+  wget -O $WORKING_DIR/bin/mount-s3.rpm https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
+fi
+sudo yum install -y $WORKING_DIR/bin/mount-s3.rpm
+echo "alias ms3='mount-s3'" | tee -a ~/.bashrc
+# mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
+mkdir -p /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
+mount-s3 ${IA_S3_BUCKET} /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
+
 
 echo "==============================================="
 echo "  EFS ......"
