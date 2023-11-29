@@ -22,7 +22,7 @@ echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ..
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
-sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils
+sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils nc
 
 
 echo "==============================================="
@@ -160,9 +160,10 @@ echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
 echo "==============================================="
 echo " k8sgpt ......"
 echo "==============================================="
-curl -LO https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.21/k8sgpt_amd64.deb
-sudo dpkg -i k8sgpt_amd64.deb
-echo "alias kb='k8sgpt'" | tee -a ~/.bashrc
+if [ ! -f $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz ]; then
+  wget -O $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.23/k8sgpt_Linux_x86_64.tar.gz
+  tar -xvf $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz -C $WORKING_DIR/bin
+fi
 # k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
 # k8sgpt auth list
 # k8sgpt auth default -p amazonbedrock
@@ -217,6 +218,7 @@ source <(kubectl completion bash)
 alias k=kubectl
 complete -F __start_kubectl k
 alias kk='kubectl-karpenter.sh'
+alias kb='k8sgpt'
 alias kt=kubetail
 alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'
 alias kgp='kubectl get po -o wide'
