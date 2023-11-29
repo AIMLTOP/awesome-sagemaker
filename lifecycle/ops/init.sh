@@ -288,7 +288,8 @@ echo "==============================================="
 echo "  EKS Cluster ......"
 echo "==============================================="
 if [ ! -z "$EKS_CLUSTER_NAME" ]; then
-    aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+    # aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+    /usr/local/bin/aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
 fi
 
 
