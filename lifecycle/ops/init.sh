@@ -155,6 +155,14 @@ echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
 # aws configure --profile bedrock
 # ask-bedrock converse
 # ask-bedrock configure
+if [ ! -f $WORKING_DIR/profile_bedrock_config ]; then
+  cat $WORKING_DIR/profile_bedrock_config >> ~/.aws/config
+  cat $WORKING_DIR/profile_bedrock_credentials >> ~/.aws/credentials
+fi
+
+if [ ! -f $WORKING_DIR/abc_config ]; then
+  cp $WORKING_DIR/abc_config $HOME/.config/ask-bedrock/config.yaml
+fi
 
 
 echo "==============================================="
@@ -164,9 +172,9 @@ if [ ! -f $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz ]; then
   wget -O $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.23/k8sgpt_Linux_x86_64.tar.gz
   tar -xvf $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz -C $WORKING_DIR/bin
 fi
-# k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
-# k8sgpt auth list
-# k8sgpt auth default -p amazonbedrock
+k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
+k8sgpt auth list
+k8sgpt auth default -p amazonbedrock
 # k8sgpt analyze -e -b amazonbedrock
 # export AWS_ACCESS_KEY=
 # export AWS_SECRET_ACCESS_KEY=
@@ -335,6 +343,8 @@ fi
 sudo mount -a
 sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
 #sudo chmod 777 /home/ec2-user/SageMaker/efs*
+
+
 
 
 ##--------------------- Check ENVs -------------------##
