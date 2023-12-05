@@ -22,6 +22,7 @@ echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ..
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
+sudo yum groupinstall "Development Tools" -y
 sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils nc
 
 
