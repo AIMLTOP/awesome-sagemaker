@@ -23,7 +23,13 @@ echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
 sudo yum groupinstall "Development Tools" -y
-sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils nc
+sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils nc telnet mtr traceroute netcat 
+# sudo yum -y install siege fio ioping dos2unix
+
+if [ ! -f $WORKING_DIR/bin/yq ]; then
+  wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $WORKING_DIR/bin/yq
+  chmod +x $WORKING_DIR/bin/yq
+fi
 
 
 echo "==============================================="
@@ -65,12 +71,14 @@ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 
 
 echo "==============================================="
-echo "  Install netron ......"
+echo "  Install Python tools e.g. netron ......"
 echo "==============================================="
 #https://github.com/lutzroeder/netron
 pip install netron
 netron --version
 # netron [FILE] or netron.start('[FILE]').
+python3 -m pip install awscurl
+pip3 install httpie
 
 
 echo "==============================================="
@@ -147,6 +155,28 @@ if [ ! -f $WORKING_DIR/bin/kubetail ]; then
   chmod +x $WORKING_DIR/bin/kubetail
 fi
 
+if [ ! -f $WORKING_DIR/bin/kustomize ]; then
+  curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash
+  sudo mv -v kustomize $WORKING_DIR/bin
+fi
+kustomize version
+
+
+echo "==============================================="
+echo "  EC2 tools e.g. ec2-instance-selector ......"
+echo "==============================================="
+if [ ! -f $WORKING_DIR/bin/ec2-instance-selector ]; then
+  curl -Lo $WORKING_DIR/bin/ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.4.1/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 
+  chmod +x $WORKING_DIR/bin/ec2-instance-selector
+fi
+
+# run this script on your eks node
+if [ ! -f $WORKING_DIR/bin/eks-log-collector.sh ]; then
+  curl -o $WORKING_DIR/bin/eks-log-collector.sh https://raw.githubusercontent.com/awslabs/amazon-eks-ami/master/log-collector-script/linux/eks-log-collector.sh 
+  chmod +x $WORKING_DIR/bin/eks-log-collector.sh
+fi
+
+
 
 echo "==============================================="
 echo " Ask bedrock ......"
@@ -222,6 +252,11 @@ alias s5='s5cmd'
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
 alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
+
+alias nsel=ec2-instance-selector
+alias nlog=eks-log-collector.sh
+
+alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage" 
 
 source <(kubectl completion bash)
 alias k=kubectl
@@ -346,6 +381,14 @@ sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
 #sudo chmod 777 /home/ec2-user/SageMaker/efs*
 
 
+echo "==============================================="
+echo "  Local Stable Diffusion ......"
+echo "==============================================="
+if [ ! -z "$SD_HOME" ]; then
+  cd $SD_HOME/sd-webui # WorkingDirectory 注意一定要进入到这个目录
+  # TODO check GPU
+  nohup $SD_HOME/sd-webui/webui.sh --gradio-auth admin:${SD_PWD} --cors-allow-origins=* --enable-insecure-extension-access --allow-code --medvram --xformers --listen --port 8760 > $SD_HOME/sd.log 2>&1 & # execute asynchronously
+fi
 
 
 ##--------------------- Check ENVs -------------------##
