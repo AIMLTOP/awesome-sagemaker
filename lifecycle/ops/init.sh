@@ -186,14 +186,6 @@ echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
 # aws configure --profile bedrock
 # ask-bedrock converse
 # ask-bedrock configure
-if [ ! -f $WORKING_DIR/profile_bedrock_config ]; then
-  cat $WORKING_DIR/profile_bedrock_config >> ~/.aws/config
-  cat $WORKING_DIR/profile_bedrock_credentials >> ~/.aws/credentials
-fi
-
-if [ ! -f $WORKING_DIR/abc_config ]; then
-  cp $WORKING_DIR/abc_config $HOME/.config/ask-bedrock/config.yaml
-fi
 
 
 echo "==============================================="
@@ -321,6 +313,18 @@ then
   sudo chmod 400 ~/.ssh/id_rsa
   sudo chown -R ec2-user:ec2-user ~/.ssh/
   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+fi
+
+if [ -f $WORKING_DIR/profile_bedrock_config ]; then
+  # cat $WORKING_DIR/profile_bedrock_config >> ~/.aws/config
+  # cat $WORKING_DIR/profile_bedrock_credentials >> ~/.aws/credentials
+  cp $WORKING_DIR/profile_bedrock_config ~/.aws/config
+  cp $WORKING_DIR/profile_bedrock_credentials ~/.aws/credentials  
+fi
+
+if [ -f $WORKING_DIR/abc_config ]; then
+  mkdir -p /home/ec2-user/.config/ask-bedrock
+  cp $WORKING_DIR/abc_config $HOME/.config/ask-bedrock/config.yaml
 fi
 
 
