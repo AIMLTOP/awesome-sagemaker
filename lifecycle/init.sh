@@ -360,32 +360,17 @@ fi
 echo "==============================================="
 echo "  S3 Bucket ......"
 echo "==============================================="
-export IA_S3_BUCKET=ia-${ACCOUNT_ID}-${AWS_REGION}
-# Check if bucket exists 
-bucket_exists=$(aws s3api head-bucket --bucket ${IA_S3_BUCKET} --region ${AWS_REGION} 2>/dev/null)
-# Create bucket if not exists
-if [ $? -ne 0 ]; then
-  echo "Bucket ${IA_S3_BUCKET} does not exist, creating..."
-  if [ ${AWS_REGION} == 'us-east-1' ]
-  then
-    aws s3api create-bucket --bucket ${IA_S3_BUCKET} --region ${AWS_REGION}
-  else
-    aws s3api create-bucket --bucket ${IA_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration LocationConstraint=${AWS_REGION}
-  fi  
-else
-  echo "Bucket ${IA_S3_BUCKET} already exists"  
-fi
-
-echo "export IA_S3_BUCKET=\"$IA_S3_BUCKET\"" >> ~/.bashrc
-
 if [ ! -f $WORKING_DIR/bin/mount-s3.rpm ]; then
   wget -O $WORKING_DIR/bin/mount-s3.rpm https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
 fi
 sudo yum install -y $WORKING_DIR/bin/mount-s3.rpm
 echo "alias ms3='mount-s3'" | tee -a ~/.bashrc
 # mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
-mkdir -p /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
-mount-s3 ${IA_S3_BUCKET} /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
+if [ ! -z "$IA_S3_BUCKET" ]; then
+    mkdir -p /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
+    mount-s3 ${IA_S3_BUCKET} /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
+fi
+
 
 
 echo "==============================================="

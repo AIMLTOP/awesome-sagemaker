@@ -42,10 +42,6 @@ EoL
 echo "Install Extensions ... "
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
 
-jupyter labextension install jupyterlab-s3-browser
-python -m pip install widgetsnbextension
-jupyter serverextension enable --py widgetsnbextension
-
 pip install ipywidgets
 jupyter nbextension enable widgetsnbextension --py --sys-prefix
 
