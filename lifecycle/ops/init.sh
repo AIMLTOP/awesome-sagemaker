@@ -121,7 +121,13 @@ if [ ! -f $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz ]; then
   curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz" -o $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz
   tar -xzf $WORKING_DIR/bin/eksctl_$PLATFORM.tar.gz -C $WORKING_DIR/bin
 fi
-eksctl version
+if [ ! -f $WORKING_DIR/bin/eksctl_150.tar.gz ]; then
+  curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v0.150.0/eksctl_Linux_amd64.tar.gz" -o $WORKING_DIR/bin/eksctl_150.tar.gz
+  tar -xzf $WORKING_DIR/bin/eksctl_150.tar.gz
+  mv eksctl $WORKING_DIR/bin/eksctl150
+fi
+
+
 
 if [ ! -f $WORKING_DIR/bin/kubectl ]; then
   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
