@@ -5,7 +5,7 @@ set -eux
 sudo -u ec2-user -i <<'EOF'
 
 echo "Donwload and init ..."
-aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/eks/init.sh /home/ec2-user/SageMaker/custom/init.sh
+aws s3 cp s3://${IA_S3_BUCKET}/sagemaker/lifecycle/eks/init.sh /home/ec2-user/SageMaker/custom/init.sh
 
 chmod +x /home/ec2-user/SageMaker/custom/*.sh
 chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
