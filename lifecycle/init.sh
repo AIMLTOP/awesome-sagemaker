@@ -75,6 +75,7 @@ echo "  Install Python tools e.g. netron ......"
 echo "==============================================="
 #https://github.com/lutzroeder/netron
 pip install netron
+# pip install cleanipynb # cleanipynb xxx.ipynb # 注意会把所有的图片附件都清掉
 netron --version
 # netron [FILE] or netron.start('[FILE]').
 python3 -m pip install awscurl
@@ -271,7 +272,7 @@ alias ka='kubectl apply -f'
 alias ke='kubectl explain'
 export dry="--dry-run=client -o yaml"
 alias kr='kubectl run \$dry'
-alias tk='kt karpenter -n karpenter'
+alias tk='kt karpenter -n \${KARPENTER_NAMESPACE}'
 alias tlbc='kt aws-load-balancer-controller -n kube-system'
 alias tebs='kt ebs-csi-controller -n kube-system'
 alias tefs='kt efs-csi-controller -n kube-system'

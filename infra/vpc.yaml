@@ -1700,6 +1700,15 @@ Resources:
     Properties:
       GroupDescription: Cluster communication with worker nodes
       VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VpcBlockMain
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VpcBlockEKS      
       Tags:
       - Key: Name
         Value: !Sub "${NamePrefix}-control-plane"
@@ -1712,6 +1721,33 @@ Resources:
         FromPort: -1
         ToPort: -1
         SourceSecurityGroupId: !GetAtt ControlPlaneSecurityGroup.GroupId
+
+  AdditionalSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Additional security groups for EKS
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VpcBlockMain
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VpcBlockEKS      
+      Tags:
+      - Key: Name
+        Value: !Sub "${NamePrefix}-additional"
+
+  AdditionalSecurityGroupIngress:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+        GroupId: !Ref AdditionalSecurityGroup
+        IpProtocol: -1
+        FromPort: -1
+        ToPort: -1
+        SourceSecurityGroupId: !GetAtt AdditionalSecurityGroup.GroupId
 
   SharedNodeSecurityGroup:
     Type: AWS::EC2::SecurityGroup

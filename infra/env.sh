@@ -47,8 +47,10 @@ do
 	echo "export EKS_POD_SUBNET_$SUB_IDX=$subnet" >> ~/.bashrc
 	((SUB_IDX++))
 done
-# Cluster security group
+# Additional security groups, 1
 export EKS_CLUSTER_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-control-plane*" | jq -r '.SecurityGroups[]|.GroupId')
+# Additional security groups, 2
+export EKS_ADDITIONAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-additional*" | jq -r '.SecurityGroups[]|.GroupId')
 # Custom network security groups
 export EKS_CUSTOMNETWORK_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-custom-network*" | jq -r '.SecurityGroups[]|.GroupId')
 # Share node security group
@@ -59,6 +61,7 @@ export EKS_EXTERNAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id
 echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ~/.bashrc
 echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ~/.bashrc
 echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ~/.bashrc
+echo "export EKS_ADDITIONAL_SG=${EKS_ADDITIONAL_SG}" | tee -a ~/.bashrc
 echo "export EKS_CUSTOMNETWORK_SG=${EKS_CUSTOMNETWORK_SG}" | tee -a ~/.bashrc
 echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ~/.bashrc
 echo "export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}" | tee -a ~/.bashrc
