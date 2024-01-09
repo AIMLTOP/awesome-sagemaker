@@ -199,7 +199,7 @@ echo "==============================================="
 echo " k8sgpt ......"
 echo "==============================================="
 if [ ! -f $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz ]; then
-  wget -O $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.23/k8sgpt_Linux_x86_64.tar.gz
+  wget -O $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.25/k8sgpt_Linux_x86_64.tar.gz
   tar -xvf $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz -C $WORKING_DIR/bin
 fi
 k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
