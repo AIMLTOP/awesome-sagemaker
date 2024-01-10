@@ -263,7 +263,7 @@ complete -F __start_kubectl k
 alias kk='kubectl-karpenter.sh'
 alias kb='k8sgpt'
 alias kt=kubetail
-alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/provisioner-name'
+alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/nodepool'
 alias kgp='kubectl get po -o wide'
 alias kga='kubectl get all'
 alias kgd='kubectl get deployment -o wide'
