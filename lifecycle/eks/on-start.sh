@@ -55,7 +55,9 @@ EOF
 
 # Under root
 echo "Auto stop to save cost ..."
-IDLE_TIME=9720 # 2.7 hour
+# IDLE_TIME=9720 # 2.7 hour
+IDLE_TIME=28800 # 8 hour
+
 CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
 if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then
     PYTHON_DIR=$CONDA_PYTHON_DIR
