@@ -244,6 +244,7 @@ alias gca='git clone-all'
 export TERM=xterm-256color
 #export TERM=xterm-color
 alias a=aws
+alias aid='aws sts get-caller-identity'
 complete -C '${AWS_COMPLETER}' aws
 complete -C '${AWS_COMPLETER}' a
 export WORKING_DIR=/home/ec2-user/SageMaker/custom
