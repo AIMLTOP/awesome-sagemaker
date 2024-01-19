@@ -112,6 +112,12 @@ local:
   container_root: /home/ec2-user/SageMaker/tmp
 EOF
 
+if [ ! -f $WORKING_DIR/bin/powerEBS.sh ]; then
+  wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/powerEBS.sh -O $WORKING_DIR/bin/powerEBS.sh
+  chmod +x $WORKING_DIR/bin/powerEBS.sh
+  df -ah
+fi
+
 
 echo "==============================================="
 echo "  Container related ......"
@@ -127,8 +133,6 @@ if [ ! -f $WORKING_DIR/bin/eksctl_150.tar.gz ]; then
   tar -xzf $WORKING_DIR/bin/eksctl_150.tar.gz
   mv eksctl $WORKING_DIR/bin/eksctl150
 fi
-
-
 
 if [ ! -f $WORKING_DIR/bin/kubectl ]; then
   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -169,6 +173,12 @@ fi
 kustomize version
 
 
+if [ ! -f $WORKING_DIR/bin/kubie ]; then
+  wget https://github.com/sbstp/kubie/releases/latest/download/kubie-linux-amd64 -O $WORKING_DIR/bin/kubie
+  chmod +x $WORKING_DIR/bin/kubie
+fi
+
+
 echo "==============================================="
 echo "  EC2 tools e.g. ec2-instance-selector ......"
 echo "==============================================="
@@ -183,6 +193,12 @@ if [ ! -f $WORKING_DIR/bin/eks-log-collector.sh ]; then
   chmod +x $WORKING_DIR/bin/eks-log-collector.sh
 fi
 
+# AMI
+# export ACCELERATED_AMI=$(aws ssm get-parameter \
+#     --name /aws/service/eks/optimized-ami/$EKS_VERSION/amazon-linux-2-gpu/recommended/image_id \
+#     --region $AWS_REGION \
+#     --query "Parameter.Value" \
+#     --output text)
 
 
 echo "==============================================="
@@ -283,7 +299,8 @@ alias e=eksctl
 complete -F __start_eksctl e
 alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
 alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
-alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name'
+alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} -n'
+alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nodes-min=0 -n'
 
 bashrc_files=(bashrc)
 path="/home/ec2-user/SageMaker/custom/"
