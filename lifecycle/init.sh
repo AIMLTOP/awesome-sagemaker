@@ -18,7 +18,7 @@ aws configure set region $AWS_REGION
 
 # 辅助工具
 echo "==============================================="
-echo "  Install jq, envsubst (from GNU gettext utilities) and bash-completion ......"
+echo "  Install utilities ......"
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
@@ -33,8 +33,9 @@ fi
 
 
 echo "==============================================="
-echo "  Upgrade awscli to v2 ......"
+echo "  AWS Tools ......"
 echo "==============================================="
+# Upgrade awscli to v2
 if [ ! -f $WORKING_DIR/bin/awscliv2.zip ]; then
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$WORKING_DIR/bin/awscliv2.zip"
   # unzip -qq awscliv2.zip -C
@@ -47,27 +48,12 @@ ls -l /usr/local/bin/aws
 source ~/.bashrc
 aws --version
 
-
-echo "==============================================="
-echo "  Install session-manager ......"
-echo "==============================================="
+# Install session-manager
 if [ ! -f $WORKING_DIR/bin/session-manager-plugin.rpm ]; then
   curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$WORKING_DIR/bin/session-manager-plugin.rpm"
 fi
 sudo yum install -y $WORKING_DIR/bin/session-manager-plugin.rpm
 session-manager-plugin
-
-
-echo "==============================================="
-echo "  Docker Compose ......"
-echo "==============================================="
-#sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo mkdir -p /usr/local/lib/docker/cli-plugins/
-sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-# sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $WORKING_DIR/docker-compose
-# sudo chmod +x $WORKING_DIR/docker-compose
-# $WORKING_DIR/docker-compose version
 
 
 echo "==============================================="
@@ -172,11 +158,19 @@ if [ ! -f $WORKING_DIR/bin/kustomize ]; then
 fi
 kustomize version
 
-
 if [ ! -f $WORKING_DIR/bin/kubie ]; then
   wget https://github.com/sbstp/kubie/releases/latest/download/kubie-linux-amd64 -O $WORKING_DIR/bin/kubie
   chmod +x $WORKING_DIR/bin/kubie
 fi
+
+# Docker Compose
+#sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+# sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $WORKING_DIR/docker-compose
+# sudo chmod +x $WORKING_DIR/docker-compose
+# $WORKING_DIR/docker-compose version
 
 
 echo "==============================================="
@@ -202,18 +196,13 @@ fi
 
 
 echo "==============================================="
-echo " Ask bedrock ......"
+echo " AI/ML ......"
 echo "==============================================="
+# Ask bedrock
 pip install ask-bedrock
 echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
-# aws configure --profile bedrock
-# ask-bedrock converse
-# ask-bedrock configure
 
-
-echo "==============================================="
-echo " k8sgpt ......"
-echo "==============================================="
+# k8sgpt
 if [ ! -f $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz ]; then
   wget -O $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.25/k8sgpt_Linux_x86_64.tar.gz
   tar -xvf $WORKING_DIR/bin/k8sgpt_Linux_x86_64.tar.gz -C $WORKING_DIR/bin
@@ -221,10 +210,15 @@ fi
 k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
 k8sgpt auth list
 k8sgpt auth default -p amazonbedrock
-# k8sgpt analyze -e -b amazonbedrock
-# export AWS_ACCESS_KEY=
-# export AWS_SECRET_ACCESS_KEY=
-# export AWS_DEFAULT_REGION=
+
+
+echo "==============================================="
+echo "  Dev Platform ......"
+echo "==============================================="
+if [ ! -f $WORKING_DIR/bin/devpod ]; then
+  curl -L -o $WORKING_DIR/bin/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64" 
+  sudo install -c -m 0755 /$WORKING_DIR/bin/devpod $WORKING_DIR/bin
+fi
 
 
 echo "==============================================="
