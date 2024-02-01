@@ -217,7 +217,8 @@ echo "  Dev Platform ......"
 echo "==============================================="
 if [ ! -f $WORKING_DIR/bin/devpod ]; then
   curl -L -o $WORKING_DIR/bin/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64" 
-  sudo install -c -m 0755 /$WORKING_DIR/bin/devpod $WORKING_DIR/bin
+  # sudo install -c -m 0755 $WORKING_DIR/bin/devpod $WORKING_DIR/bin
+  chmod 0755 $WORKING_DIR/bin/devpod
 fi
 
 
