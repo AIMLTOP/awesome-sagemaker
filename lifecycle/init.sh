@@ -5,7 +5,7 @@ mkdir -p "$WORKING_DIR"/bin
 
 
 echo "==============================================="
-echo "  Config envs ......"
+echo "  Config envs, load custom bashrc ......"
 echo "==============================================="
 export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
@@ -15,8 +15,26 @@ aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
 
+cat >> ~/.bashrc <<EOF
+bashrc_files=(bashrc)
+path="/home/ec2-user/SageMaker/custom/"
+for file in \${bashrc_files[@]}
+do 
+    file_to_load=\$path\$file
+    if [ -f "\$file_to_load" ];
+    then
+        . \$file_to_load
+        echo "loaded \$file_to_load"
+    fi
+done
+EOF
 
-# 辅助工具
+# if [ -f /home/ec2-user/SageMaker/custom/bashrc ]
+# then
+#   cat /home/ec2-user/SageMaker/custom/bashrc >> ~/.bashrc
+# fi
+
+
 echo "==============================================="
 echo "  Install utilities ......"
 echo "==============================================="
@@ -318,25 +336,7 @@ alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nod
 
 export KREW_ROOT="\$WORKING_DIR/bin/krew"
 export PATH="\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH"
-
-bashrc_files=(bashrc)
-path="/home/ec2-user/SageMaker/custom/"
-for file in \${bashrc_files[@]}
-do 
-    file_to_load=\$path\$file
-    if [ -f "\$file_to_load" ];
-    then
-        . \$file_to_load
-        echo "loaded \$file_to_load"
-    fi
-done
 EOF
-
-# if [ -f /home/ec2-user/SageMaker/custom/bashrc ]
-# then
-#   cat /home/ec2-user/SageMaker/custom/bashrc >> ~/.bashrc
-# fi
-
 
 source ~/.bashrc
 
