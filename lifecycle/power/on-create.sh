@@ -6,12 +6,14 @@ sudo -u ec2-user -i <<'EOF'
 CUSTOM_DIR=/home/ec2-user/SageMaker/custom
 mkdir -p "$CUSTOM_DIR"/bin
 
-echo "Set helper env"
-export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
-export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+echo "Set helper env and alias"
 echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
-echo "export ACCOUNT_ID=${ACCOUNT_ID}" >> ~/SageMaker/custom/bashrc
-echo "export AWS_REGION=${AWS_REGION}" >> ~/SageMaker/custom/bashrc
+
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/infra/env.sh -O /home/ec2-user/SageMaker/custom/env.sh
+chmod +x /home/ec2-user/SageMaker/custom/env.sh
+/home/ec2-user/SageMaker/custom/env.sh ~/SageMaker/custom/bashrc
+
+echo "alias abc='ask-bedrock converse'" >> ~/SageMaker/custom/bashrc
 
 echo "Cloning examples and init scripts"
 nohup git clone --recurse-submodules https://github.com/TipTopBin/amazon-sagemaker-notebook-instance-customization.git /home/ec2-user/SageMaker/custom/init > /dev/null 2>&1 &

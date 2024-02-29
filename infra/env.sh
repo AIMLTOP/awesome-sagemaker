@@ -1,5 +1,7 @@
 #!/bin/bash
 source ~/.bashrc
+
+BASH_FILE="${1:-~/.bashrc}"
 NAME_PREFIX="sage"
 
 echo "==============================================="
@@ -9,11 +11,11 @@ echo "==============================================="
 export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
 test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is not set
-echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bashrc
-echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bashrc
+echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ${BASH_FILE}
+echo "export AWS_REGION=${AWS_REGION}" | tee -a ${BASH_FILE}
 # export AZS=($(aws ec2 describe-availability-zones --query 'AvailabilityZones[].ZoneName' --output text --region $AWS_REGION))
-# echo "export AZS=${AZS}" | tee -a ~/.bashrc
-# echo "export AZS=(${AZS[@]})" | tee -a ~/.bashrc
+# echo "export AZS=${AZS}" | tee -a ${BASH_FILE}
+# echo "export AZS=(${AZS[@]})" | tee -a ${BASH_FILE}
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
@@ -26,9 +28,9 @@ for pubazinfo in $EKS_PUBAZ_INFO_LIST
 do
 	export info_str=$(echo "$pubazinfo" | tr -d '"') # 去掉双引号
   IFS=',' read -ra info_array <<< "$info_str"
-	echo "export EKS_PUB_SUBNET_$SUB_IDX=${info_array[0]}" >> ~/.bashrc
-	echo "export EKS_AZ_$SUB_IDX=${info_array[1]}" >> ~/.bashrc
-	echo "export EKS_AZ_ID_$SUB_IDX=${info_array[2]}" >> ~/.bashrc
+	echo "export EKS_PUB_SUBNET_$SUB_IDX=${info_array[0]}" >> ${BASH_FILE}
+	echo "export EKS_AZ_$SUB_IDX=${info_array[1]}" >> ${BASH_FILE}
+	echo "export EKS_AZ_ID_$SUB_IDX=${info_array[2]}" >> ${BASH_FILE}
 	((SUB_IDX++))
 done
 # private 子网
@@ -36,7 +38,7 @@ EKS_PRI_SUBNET_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${E
 SUB_IDX=1
 for subnet in $EKS_PRI_SUBNET_LIST
 do
-	echo "export EKS_PRI_SUBNET_$SUB_IDX=$subnet" >> ~/.bashrc
+	echo "export EKS_PRI_SUBNET_$SUB_IDX=$subnet" >> ${BASH_FILE}
 	((SUB_IDX++))
 done
 # pod 子网
@@ -44,7 +46,7 @@ EKS_POD_SUBNET_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${E
 SUB_IDX=1
 for subnet in $EKS_POD_SUBNET_LIST
 do
-	echo "export EKS_POD_SUBNET_$SUB_IDX=$subnet" >> ~/.bashrc
+	echo "export EKS_POD_SUBNET_$SUB_IDX=$subnet" >> ${BASH_FILE}
 	((SUB_IDX++))
 done
 # Additional security groups, 1
@@ -58,13 +60,13 @@ export EKS_SHAREDNODE_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-
 # Extrenal security group
 export EKS_EXTERNAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-external*" | jq -r '.SecurityGroups[]|.GroupId')
 
-echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ~/.bashrc
-echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ~/.bashrc
-echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ~/.bashrc
-echo "export EKS_ADDITIONAL_SG=${EKS_ADDITIONAL_SG}" | tee -a ~/.bashrc
-echo "export EKS_CUSTOMNETWORK_SG=${EKS_CUSTOMNETWORK_SG}" | tee -a ~/.bashrc
-echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ~/.bashrc
-echo "export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}" | tee -a ~/.bashrc
+echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ${BASH_FILE}
+echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ${BASH_FILE}
+echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ${BASH_FILE}
+echo "export EKS_ADDITIONAL_SG=${EKS_ADDITIONAL_SG}" | tee -a ${BASH_FILE}
+echo "export EKS_CUSTOMNETWORK_SG=${EKS_CUSTOMNETWORK_SG}" | tee -a ${BASH_FILE}
+echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ${BASH_FILE}
+echo "export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}" | tee -a ${BASH_FILE}
 
 source ~/.bashrc
 aws sts get-caller-identity

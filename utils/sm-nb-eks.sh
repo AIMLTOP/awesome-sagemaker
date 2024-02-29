@@ -101,13 +101,6 @@ fi
 #     --output text)
 
 
-echo "==============================================="
-echo " AI/ML ......"
-echo "==============================================="
-# Ask bedrock
-pip install ask-bedrock
-echo "alias abc='ask-bedrock converse'" | tee -a ~/.bashrc
-
 # k8sgpt
 if [ ! -f $CUSTOM_DIR/bin/k8sgpt_Linux_x86_64.tar.gz ]; then
   wget -O $CUSTOM_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.25/k8sgpt_Linux_x86_64.tar.gz
@@ -131,9 +124,6 @@ fi
 echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/infra/env.sh -O /home/ec2-user/SageMaker/custom/env.sh
-chmod +x /home/ec2-user/SageMaker/custom/env.sh
-/home/ec2-user/SageMaker/custom/env.sh
 
 # Tag to Env
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
