@@ -125,44 +125,8 @@ echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
 
-# Tag to Env
-# https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
-echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/.bashrc
-sudo bash -c "cat << EOF > /usr/local/bin/b
-#!/bin/bash
-/bin/bash
-EOF"
-sudo chmod +x /usr/local/bin/b
-AWS_COMPLETER=$(which aws_completer)
-echo $SHELL
 cat >> ~/.bashrc <<EOF
-alias ..='source ~/.bashrc'
-alias c=clear
-alias z='zip -r ../1.zip .'
-alias g=git
-alias l='ls -CF'
-alias la='ls -A'
-alias ll='ls -alh --color=auto'
-alias ls='ls --color=auto'
-alias jc=/bin/journalctl
-# alias gpa='git pull-all'
-alias gpa='git pull-all && git submodule update --remote'
-alias gca='git clone-all'
-export TERM=xterm-256color
-#export TERM=xterm-color
-alias a=aws
-alias aid='aws sts get-caller-identity'
-complete -C '${AWS_COMPLETER}' aws
-complete -C '${AWS_COMPLETER}' a
-export CUSTOM_DIR=/home/ec2-user/SageMaker/custom
-alias s5='s5cmd'
-alias 2s='cd /home/ec2-user/SageMaker'
-alias 2c='cd /home/ec2-user/SageMaker/custom'
-alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
-
-alias nsel=ec2-instance-selector
 alias nlog=eks-log-collector.sh
-
 alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage" 
 
 source <(kubectl completion bash)
@@ -216,18 +180,6 @@ then
   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
 fi
 
-if [ -f $CUSTOM_DIR/profile_bedrock_config ]; then
-  # cat $CUSTOM_DIR/profile_bedrock_config >> ~/.aws/config
-  # cat $CUSTOM_DIR/profile_bedrock_credentials >> ~/.aws/credentials
-  cp $CUSTOM_DIR/profile_bedrock_config ~/.aws/config
-  cp $CUSTOM_DIR/profile_bedrock_credentials ~/.aws/credentials  
-fi
-
-if [ -f $CUSTOM_DIR/abc_config ]; then
-  mkdir -p /home/ec2-user/.config/ask-bedrock
-  cp $CUSTOM_DIR/abc_config $HOME/.config/ask-bedrock/config.yaml
-fi
-
 
 echo "==============================================="
 echo "  Resource Metadata ......"
@@ -244,41 +196,12 @@ echo "export SAGE_ROLE_ARN=\"$SAGE_ROLE_ARN\"" >> ~/.bashrc
 
 
 echo "==============================================="
-echo "  EKS Cluster ......"
+echo "  Load config ......"
 echo "==============================================="
 if [ ! -z "$EKS_CLUSTER_NAME" ]; then
     # aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
     /usr/local/bin/aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
 fi
-
-
-echo "==============================================="
-echo "  S3 Bucket ......"
-echo "==============================================="
-if [ ! -f $CUSTOM_DIR/bin/mount-s3.rpm ]; then
-  wget -O $CUSTOM_DIR/bin/mount-s3.rpm https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
-fi
-sudo yum install -y $CUSTOM_DIR/bin/mount-s3.rpm
-echo "alias ms3='mount-s3'" | tee -a ~/.bashrc
-# mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
-if [ ! -z "$IA_S3_BUCKET" ]; then
-    mkdir -p /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
-    mount-s3 ${IA_S3_BUCKET} /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
-fi
-
-
-
-echo "==============================================="
-echo "  EFS ......"
-echo "==============================================="
-if [ ! -z "$EFS_FS_ID" ]; then
-  mkdir -p /home/ec2-user/SageMaker/efs
-  # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
-  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs efs _netdev,tls 0 0" | sudo tee -a /etc/fstab  
-fi
-sudo mount -a
-sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
-#sudo chmod 777 /home/ec2-user/SageMaker/efs*
 
 
 echo "==============================================="

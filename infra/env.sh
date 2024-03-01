@@ -1,5 +1,9 @@
 #!/bin/bash
+
 source ~/.bashrc
+
+# Tag to Env
+# https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 
 BASH_FILE="${1:-~/.bashrc}"
 NAME_PREFIX="sage"
