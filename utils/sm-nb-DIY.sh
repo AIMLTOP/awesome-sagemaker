@@ -24,7 +24,7 @@ alias la='ls -A'
 alias ll='ls -alh --color=auto'
 alias ls='ls --color=auto'
 alias jc=/bin/journalctl
-alias s5='s5cmd' "
+alias s5='s5cmd'
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
 alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
