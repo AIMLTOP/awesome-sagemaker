@@ -8,6 +8,16 @@ echo "Pull code and init ..."
 cd /home/ec2-user/SageMaker/custom/init && git pull
 chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 nohup /home/ec2-user/SageMaker/custom/init/initsmnb/r_init.sh > /home/ec2-user/SageMaker/custom/init.log 2>&1 & # execute asynchronously
+
+echo "Do your self configuration ..."
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-DIY.sh -O /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh
+chmod +x /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh
+nohup /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh > /home/ec2-user/SageMaker/custom/sm-nb-DIY.log 2>&1 &
+
+echo "Add EKS toolset ..."
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-EKS.sh -O /home/ec2-user/SageMaker/custom/sm-nb-EKS.sh
+chmod +x /home/ec2-user/SageMaker/custom/sm-nb-EKS.sh
+nohup /home/ec2-user/SageMaker/custom/sm-nb-EKS.sh > /home/ec2-user/SageMaker/custom/sm-nb-EKS.log 2>&1 &
 EOF
 
 
