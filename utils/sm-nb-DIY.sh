@@ -10,11 +10,6 @@ if [ -z ${SAGE_NB_NAME} ]; then
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
 # Add by sm-nb-DIY
-export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
-export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
-export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
-export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})
-
 alias ..='source ~/.bashrc'
 alias c=clear
 alias z='zip -r ../1.zip .'
@@ -35,6 +30,16 @@ alias aid='aws sts get-caller-identity'
 alias abc='ask-bedrock converse'
 alias nsel=ec2-instance-selector
 EOF
+
+  export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
+  export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
+  export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
+  export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})
+
+  echo "export SAGE_NB_NAME=\"$SAGE_NB_NAME\"" >> ~/SageMaker/custom/bashrc
+  echo "export SAGE_LC_NAME=\"$SAGE_LC_NAME\"" >>~/SageMaker/custom/bashrc
+  echo "export SAGE_ROLE_NAME=\"$SAGE_ROLE_NAME\"" >> ~/SageMaker/custom/bashrc
+  echo "export SAGE_ROLE_ARN=\"$SAGE_ROLE_ARN\"" >> ~/SageMaker/custom/bashrc
 fi
 
 echo "==============================================="

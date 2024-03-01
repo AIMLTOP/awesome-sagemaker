@@ -165,7 +165,7 @@ if [ -z ${dry} ]; then
   # Add alias if not set before
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
-# Add by sm-nb-EKS  
+# Add by sm-nb-MAD
 export dry="--dry-run=client -o yaml"
 export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
 export PATH="\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH"
