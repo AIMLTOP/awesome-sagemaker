@@ -14,10 +14,10 @@ wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm
 chmod +x /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh
 nohup /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh > /home/ec2-user/SageMaker/custom/sm-nb-DIY.log 2>&1 &
 
-echo "Add EKS toolset ..."
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-EKS.sh -O /home/ec2-user/SageMaker/custom/sm-nb-EKS.sh
-chmod +x /home/ec2-user/SageMaker/custom/sm-nb-EKS.sh
-nohup /home/ec2-user/SageMaker/custom/sm-nb-EKS.sh > /home/ec2-user/SageMaker/custom/sm-nb-EKS.log 2>&1 &
+echo "Modern application development ..."
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-MAD.sh -O /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh
+chmod +x /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh
+nohup /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh > /home/ec2-user/SageMaker/custom/sm-nb-MAD.log 2>&1 &
 EOF
 
 

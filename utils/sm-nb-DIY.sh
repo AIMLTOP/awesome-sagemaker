@@ -113,11 +113,11 @@ echo "==============================================="
 if [ ! -z "$EFS_FS_ID" ]; then
   mkdir -p /home/ec2-user/SageMaker/efs
   # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
-  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs efs _netdev,tls 0 0" | sudo tee -a /etc/fstab  
+  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs efs _netdev,tls 0 0" | sudo tee -a /etc/fstab
+  sudo mount -a
+  sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
+  #sudo chmod 777 /home/ec2-user/SageMaker/efs*
 fi
-sudo mount -a
-sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
-#sudo chmod 777 /home/ec2-user/SageMaker/efs*
 
 
 echo "==============================================="
