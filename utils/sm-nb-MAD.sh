@@ -2,6 +2,8 @@
 
 # Modern application development
 
+source ~/.bashrc
+
 echo "==============================================="
 echo "  Container tools ......"
 echo "==============================================="
