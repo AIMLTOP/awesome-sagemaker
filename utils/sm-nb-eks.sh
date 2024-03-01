@@ -58,14 +58,6 @@ if [ ! -f $CUSTOM_DIR/bin/kubie ]; then
   chmod +x $CUSTOM_DIR/bin/kubie
 fi
 
-# Docker Compose
-#sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo mkdir -p /usr/local/lib/docker/cli-plugins/
-sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-# sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $CUSTOM_DIR/docker-compose
-# sudo chmod +x $CUSTOM_DIR/docker-compose
-# $CUSTOM_DIR/docker-compose version
 
 # krew
 if [ ! -d $CUSTOM_DIR/bin/krew ]; then
@@ -111,58 +103,28 @@ k8sgpt auth list
 k8sgpt auth default -p amazonbedrock
 
 
+# # Docker Compose
+# #sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+# sudo mkdir -p /usr/local/lib/docker/cli-plugins/
+# sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+# sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+# # sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $CUSTOM_DIR/docker-compose
+# # sudo chmod +x $CUSTOM_DIR/docker-compose
+# # $CUSTOM_DIR/docker-compose version
+
+
 echo "==============================================="
-echo "  Dev Platform ......"
+echo "  Load config ......"
 echo "==============================================="
-if [ ! -f $CUSTOM_DIR/bin/devpod ]; then
-  curl -L -o $CUSTOM_DIR/bin/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64" 
-  # sudo install -c -m 0755 $CUSTOM_DIR/bin/devpod $CUSTOM_DIR/bin
-  chmod 0755 $CUSTOM_DIR/bin/devpod
+if [ ! -z "$EKS_CLUSTER_NAME" ]; then
+    # aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+    /usr/local/bin/aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
 fi
 
 
 echo "==============================================="
-echo "  Env, Alias and Path ......"
+echo "  SSH ......"
 echo "==============================================="
-
-cat >> ~/.bashrc <<EOF
-alias nlog=eks-log-collector.sh
-alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage" 
-
-source <(kubectl completion bash)
-alias k=kubectl
-complete -F __start_kubectl k
-alias kk='kubectl-karpenter.sh'
-alias kb='k8sgpt'
-alias kt=kubetail
-alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/nodepool'
-alias kgp='kubectl get po -o wide'
-alias kga='kubectl get all'
-alias kgd='kubectl get deployment -o wide'
-alias kgs='kubectl get svc -o wide'
-alias ka='kubectl apply -f'
-alias ke='kubectl explain'
-export dry="--dry-run=client -o yaml"
-alias kr='kubectl run \$dry'
-alias tk='kt karpenter -n \${KARPENTER_NAMESPACE}'
-alias tlbc='kt aws-load-balancer-controller -n kube-system'
-alias tebs='kt ebs-csi-controller -n kube-system'
-alias tefs='kt efs-csi-controller -n kube-system'
-
-. <(eksctl completion bash)
-alias e=eksctl
-complete -F __start_eksctl e
-alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
-alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
-alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} -n'
-alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nodes-min=0 -n'
-
-export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
-export PATH="\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH"
-EOF
-
-source ~/.bashrc
-
 # if [ -f /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ]
 # then
 #   sudo cp /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa
@@ -182,59 +144,53 @@ fi
 
 
 echo "==============================================="
-echo "  Resource Metadata ......"
+echo "  Env, Alias and Path ......"
 echo "==============================================="
-export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
-export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
-export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
-export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})
+cat >> ~/.bashrc <<EOF
+source <(kubectl completion bash)
+alias k=kubectl
+complete -F __start_kubectl k
 
-echo "export SAGE_NB_NAME=\"$SAGE_NB_NAME\"" >> ~/.bashrc
-echo "export SAGE_LC_NAME=\"$SAGE_LC_NAME\"" >> ~/.bashrc
-echo "export SAGE_ROLE_NAME=\"$SAGE_ROLE_NAME\"" >> ~/.bashrc
-echo "export SAGE_ROLE_ARN=\"$SAGE_ROLE_ARN\"" >> ~/.bashrc
+. <(eksctl completion bash)
+alias e=eksctl
+complete -F __start_eksctl e
+EOF
 
+# check if a ENV dry exist
+if [ -z ${dry} ]; then
+  # Add alias if not set before
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+# Add by sm-nb-EKS  
+export dry="--dry-run=client -o yaml"
+export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
+export PATH="\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH"
 
-echo "==============================================="
-echo "  Load config ......"
-echo "==============================================="
-if [ ! -z "$EKS_CLUSTER_NAME" ]; then
-    # aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
-    /usr/local/bin/aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
-fi
+alias nlog=eks-log-collector.sh
+alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage" 
+alias kk='kubectl-karpenter.sh'
+alias kb='k8sgpt'
+alias kt=kubetail
+alias kgn='kubectl get nodes -L beta.kubernetes.io/arch -L karpenter.sh/capacity-type -L node.kubernetes.io/instance-type -L topology.kubernetes.io/zone -L karpenter.sh/nodepool'
+alias kgp='kubectl get po -o wide'
+alias kga='kubectl get all'
+alias kgd='kubectl get deployment -o wide'
+alias kgs='kubectl get svc -o wide'
+alias ka='kubectl apply -f'
+alias ke='kubectl explain'
+alias kr='kubectl run \$dry'
 
+alias tk='kt karpenter -n \${KARPENTER_NAMESPACE}'
+alias tlbc='kt aws-load-balancer-controller -n kube-system'
+alias tebs='kt ebs-csi-controller -n kube-system'
+alias tefs='kt efs-csi-controller -n kube-system'
 
-echo "==============================================="
-echo "  Local Stable Diffusion ......"
-echo "==============================================="
-if [ ! -z "$SD_HOME" ]; then
-  cd $SD_HOME/sd-webui # WorkingDirectory 注意一定要进入到这个目录
-  # TODO check GPU
-  nohup $SD_HOME/sd-webui/webui.sh --gradio-auth admin:${SD_PWD} --cors-allow-origins=* --enable-insecure-extension-access --allow-code --medvram --xformers --listen --port 8760 > $SD_HOME/sd.log 2>&1 & # execute asynchronously
-fi
+alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
+alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
+alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} -n'
+alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nodes-min=0 -n'
+EOF
+fi    
 
-
-##--------------------- Check ENVs -------------------##
 source ~/.bashrc
-
-echo -e " EKS_CLUSTER_NAME: $EKS_CLUSTER_NAME\n" \
-  "EKS_VERSION: $EKS_VERSION\n" \
-  "EKS_MASTER_ARN: ${EKS_MASTER_ARN}\n" \
-  "SAGE_NB_NAME: $SAGE_NB_NAME\n" \
-  "SAGE_LC_NAME: $SAGE_LC_NAME\n" \
-  "SAGE_ROLE_NAME: $SAGE_ROLE_NAME\n" \
-  "SAGE_ROLE_ARN: $SAGE_ROLE_ARN\n" \
-  "IA_S3_BUCKET: $IA_S3_BUCKET\n" \
-  "EFS_FS_NAME: ${EFS_FS_NAME}\n" \
-  "EFS_FS_ID: ${EFS_FS_ID}\n" \
-  "EFS_PV_DEFAULT: $EFS_PV_DEFAULT\n" \
-  "EFS_CLAIM_DEFAULT: $EFS_CLAIM_DEFAULT\n" \
-  "EFS_PV_OTEL: $EFS_PV_OTEL\n" \
-  "EFS_CLAIM_OTEL: $EFS_CLAIM_OTEL\n" \
-  "EMR_VIRTUAL_CLUSTER_NAME: $EMR_VIRTUAL_CLUSTER_NAME\n" \
-  "EMR_VIRTUAL_CLUSTER_NS: $EMR_VIRTUAL_CLUSTER_NS\n" \
-  "EMR_VIRTUAL_CLUSTER_ID: $EMR_VIRTUAL_CLUSTER_ID\n" \
-  "ECR_DATAML_REPO: $ECR_DATAML_REPO\n" \
-  "ELB_NLB_ARN: $ELB_NLB_ARN\n"
 
 echo " done"
