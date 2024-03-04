@@ -193,6 +193,9 @@ alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
 alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
 alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} -n'
 alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nodes-min=0 -n'
+
+# Other
+
 EOF
 fi    
 
