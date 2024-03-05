@@ -139,6 +139,7 @@ echo "==============================================="
 
 if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
 then
+  echo "Setup SSH Keys"
   sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
   sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
   sudo chmod 400 ~/.ssh/id_rsa

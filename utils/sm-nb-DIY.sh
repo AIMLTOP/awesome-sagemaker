@@ -60,6 +60,15 @@ if [ -f $CUSTOM_DIR/abc_config ]; then
   cp $CUSTOM_DIR/abc_config $HOME/.config/ask-bedrock/config.yaml
 fi
 
+
+# https://github.com/muesli/duf
+echo "Setup duf"
+if [ ! -f $CUSTOM_DIR/duf.rpm ]; then
+    DOWNLOAD_URL="https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_amd64.rpm"
+    wget $DOWNLOAD_URL -O $CUSTOM_DIR/duf.rpm
+fi
+sudo yum localinstall -y $CUSTOM_DIR/duf.rpm
+
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo yum groupinstall "Development Tools" -y
 sudo yum -y install jq gettext bash-completion moreutils openssl zsh xsel xclip amazon-efs-utils nc telnet mtr traceroute netcat 
@@ -111,6 +120,19 @@ if [ ! -z "$IA_S3_BUCKET" ]; then
     mount-s3 ${IA_S3_BUCKET} /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
 fi
 
+
+# https://github.com/peak/s5cmd
+if [ ! -f $CUSTOM_DIR/bin/s5cmd ]; then
+    echo "Setup s5cmd"
+    # export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/latest \
+    # | grep "browser_download_url.*_Linux-64bit.tar.gz" \
+    # | cut -d : -f 2,3 \
+    # | tr -d \")
+    S5CMD_URL="https://github.com/peak/s5cmd/releases/download/v2.2.2/s5cmd_2.2.2_Linux-64bit.tar.gz"
+    wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
+    sudo mkdir -p /opt/s5cmd/
+    sudo tar xzvf /tmp/s5cmd.tar.gz -C $CUSTOM_DIR/bin
+fi
 
 echo "==============================================="
 echo "  EFS ......"
