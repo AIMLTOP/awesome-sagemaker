@@ -18,6 +18,12 @@ echo "Modern application development ..."
 wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-MAD.sh -O /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh
 chmod +x /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh
 nohup /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh > /home/ec2-user/SageMaker/custom/sm-nb-MAD.log 2>&1 &
+
+echo "Install Extensions ... "
+source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
+pip install amazon-codewhisperer-jupyterlab-ext
+jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
+source /home/ec2-user/anaconda3/bin/deactivate
 EOF
 
 
