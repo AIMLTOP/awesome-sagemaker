@@ -158,10 +158,36 @@ fi
 
 
 echo "==============================================="
-echo "  Dev Platform ......"
+echo "  Dev Tools ......"
 echo "==============================================="
 if [ ! -f $CUSTOM_DIR/bin/devpod ]; then
   curl -L -o $CUSTOM_DIR/bin/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-amd64" 
   # sudo install -c -m 0755 $CUSTOM_DIR/bin/devpod $CUSTOM_DIR/bin
   chmod 0755 $CUSTOM_DIR/bin/devpod
 fi
+
+
+if [ ! -f /opt/apache-maven-3.8.6/bin/mvn ]; then
+  echo "  Install Maven ......"
+  wget https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -O /tmp/apache-maven-3.8.6-bin.tar.gz
+  sudo tar xzvf /tmp/apache-maven-3.8.6-bin.tar.gz -C /opt
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+export PATH="/opt/apache-maven-3.8.6/bin:\$PATH"
+EOF
+  # mvn --version  
+fi
+
+
+echo "==============================================="
+echo "  Data ......"
+echo "==============================================="
+if [ ! -f /opt/flink-1.16.3/bin/flink ]; then
+  echo "Setup Flink"
+  wget https://dlcdn.apache.org/flink/flink-1.16.3/flink-1.16.3-bin-scala_2.12.tgz
+  sudo tar xzvf flink-*.tgz -C /opt
+  sudo chown -R ec2-user /opt/flink-1.16.3
+  # flink -v
+fi
+
+
+
