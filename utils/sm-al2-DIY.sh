@@ -178,6 +178,15 @@ EOF
 fi
 
 
+# nginx
+# sudo amazon-linux-extras enable nginx1
+# sudo yum install -y nginx
+# sudo systemctl start nginx
+
+# htpasswd
+# sudo yum install httpd-tools
+
+
 echo "==============================================="
 echo "  Data ......"
 echo "==============================================="
@@ -187,6 +196,9 @@ if [ ! -f /opt/flink-1.16.3/bin/flink ]; then
   sudo tar xzvf flink-*.tgz -C /opt
   sudo chown -R ec2-user /opt/flink-1.16.3
   # flink -v
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+export PATH="/opt/flink-1.16.3/bin:\$PATH"
+EOF  
 fi
 
 

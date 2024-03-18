@@ -10,14 +10,14 @@ chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 nohup /home/ec2-user/SageMaker/custom/init/initsmnb/r_init.sh > /home/ec2-user/SageMaker/custom/init.log 2>&1 & # execute asynchronously
 
 echo "Do your self configuration ..."
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-DIY.sh -O /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh
-chmod +x /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh
-nohup /home/ec2-user/SageMaker/custom/sm-nb-DIY.sh > /home/ec2-user/SageMaker/custom/sm-nb-DIY.log 2>&1 &
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-DIY.sh -O /home/ec2-user/SageMaker/custom/sm-al2-DIY.sh
+chmod +x /home/ec2-user/SageMaker/custom/sm-al2-DIY.sh
+nohup /home/ec2-user/SageMaker/custom/sm-al2-DIY.sh > /home/ec2-user/SageMaker/custom/sm-al2-DIY.log 2>&1 &
 
 echo "Modern application development ..."
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-nb-MAD.sh -O /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh
-chmod +x /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh
-nohup /home/ec2-user/SageMaker/custom/sm-nb-MAD.sh > /home/ec2-user/SageMaker/custom/sm-nb-MAD.log 2>&1 &
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-MAD.sh -O /home/ec2-user/SageMaker/custom/sm-al2-MAD.sh
+chmod +x /home/ec2-user/SageMaker/custom/sm-al2-MAD.sh
+nohup /home/ec2-user/SageMaker/custom/sm-al2-MAD.sh > /home/ec2-user/SageMaker/custom/sm-al2-MAD.log 2>&1 &
 
 echo "Install Extensions ... "
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
