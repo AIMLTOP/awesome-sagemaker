@@ -178,13 +178,7 @@ EOF
 fi
 
 
-# nginx
-# sudo amazon-linux-extras enable nginx1
-# sudo yum install -y nginx
-# sudo systemctl start nginx
 
-# htpasswd
-# sudo yum install httpd-tools
 
 
 echo "==============================================="
@@ -202,4 +196,9 @@ EOF
 fi
 
 
+echo "==============================================="
+echo "  AI/ML ......"
+echo "==============================================="
+# https://github.com/awslabs/mlspace
+# https://mlspace.readthedocs.io/en/latest/index.html
 
