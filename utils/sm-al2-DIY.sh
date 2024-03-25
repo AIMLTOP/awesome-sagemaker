@@ -34,13 +34,17 @@ EOF
   export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
   export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
   export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
+  # Get sagemaker role ROLENAME 
   export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})
+  # export SAGE_ROLE_NAME=$(basename "$ROLE") # another way
 
   echo "export SAGE_NB_NAME=\"$SAGE_NB_NAME\"" >> ~/SageMaker/custom/bashrc
   echo "export SAGE_LC_NAME=\"$SAGE_LC_NAME\"" >>~/SageMaker/custom/bashrc
   echo "export SAGE_ROLE_NAME=\"$SAGE_ROLE_NAME\"" >> ~/SageMaker/custom/bashrc
   echo "export SAGE_ROLE_ARN=\"$SAGE_ROLE_ARN\"" >> ~/SageMaker/custom/bashrc
 fi
+
+
 
 echo "==============================================="
 echo " More tools ......"
@@ -87,13 +91,6 @@ netron --version
 python3 -m pip install awscurl
 pip3 install httpie
 
-
-# Install session-manager
-if [ ! -f $CUSTOM_DIR/bin/session-manager-plugin.rpm ]; then
-  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$CUSTOM_DIR/bin/session-manager-plugin.rpm"
-fi
-sudo yum install -y $CUSTOM_DIR/bin/session-manager-plugin.rpm
-session-manager-plugin
 
 # ec2-instance-selector
 if [ ! -f $CUSTOM_DIR/bin/ec2-instance-selector ]; then
@@ -202,3 +199,52 @@ echo "==============================================="
 # https://github.com/awslabs/mlspace
 # https://mlspace.readthedocs.io/en/latest/index.html
 
+
+
+echo "==============================================="
+echo "  SSH ......"
+echo "==============================================="
+# if [ -f /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ]
+# then
+#   sudo cp /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa
+#   chmod 400 ~/.ssh/id_rsa
+#   cp /home/ec2-user/SageMaker/custom/id_rsa_pub_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa.pub
+#   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+# fi
+
+if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
+then
+  echo "Setup SSH Keys"
+  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
+  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
+  sudo chmod 400 ~/.ssh/id_rsa
+  sudo chown -R ec2-user:ec2-user ~/.ssh/
+  # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+fi
+
+
+# Install session-manager
+if [ ! -f $CUSTOM_DIR/bin/session-manager-plugin.rpm ]; then
+  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$CUSTOM_DIR/bin/session-manager-plugin.rpm"
+fi
+# sudo yum install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm
+sudo yum install -y $CUSTOM_DIR/bin/session-manager-plugin.rpm
+session-manager-plugin --version
+
+
+# sagemaker-hyperpod ssh
+# https://catalog.workshops.aws/sagemaker-hyperpod/en-US/01-cluster/05-ssh
+if [ ! -f $CUSTOM_DIR/bin/easy-ssh ]; then
+  wget -O $CUSTOM_DIR/bin/easy-ssh https://raw.githubusercontent.com/TipTopBin/awesome-distributed-training/main/1.architectures/5.sagemaker-hyperpod/easy-ssh.sh
+  chmod +x $CUSTOM_DIR/bin/easy-ssh
+fi
+# easy-ssh -h
+# easy-ssh -c controller-group cluster-name
+# 第一次用 easy-ssh 登录后，可以进一步配置直接 SSH 登录
+# 注意生成的 key 权限 chmod 400 /home/ec2-user/.ssh/config
+
+# If you have a huge cluster it can be confusing to figure out which node you're on. To make it easier, you can update your bash prompt to reflect if you're on a CONTROLLER or WORKER node.
+# You can execute the following commands to set the type of the instance CONTROLLER or WORKER in the bash prompt:
+# echo -e "\n# Show (CONTROLLER) or (WORKER) on the CLI prompt" >> ~/.bashrc
+# echo 'head_node_ip=$(sudo cat /opt/ml/config/resource_config.json | jq '"'"'.InstanceGroups[] | select(.Name == "controller-machine") | .Instances[0].CustomerIpAddress'"'"' | tr -d '"'"'"'"'"')' >> ~/.bashrc
+# echo 'if [ $(hostname -I | awk '"'"'{print $1}'"'"') = $head_node_ip ]; then PS1="(CONTROLLER) ${PS1}"; else PS1="(WORKER) ${PS1}"; fi' >> ~/.bashrc

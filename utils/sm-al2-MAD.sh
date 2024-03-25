@@ -127,28 +127,6 @@ fi
 
 
 echo "==============================================="
-echo "  SSH ......"
-echo "==============================================="
-# if [ -f /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ]
-# then
-#   sudo cp /home/ec2-user/SageMaker/custom/id_rsa_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa
-#   chmod 400 ~/.ssh/id_rsa
-#   cp /home/ec2-user/SageMaker/custom/id_rsa_pub_${EKS_CLUSTER_NAME} ~/.ssh/id_rsa.pub
-#   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
-# fi
-
-if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
-then
-  echo "Setup SSH Keys"
-  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
-  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
-  sudo chmod 400 ~/.ssh/id_rsa
-  sudo chown -R ec2-user:ec2-user ~/.ssh/
-  # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
-fi
-
-
-echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
 cat >> ~/.bashrc <<EOF
