@@ -179,21 +179,19 @@ EOF
 fi
 
 
-
-
-
 echo "==============================================="
 echo "  Data ......"
 echo "==============================================="
-if [ ! -f /opt/flink-1.16.3/bin/flink ]; then
+if [ ! -f $CUSTOM_DIR/flink-1.16.3/bin/flink ]; then
   echo "Setup Flink"
   wget https://dlcdn.apache.org/flink/flink-1.16.3/flink-1.16.3-bin-scala_2.12.tgz
-  sudo tar xzvf flink-*.tgz -C /opt
-  sudo chown -R ec2-user /opt/flink-1.16.3
+  sudo tar xzvf flink-*.tgz -C $CUSTOM_DIR/flink-1.16.3
+  sudo chown -R ec2-user $CUSTOM_DIR/flink-1.16.3
   # flink -v
   cat >> ~/SageMaker/custom/bashrc <<EOF
-export PATH="/opt/flink-1.16.3/bin:\$PATH"
-EOF  
+export PATH="$CUSTOM_DIR/flink-1.16.3/bin:\$PATH"
+EOF
+
 fi
 
 
@@ -203,7 +201,9 @@ echo "==============================================="
 # https://github.com/awslabs/mlspace
 # https://mlspace.readthedocs.io/en/latest/index.html
 
-
+# aws configure --profile bedrock
+# ask-bedrock converse
+# ask-bedrock configure
 
 echo "==============================================="
 echo "  SSH ......"
