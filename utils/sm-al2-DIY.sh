@@ -168,12 +168,12 @@ if [ ! -f $CUSTOM_DIR/bin/devpod ]; then
 fi
 
 
-if [ ! -f /opt/apache-maven-3.8.6/bin/mvn ]; then
+if [ ! -f $CUSTOM_DIR/apache-maven-3.8.6/bin/mvn ]; then
   echo "  Install Maven ......"
   wget https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -O /tmp/apache-maven-3.8.6-bin.tar.gz
-  sudo tar xzvf /tmp/apache-maven-3.8.6-bin.tar.gz -C /opt
+  sudo tar xzvf /tmp/apache-maven-3.8.6-bin.tar.gz -C $CUSTOM_DIR
   cat >> ~/SageMaker/custom/bashrc <<EOF
-export PATH="/opt/apache-maven-3.8.6/bin:\$PATH"
+export PATH="$CUSTOM_DIR/apache-maven-3.8.6/bin:\$PATH"
 EOF
   # mvn --version  
 fi
