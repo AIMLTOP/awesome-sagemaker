@@ -7,7 +7,7 @@ Description: >
   public subnet if selected. Route tables are set for each subnet.
   The VPC contains 2 CIDR blocks 192.168.0.0/16 and 100.66.0.0/16. 
   The first CIDR is used for EC2 instances. The second is for containers. 
-  To keep it simple, TGW/CNE subnest not.
+  To keep it simple, TGW/CNE subnet not set.
 
 
 ####################
