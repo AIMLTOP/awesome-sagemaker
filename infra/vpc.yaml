@@ -81,6 +81,14 @@ Parameters:
       Set to false if to avoid creating an S3 endpoint on your VPC.
     Type: String
 
+  CreateDynamoDBEndpoint:
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'true'
+    Description:
+      Set to false if to avoid creating a DynamoDB endpoint on your VPC.
+    Type: String
 
 ###############################
 ## Conditions for Parameters ##
@@ -107,6 +115,7 @@ Conditions:
   6AZConditionPublic: !Condition '6AZCondition'
 
   S3EndpointCondition: !Equals [!Ref 'CreateS3Endpoint', 'true']
+  DynamoDBEndpointCondition: !Equals [!Ref 'CreateDynamoDBEndpoint', 'true']
 
 #########################
 ## VPC & Network Setup ##
@@ -1361,6 +1370,36 @@ Resources:
         - - com.amazonaws.
           - !Ref AWS::Region
           - .s3express
+      VpcId: !Ref VPC
+
+
+  # DynamoDB endpoint
+  DynamoDBEndpoint:
+    Condition: DynamoDBEndpointCondition
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            - Effect: Allow
+              Principal: '*'
+              Action:
+                - '*'
+              Resource:
+                - '*'
+      RouteTableIds:
+        - !Ref PublicRouteTable
+        - !Ref PrivateRouteTable
+        - !Ref PrivateRouteTable2
+        - !If [3AZCondition, !Ref PrivateRouteTable3, !Ref AWS::NoValue]
+        - !If [4AZCondition, !Ref PrivateRouteTable4, !Ref AWS::NoValue]
+        - !If [5AZCondition, !Ref PrivateRouteTable5, !Ref AWS::NoValue]
+        - !If [6AZCondition, !Ref PrivateRouteTable6, !Ref AWS::NoValue]
+      ServiceName: !Join
+        - ''
+        - - com.amazonaws.
+          - !Ref AWS::Region
+          - .dynamodb
       VpcId: !Ref VPC
 
 

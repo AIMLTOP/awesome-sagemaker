@@ -244,11 +244,3 @@ if [ ! -f $CUSTOM_DIR/bin/easy-ssh ]; then
 fi
 # easy-ssh -h
 # easy-ssh -c controller-group cluster-name
-# 第一次用 easy-ssh 登录后，可以进一步配置直接 SSH 登录
-# 注意生成的 key 权限 chmod 400 /home/ec2-user/.ssh/config
-
-# If you have a huge cluster it can be confusing to figure out which node you're on. To make it easier, you can update your bash prompt to reflect if you're on a CONTROLLER or WORKER node.
-# You can execute the following commands to set the type of the instance CONTROLLER or WORKER in the bash prompt:
-# echo -e "\n# Show (CONTROLLER) or (WORKER) on the CLI prompt" >> ~/.bashrc
-# echo 'head_node_ip=$(sudo cat /opt/ml/config/resource_config.json | jq '"'"'.InstanceGroups[] | select(.Name == "controller-machine") | .Instances[0].CustomerIpAddress'"'"' | tr -d '"'"'"'"'"')' >> ~/.bashrc
-# echo 'if [ $(hostname -I | awk '"'"'{print $1}'"'"') = $head_node_ip ]; then PS1="(CONTROLLER) ${PS1}"; else PS1="(WORKER) ${PS1}"; fi' >> ~/.bashrc
