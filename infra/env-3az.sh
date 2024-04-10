@@ -6,7 +6,7 @@ source ~/.bashrc
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 
 BASH_FILE="${1:-~/.bashrc}"
-NAME_PREFIX="SageVPC"
+NAME_PREFIX="sage"
 
 echo "==============================================="
 echo "  Config envs ......"
@@ -23,7 +23,7 @@ echo "export AWS_REGION=${AWS_REGION}" | tee -a ${BASH_FILE}
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
-export EKS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${NAME_PREFIX}" --query 'Vpcs[0].VpcId' --output text)
+export EKS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${NAME_PREFIX}-VPC" --query 'Vpcs[0].VpcId' --output text)
 export EKS_VPC_CIDR=$(aws ec2 describe-vpcs --vpc-ids $EKS_VPC_ID --query 'Vpcs[0].{CidrBlock:CidrBlock}' --output text)
 # 注意 filter 区分大小写
 EKS_PUBAZ_INFO_LIST=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${EKS_VPC_ID}"  "Name=tag:Name,Values=*${NAME_PREFIX}-PublicELB*" | jq '.Subnets | sort_by(.AvailabilityZone)' | jq '.[] | .SubnetId+","+.AvailabilityZone+","+.AvailabilityZoneId')
