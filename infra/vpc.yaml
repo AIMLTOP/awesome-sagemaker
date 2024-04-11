@@ -1085,7 +1085,7 @@ Resources:
   AdditionalSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Additional security groups for EKS
+      GroupDescription: Additional security groups for EFA and FSx
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -1104,19 +1104,73 @@ Resources:
           FromPort: -1
           ToPort: -1
           CidrIp: !FindInMap [Networking, VPC, CIDR1]
+        - IpProtocol: tcp
+          FromPort: 988
+          ToPort: 988
+          CidrIp: !FindInMap [Networking, VPC, CIDR0]
+        - IpProtocol: tcp
+          FromPort: 1021
+          ToPort: 1023
+          CidrIp: !FindInMap [Networking, VPC, CIDR0]
+        - IpProtocol: tcp
+          FromPort: 988
+          ToPort: 988
+          CidrIp: !FindInMap [Networking, VPC, CIDR1]
+        - IpProtocol: tcp
+          FromPort: 1021
+          ToPort: 1023
+          CidrIp: !FindInMap [Networking, VPC, CIDR1]  
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 988
+          ToPort: 988
+          CidrIp: !FindInMap [Networking, VPC, CIDR0]
+        - IpProtocol: tcp
+          FromPort: 1021
+          ToPort: 1023
+          CidrIp: !FindInMap [Networking, VPC, CIDR0]
+        - IpProtocol: tcp
+          FromPort: 988
+          ToPort: 988
+          CidrIp: !FindInMap [Networking, VPC, CIDR1]
+        - IpProtocol: tcp
+          FromPort: 1021
+          ToPort: 1023
+          CidrIp: !FindInMap [Networking, VPC, CIDR1]                  
       Tags:
       - Key: Name
         Value: !Join [ '-', [ !Ref VPCName, 'SG', 'additional'] ]                                        
 
 
-  AdditionalSecurityGroupIngress:
+  EFASecurityGroupIngress:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
+        Description: All to all communication for EFA Ingress within Security Group
         GroupId: !Ref AdditionalSecurityGroup
         IpProtocol: -1
         FromPort: -1
         ToPort: -1
         SourceSecurityGroupId: !GetAtt AdditionalSecurityGroup.GroupId
+
+  EFASecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: All to all communication for EFA Egress within Security Group
+      IpProtocol: -1
+      FromPort: -1
+      ToPort: -1
+      GroupId: !Ref AdditionalSecurityGroup
+      DestinationSecurityGroupId: !Ref AdditionalSecurityGroup
+  
+  EFASecurityGroupEgressECS:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: All to all communication for Egress to all
+      IpProtocol: -1
+      FromPort: -1
+      ToPort: -1
+      GroupId: !Ref AdditionalSecurityGroup
+      CidrIp: 0.0.0.0/0
 
   SharedNodeSecurityGroup:
     Type: AWS::EC2::SecurityGroup
