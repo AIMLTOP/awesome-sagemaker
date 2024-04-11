@@ -54,15 +54,15 @@ do
 	((SUB_IDX++))
 done
 # Additional security groups, 1
-export EKS_CLUSTER_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-control-plane*" | jq -r '.SecurityGroups[]|.GroupId')
+export EKS_CLUSTER_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-SG-control-plane*" | jq -r '.SecurityGroups[]|.GroupId')
 # Additional security groups, 2
-export EKS_ADDITIONAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-additional*" | jq -r '.SecurityGroups[]|.GroupId')
+export EKS_ADDITIONAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-SG-additional*" | jq -r '.SecurityGroups[]|.GroupId')
 # Custom network security groups
-export EKS_CUSTOMNETWORK_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-custom-network*" | jq -r '.SecurityGroups[]|.GroupId')
+export EKS_CUSTOMNETWORK_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-SG-custom-network*" | jq -r '.SecurityGroups[]|.GroupId')
 # Share node security group
-export EKS_SHAREDNODE_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-shared-node*" | jq -r '.SecurityGroups[]|.GroupId')  
+export EKS_SHAREDNODE_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-SG-shared-node*" | jq -r '.SecurityGroups[]|.GroupId')  
 # Extrenal security group
-export EKS_EXTERNAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-external*" | jq -r '.SecurityGroups[]|.GroupId')
+export EKS_EXTERNAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-SG-external*" | jq -r '.SecurityGroups[]|.GroupId')
 
 echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ${BASH_FILE}
 echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ${BASH_FILE}
