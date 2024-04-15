@@ -40,6 +40,7 @@ cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyter
 }
 EoL
 
+mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/
 cat > ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings <<EoL
 {
     // Terminal
