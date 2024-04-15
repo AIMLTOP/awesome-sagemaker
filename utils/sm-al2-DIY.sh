@@ -2,6 +2,9 @@
 
 source ~/.bashrc
 
+CUSTOM_DIR=/home/ec2-user/SageMaker/custom
+mkdir -p "$CUSTOM_DIR"/bin
+
 echo "==============================================="
 echo "  Resource Metadata ......"
 echo "==============================================="
