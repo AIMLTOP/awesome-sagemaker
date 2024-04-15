@@ -15,63 +15,11 @@ aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
 
-cat >> ~/.bashrc <<EOF
-bashrc_files=(bashrc)
-path="/home/ec2-user/SageMaker/custom/"
-for file in \${bashrc_files[@]}
-do 
-    file_to_load=\$path\$file
-    if [ -f "\$file_to_load" ];
-    then
-        . \$file_to_load
-        echo "loaded \$file_to_load"
-    fi
-done
-EOF
 
 # if [ -f /home/ec2-user/SageMaker/custom/bashrc ]
 # then
 #   cat /home/ec2-user/SageMaker/custom/bashrc >> ~/.bashrc
 # fi
-
-
-echo "==============================================="
-echo "  Install utilities ......"
-echo "==============================================="
-# moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
-sudo amazon-linux-extras install epel -y
-sudo yum groupinstall "Development Tools" -y
-sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils nc telnet mtr traceroute netcat 
-# sudo yum -y install siege fio ioping dos2unix
-
-if [ ! -f $WORKING_DIR/bin/yq ]; then
-  wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $WORKING_DIR/bin/yq
-  chmod +x $WORKING_DIR/bin/yq
-fi
-
-
-echo "==============================================="
-echo "  AWS Tools ......"
-echo "==============================================="
-# Upgrade awscli to v2
-if [ ! -f $WORKING_DIR/bin/awscliv2.zip ]; then
-  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$WORKING_DIR/bin/awscliv2.zip"
-  # unzip -qq awscliv2.zip -C
-  unzip -o $WORKING_DIR/bin/awscliv2.zip -d $WORKING_DIR/bin
-fi
-sudo $WORKING_DIR/bin/aws/install --update
-rm -f /home/ec2-user/anaconda3/envs/JupyterSystemEnv/bin/aws
-sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
-ls -l /usr/local/bin/aws
-source ~/.bashrc
-aws --version
-
-# Install session-manager
-if [ ! -f $WORKING_DIR/bin/session-manager-plugin.rpm ]; then
-  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$WORKING_DIR/bin/session-manager-plugin.rpm"
-fi
-sudo yum install -y $WORKING_DIR/bin/session-manager-plugin.rpm
-session-manager-plugin
 
 
 echo "==============================================="
@@ -84,26 +32,6 @@ netron --version
 # netron [FILE] or netron.start('[FILE]').
 python3 -m pip install awscurl
 pip3 install httpie
-
-
-echo "==============================================="
-echo " s5cmd ......"
-echo "==============================================="
-#https://github.com/peak/s5cmd
-if [ ! -f $WORKING_DIR/bin/s5cmd ]; then
-    echo "Setup s5cmd"
-    export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/latest \
-    | grep "browser_download_url.*_Linux-64bit.tar.gz" \
-    | cut -d : -f 2,3 \
-    | tr -d \")
-    # echo $S5CMD_URL
-    wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
-    sudo mkdir -p /opt/s5cmd/
-    sudo tar xzvf /tmp/s5cmd.tar.gz -C $WORKING_DIR/bin
-fi
-# mv/sync 等注意要加单引号，注意区域配置
-# s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
-# s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
 
 
 echo "==============================================="

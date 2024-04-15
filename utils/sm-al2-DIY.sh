@@ -109,33 +109,15 @@ fi
 echo "==============================================="
 echo "  Storage  ......"
 echo "==============================================="
-## S3 Bucket
-if [ ! -f $CUSTOM_DIR/bin/mount-s3.rpm ]; then
-  wget -O $CUSTOM_DIR/bin/mount-s3.rpm https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
-fi
-sudo yum install -y $CUSTOM_DIR/bin/mount-s3.rpm
-echo "alias ms3='mount-s3'" | tee -a ~/.bashrc
+# S3 bucket
 # mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
 if [ ! -z "$IA_S3_BUCKET" ]; then
     mkdir -p /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
     mount-s3 ${IA_S3_BUCKET} /home/ec2-user/SageMaker/s3/${IA_S3_BUCKET}
 fi
 
-## s5cmd
-# https://github.com/peak/s5cmd
-if [ ! -f $CUSTOM_DIR/bin/s5cmd ]; then
-    echo "Setup s5cmd"
-    # export S5CMD_URL=$(curl -s https://api.github.com/repos/peak/s5cmd/releases/latest \
-    # | grep "browser_download_url.*_Linux-64bit.tar.gz" \
-    # | cut -d : -f 2,3 \
-    # | tr -d \")
-    S5CMD_URL="https://github.com/peak/s5cmd/releases/download/v2.2.2/s5cmd_2.2.2_Linux-64bit.tar.gz"
-    wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
-    sudo mkdir -p /opt/s5cmd/
-    sudo tar xzvf /tmp/s5cmd.tar.gz -C $CUSTOM_DIR/bin
-fi
 
-## EFS
+# EFS
 if [ ! -z "$EFS_FS_ID" ]; then
   mkdir -p /home/ec2-user/SageMaker/efs
   # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
@@ -228,15 +210,6 @@ then
   sudo chown -R ec2-user:ec2-user ~/.ssh/
   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
 fi
-
-
-# Install session-manager
-if [ ! -f $CUSTOM_DIR/bin/session-manager-plugin.rpm ]; then
-  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$CUSTOM_DIR/bin/session-manager-plugin.rpm"
-fi
-# sudo yum install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm
-sudo yum install -y $CUSTOM_DIR/bin/session-manager-plugin.rpm
-session-manager-plugin --version
 
 
 # sagemaker-hyperpod ssh

@@ -4,22 +4,6 @@ set -eux
 # Under ec2-user
 sudo -u ec2-user -i <<'EOF'
 
-echo "Load custom bashrc ......"
-cat >> ~/.bashrc <<EOF
-bashrc_files=(bashrc)
-path="/home/ec2-user/SageMaker/custom/"
-for file in \${bashrc_files[@]}
-do 
-    file_to_load=\$path\$file
-    if [ -f "\$file_to_load" ];
-    then
-        . \$file_to_load
-        echo "loaded \$file_to_load"
-    fi
-done
-EOF
-
-
 echo "Modern application development setup ..."
 aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/eks/sm-al2-MAD.sh /home/ec2-user/SageMaker/custom/sm-al2-MAD.sh
 
