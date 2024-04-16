@@ -8,26 +8,10 @@ CUSTOM_DIR=/home/ec2-user/SageMaker/custom
 mkdir -p "$CUSTOM_DIR"/bin
 
 echo "==============================================="
-echo "Load custom bashrc ......"
+echo "  Load custom bashrc ......"
 echo "==============================================="
-
-# check if a ENV CUSTOM_BASH exist
-if [ -z ${CUSTOM_BASH} ]; then
-  # Update path
-  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:~/.local/bin/' >> ~/.bashrc
-
-  # create CUSTOM_BASH file
-  cat >> ~/SageMaker/custom/bashrc <<EOF
-export CUSTOM_BASH=/home/ec2-user/SageMaker/custom/bashrc
-export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
-export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
-
-EOF
-
-
-
-  # Add custom bash file if not set before
-  cat >> ~/.bashrc <<EOF
+# Add custom bash file if not set before
+cat >> ~/.bashrc <<EOF
 bashrc_files=(bashrc)
 path="/home/ec2-user/SageMaker/custom/"
 for file in \${bashrc_files[@]}
@@ -39,6 +23,21 @@ do
         echo "loaded \$file_to_load"
     fi
 done
+EOF
+
+source ~/.bashrc
+
+# check if a ENV CUSTOM_BASH exist
+if [ ! -z ${CUSTOM_BASH} ]; then
+  # Update path
+  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:~/.local/bin/' >> ~/.bashrc
+
+  # create CUSTOM_BASH file
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+export CUSTOM_BASH=/home/ec2-user/SageMaker/custom/bashrc
+export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
+export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+
 EOF
 fi
 
@@ -78,6 +77,16 @@ fi
 sudo yum install -y $CUSTOM_DIR/bin/session-manager-plugin.rpm
 session-manager-plugin
 
+# ec2-instance-selector
+if [ ! -f $CUSTOM_DIR/bin/ec2-instance-selector ]; then
+  target=$(uname | tr '[:upper:]' '[:lower:]')-amd64
+  LATEST_DOWNLOAD_URL=$(curl --silent $CUSTOM_DIR/bin/ec2-instance-selector "https://api.github.com/repos/aws/amazon-ec2-instance-selector/releases/latest" | grep "\"browser_download_url\": \"https.*$target.tar.gz" | sed -E 's/.*"([^"]+)".*/\1/')
+  curl -Lo $CUSTOM_DIR/bin/ec2-instance-selector.tar.gz $LATEST_DOWNLOAD_URL
+  tar -xvf $CUSTOM_DIR/bin/ec2-instance-selector.tar.gz -C $CUSTOM_DIR/bin
+  # curl -Lo $CUSTOM_DIR/bin/ec2-instance-selector https://github.com/aws/amazon-ec2-instance-selector/releases/download/v2.4.1/ec2-instance-selector-`uname | tr '[:upper:]' '[:lower:]'`-amd64 
+  chmod +x $CUSTOM_DIR/bin/ec2-instance-selector
+fi
+
 
 # S3 mountpoint
 if [ ! -f $CUSTOM_DIR/bin/mount-s3.rpm ]; then
@@ -99,6 +108,14 @@ fi
 # s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
 # s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
 
+
+# https://github.com/muesli/duf
+echo "Setup duf"
+if [ ! -f $CUSTOM_DIR/duf.rpm ]; then
+    DOWNLOAD_URL="https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_amd64.rpm"
+    wget $DOWNLOAD_URL -O $CUSTOM_DIR/duf.rpm
+fi
+sudo yum localinstall -y $CUSTOM_DIR/duf.rpm
 
 
 echo "==============================================="
@@ -223,6 +240,28 @@ if [ ! -z "$EKS_CLUSTER_NAME" ]; then
 fi
 
 
+if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
+then
+  echo "Setup SSH Keys"
+  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
+  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
+  sudo chmod 400 ~/.ssh/id_rsa
+  sudo chown -R ec2-user:ec2-user ~/.ssh/
+  # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+fi
+
+
+# sagemaker-hyperpod ssh
+# https://catalog.workshops.aws/sagemaker-hyperpod/en-US/01-cluster/05-ssh
+if [ ! -f $CUSTOM_DIR/bin/easy-ssh ]; then
+  wget -O $CUSTOM_DIR/bin/easy-ssh https://raw.githubusercontent.com/TipTopBin/awesome-distributed-training/main/1.architectures/5.sagemaker-hyperpod/easy-ssh.sh
+  chmod +x $CUSTOM_DIR/bin/easy-ssh
+fi
+# easy-ssh -h
+# easy-ssh -c controller-group cluster-name
+
+
+
 echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
@@ -237,6 +276,24 @@ if [ -z ${dry} ]; then
 # Add by sm-nb-MAD
 alias ..='source ~/.bashrc'
 alias c=clear
+
+alias a=aws
+alias aid='aws sts get-caller-identity'
+
+alias z='zip -r ../1.zip .'
+alias g=git
+alias l='ls -CF'
+alias la='ls -A'
+alias ll='ls -alh --color=auto'
+alias ls='ls --color=auto'
+alias jc=/bin/journalctl
+alias s5='s5cmd'
+
+alias 2s='cd /home/ec2-user/SageMaker'
+alias 2c='cd /home/ec2-user/SageMaker/custom'
+
+export TERM=xterm-256color
+#export TERM=xterm-color
 
 export dry="--dry-run=client -o yaml"
 export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
@@ -265,6 +322,10 @@ alias egn='eksctl get nodegroup --cluster=\${EKS_CLUSTER_NAME}'
 alias ess='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --name=system --nodes'
 alias esn='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} -n'
 alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nodes-min=0 -n'
+
+alias nsel=ec2-instance-selector
+
+alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
 
 # Other
 
