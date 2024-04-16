@@ -10,7 +10,24 @@ mkdir -p "$CUSTOM_DIR"/bin
 echo "==============================================="
 echo "Load custom bashrc ......"
 echo "==============================================="
-cat >> ~/.bashrc <<EOF
+
+# check if a ENV CUSTOM_BASH exist
+if [ -z ${CUSTOM_BASH} ]; then
+  # Update path
+  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:~/.local/bin/' >> ~/.bashrc
+
+  # create CUSTOM_BASH file
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+export CUSTOM_BASH=/home/ec2-user/SageMaker/custom/bashrc
+export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
+export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+
+EOF
+
+
+
+  # Add custom bash file if not set before
+  cat >> ~/.bashrc <<EOF
 bashrc_files=(bashrc)
 path="/home/ec2-user/SageMaker/custom/"
 for file in \${bashrc_files[@]}
@@ -23,7 +40,7 @@ do
     fi
 done
 EOF
-
+fi
 
 echo "==============================================="
 echo "  Utilities ......"
@@ -35,7 +52,7 @@ sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel x
 # sudo yum -y install siege fio ioping dos2unix
 
 if [ ! -f $CUSTOM_DIR/bin/yq ]; then
-  wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $WORKING_DIR/bin/yq
+  wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $CUSTOM_DIR/bin/yq
   chmod +x $CUSTOM_DIR/bin/yq
 fi
 
@@ -56,7 +73,7 @@ aws --version
 
 # Install session-manager
 if [ ! -f $CUSTOM_DIR/bin/session-manager-plugin.rpm ]; then
-  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$WORKING_DIR/bin/session-manager-plugin.rpm"
+  curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "$CUSTOM_DIR/bin/session-manager-plugin.rpm"
 fi
 sudo yum install -y $CUSTOM_DIR/bin/session-manager-plugin.rpm
 session-manager-plugin
@@ -67,7 +84,6 @@ if [ ! -f $CUSTOM_DIR/bin/mount-s3.rpm ]; then
   wget -O $CUSTOM_DIR/bin/mount-s3.rpm https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm
 fi
 sudo yum install -y $CUSTOM_DIR/bin/mount-s3.rpm
-echo "alias ms3='mount-s3'" | tee -a ~/.bashrc
 
 
 # s5cmd
@@ -82,7 +98,6 @@ fi
 # mv/sync 等注意要加单引号，注意区域配置
 # s5cmd mv 's3://xxx-iad/HFDatasets/*' 's3://xxx-iad/datasets/HF/'
 # s5 --profile=xxx cp --source-region=us-west-2 s3://xxx.zip ./xxx.zip
-
 
 
 
@@ -211,22 +226,18 @@ fi
 echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
-cat >> ~/.bashrc <<EOF
-source <(kubectl completion bash)
-alias k=kubectl
-complete -F __start_kubectl k
-
-. <(eksctl completion bash)
-alias e=eksctl
-complete -F __start_eksctl e
-EOF
+source ~/.bashrc
 
 # check if a ENV dry exist
 if [ -z ${dry} ]; then
+
   # Add alias if not set before
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
 # Add by sm-nb-MAD
+alias ..='source ~/.bashrc'
+alias c=clear
+
 export dry="--dry-run=client -o yaml"
 export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
 export PATH="\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH"
@@ -261,5 +272,22 @@ EOF
 fi    
 
 source ~/.bashrc
+
+# 检查是否存在别名 'k'
+if alias | grep -q '^alias k='; then
+  echo "Alias 'k' exists"
+else
+  echo "Alias 'k' does not exist"
+  cat >> ~/.bashrc <<EOF
+source <(kubectl completion bash)
+alias k=kubectl
+complete -F __start_kubectl k
+
+. <(eksctl completion bash)
+alias e=eksctl
+complete -F __start_eksctl e
+EOF
+fi
+
 
 echo " done"

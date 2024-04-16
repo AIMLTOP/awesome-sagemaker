@@ -13,8 +13,6 @@ if [ -z ${SAGE_NB_NAME} ]; then
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
 # Add by sm-nb-DIY
-alias ..='source ~/.bashrc'
-alias c=clear
 alias z='zip -r ../1.zip .'
 alias g=git
 alias l='ls -CF'

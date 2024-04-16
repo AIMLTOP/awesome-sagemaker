@@ -7,8 +7,6 @@ mkdir -p "$WORKING_DIR"/bin
 echo "==============================================="
 echo "  Config envs, load custom bashrc ......"
 echo "==============================================="
-export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
-export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
 echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bashrc
 echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bashrc
 aws configure set default.region ${AWS_REGION}
@@ -196,7 +194,6 @@ chmod +x /home/ec2-user/SageMaker/custom/env.sh
 
 # Tag to Env
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
-echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/.bashrc
 sudo bash -c "cat << EOF > /usr/local/bin/b
 #!/bin/bash
 /bin/bash
