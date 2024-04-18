@@ -6,6 +6,10 @@ CUSTOM_DIR=/home/ec2-user/SageMaker/custom
 if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
   mkdir -p "$CUSTOM_DIR"/bin
+  mkdir -p /home/ec2-user/SageMaker/lab
+  mkdir -p /home/ec2-user/SageMaker/tmp
+  chmod -R 777 /home/ec2-user/SageMaker/tmp
+
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
 fi
@@ -33,7 +37,6 @@ source ~/.bashrc
 
 # check if a ENV ACCOUNT_ID exist
 if [ -z ${ACCOUNT_ID} ]; then
-  # create CUSTOM_BASH file
   echo "Add envs: ACCOUNT_ID AWS_REGION"
   cat >> ~/SageMaker/custom/bashrc <<EOF
 export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
@@ -41,6 +44,13 @@ export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
 
 EOF
 fi
+
+source ~/.bashrc
+
+test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is not set
+aws configure set default.region ${AWS_REGION}
+aws configure get default.region
+aws configure set region $AWS_REGION
 
 
 echo "==============================================="
@@ -233,6 +243,198 @@ k8sgpt auth default -p amazonbedrock
 # # $CUSTOM_DIR/docker-compose version
 
 
+# echo "  Install eks anywhere ......"
+# export EKSA_RELEASE="0.14.3" OS="$(uname -s | tr A-Z a-z)" RELEASE_NUMBER=30
+# curl "https://anywhere-assets.eks.amazonaws.com/releases/eks-a/${RELEASE_NUMBER}/artifacts/eks-a/v${EKSA_RELEASE}/${OS}/amd64/eksctl-anywhere-v${EKSA_RELEASE}-${OS}-amd64.tar.gz" \
+#     --silent --location \
+#     | tar xz ./eksctl-anywhere
+# sudo mv ./eksctl-anywhere /usr/local/bin/
+# eksctl anywhere version
+
+
+# echo "  Install copilot ......"
+# sudo curl -Lo /usr/local/bin/copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux \
+#    && sudo chmod +x /usr/local/bin/copilot \
+#    && copilot --help
+
+
+# echo "  Install App2Container ......"
+# #https://docs.aws.amazon.com/app2container/latest/UserGuide/start-step1-install.html
+# #https://aws.amazon.com/blogs/containers/modernize-java-and-net-applications-remotely-using-aws-app2container/
+# curl -o /tmp/AWSApp2Container-installer-linux.tar.gz https://app2container-release-us-east-1.s3.us-east-1.amazonaws.com/latest/linux/AWSApp2Container-installer-linux.tar.gz
+# sudo tar xvf /tmp/AWSApp2Container-installer-linux.tar.gz -C /tmp
+# # sudo ./install.sh
+# echo y |sudo /tmp/install.sh
+# sudo app2container --version
+# cat >> ~/.bashrc <<EOF
+# alias a2c="sudo app2container"
+# EOF
+# source ~/.bashrc
+# a2c help
+# curl -o /tmp/optimizeImage.zip https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/samples/p-attach/dc756bff-1fcd-4fd2-8c4f-dc494b5007b9/attachments/attachment.zip
+# sudo unzip /tmp/optimizeImage.zip -d /tmp/optimizeImage
+# sudo chmod 755 /tmp/optimizeImage/optimizeImage.sh
+# sudo mv /tmp/optimizeImage/optimizeImage.sh /usr/local/bin/optimizeImage.sh
+# optimizeImage.sh -h
+
+
+# echo "  Install kube-no-trouble (kubent) ......"
+# # https://github.com/doitintl/kube-no-trouble
+# # https://medium.doit-intl.com/kubernetes-how-to-automatically-detect-and-deal-with-deprecated-apis-f9a8fc23444c
+# sh -c "$(curl -sSL https://git.io/install-kubent)"
+
+
+# echo "  Install IAM Authenticator ......"
+## https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
+## curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
+## curl -o aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
+# curl -o aws-iam-authenticator https://s3.us-west-2.amazonaws.com/amazon-eks/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator
+# chmod +x ./aws-iam-authenticator
+# mkdir -p $HOME/bin && mv ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin
+# echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+# source ~/.bashrc
+# aws-iam-authenticator help
+
+
+# echo "  Install kubescape ......"
+# # curl -s https://raw.githubusercontent.com/armosec/kubescape/master/install.sh | /bin/bash
+# curl -s https://raw.githubusercontent.com/armosec/kubescape/master/install.sh -o "/tmp/kubescape.sh"
+# /tmp/kubescape.sh
+
+
+# echo "  Install kind ......"
+# curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.17.0/kind-$(uname)-amd64"
+# chmod +x ./kind
+# sudo mv ./kind /usr/local/bin/kind
+
+
+# echo "  Install Flux CLI ......"
+# curl -s https://fluxcd.io/install.sh | sudo bash
+# flux --version
+
+
+# echo "  Install argocd ......"
+# # curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+# # sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+# # rm argocd-linux-amd64
+# # argocd version --client
+# export ARGO_VERSION="v3.4.9"
+# curl -sLO https://github.com/argoproj/argo-workflows/releases/download/${ARGO_VERSION}/argo-linux-amd64.gz
+# gunzip argo-linux-amd64.gz
+# chmod +x argo-linux-amd64
+# sudo mv ./argo-linux-amd64 /usr/local/bin/argo
+# argo version
+# rm -fr argo-linux-amd64.gz
+# # # Install Argo Rollout
+# # sudo curl -Lo /usr/local/bin/kubectl-argo-rollouts https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+# # sudo chmod +x /usr/local/bin/kubectl-argo-rollouts
+
+
+# echo "  Install docker buildx ......"
+# # https://aws.amazon.com/blogs/compute/how-to-quickly-setup-an-experimental-environment-to-run-containers-on-x86-and-aws-graviton2-based-amazon-ec2-instances-effort-to-port-a-container-based-application-from-x86-to-graviton2/
+# # https://docs.docker.com/build/buildx/install/
+# # export DOCKER_BUILDKIT=1
+# # docker build --platform=local -o . git://github.com/docker/buildx
+# DOCKER_BUILDKIT=1 docker build --platform=local -o . "https://github.com/docker/buildx.git"
+# mkdir -p ~/.docker/cli-plugins
+# mv buildx ~/.docker/cli-plugins/docker-buildx
+# chmod a+x ~/.docker/cli-plugins/docker-buildx
+# docker run --privileged --rm tonistiigi/binfmt --install all
+# docker buildx ls
+
+
+# 编译安装时间较久，如需要请手动复制脚本安装
+# echo "  Install kmf ......"
+# git clone https://github.com/awslabs/aws-kubernetes-migration-factory
+# cd aws-kubernetes-migration-factory/
+# sudo go build -o /usr/local/bin/kmf
+# cd ..
+# kmf -h
+
+
+# echo "  Install clusterctl ......"
+# curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.2.4/clusterctl-linux-amd64 -o clusterctl
+# chmod +x ./clusterctl
+# sudo mv ./clusterctl /usr/local/bin/clusterctl
+# clusterctl version
+
+
+# echo "  Install clusterawsadm ......"
+# curl -L https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/download/v1.5.0/clusterawsadm-linux-amd64 -o clusterawsadm
+# chmod +x clusterawsadm
+# sudo mv clusterawsadm /usr/local/bin
+# clusterawsadm version
+
+
+# echo "  Install kube-ps1.sh ......"
+# curl -L -o ~/kube-ps1.sh https://github.com/jonmosco/kube-ps1/raw/master/kube-ps1.sh
+# cat << EOF >> ~/.bashrc
+# alias kon='touch ~/.kubeon; source ~/.bashrc'
+# alias koff='rm -f ~/.kubeon; source ~/.bashrc'
+# if [ -f ~/.kubeon ]; then
+#         source ~/kube-ps1.sh
+#         PS1='[\u@\h \W \$(kube_ps1)]\$ '
+# fi
+# EOF
+# source ~/.bashrc
+
+
+# echo "  Cloudwatch Dashboard Generator ......"
+# https://github.com/aws-samples/aws-cloudwatch-dashboard-generator
+# mkdir -p ~/environment/sre && cd ~/environment/sre
+# # git clone https://github.com/aws-samples/aws-cloudwatch-dashboard-generator.git 
+# git clone https://github.com/CLOUDCNTOP/aws-cloudwatch-dashboard-generator.git
+# cd aws-cloudwatch-dashboard-generator
+# pip install -r r_requirements.txt
+
+
+# echo " krr (Prometheus-based Kubernetes Resource Recommendations) ......"
+#https://github.com/robusta-dev/krr
+
+
+# echo " tumx ......"
+#https://tmuxcheatsheet.com/
+#https://github.com/MarcoLeongDev/handsfree-stable-diffusion
+
+
+# echo " eksdemo ......"
+# https://github.com/awslabs/eksdemo
+
+# echo " kubefirst ......"
+# https://github.com/kubefirst/kubefirst
+# https://docs.kubefirst.io/aws/overview
+
+
+# echo " Steampipe ......"
+# Visualizing AWS EKS Kubernetes Clusters with Relationship Graphs
+# https://dev.to/aws-builders/visualizing-aws-eks-kubernetes-clusters-with-relationship-graphs-46a4
+# sudo /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/turbot/steampipe/main/install.sh)"
+# steampipe plugin install kubernetes
+# git clone https://github.com/turbot/steampipe-mod-kubernetes-insights
+# cd steampipe-mod-kubernetes-insights
+# steampipe dashboard
+
+
+# echo " kuboard ......"
+# https://kuboard.cn/install/v3/install-built-in.html#%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92
+# LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+# sudo docker run -d \
+#   --restart=unless-stopped \
+#   --name=kuboard \
+#   -p 80:80/tcp \
+#   -p 10081:10081/tcp \
+#   -e KUBOARD_ENDPOINT="http://${LOCAL_IPV4}:80" \
+#   -e KUBOARD_AGENT_SERVER_TCP_PORT="10081" \
+#   -v /root/kuboard-data:/data \
+#   eipwork/kuboard:v3
+  # 也可以使用镜像 swr.cn-east-2.myhuaweicloud.com/kuboard/kuboard:v3 ，可以更快地完成镜像下载。
+  # 请不要使用 127.0.0.1 或者 localhost 作为内网 IP \
+  # Kuboard 不需要和 K8S 在同一个网段，Kuboard Agent 甚至可以通过代理访问 Kuboard Server \
+
+# echo "  KubeVela ......"
+# https://kubevela.io/docs/installation/standalone/#local
+
+
 echo "==============================================="
 echo "  Load config ......"
 echo "==============================================="
@@ -355,6 +557,14 @@ EOF
 fi    
 
 source ~/.bashrc
+
+if [ ! -f $CUSTOM_DIR/bin/b ]; then
+  sudo bash -c "cat << EOF > /usr/local/bin/b
+  #!/bin/bash
+  /bin/bash
+  EOF"
+  sudo chmod +x /usr/local/bin/b  
+fi
 
 # 检查是否存在别名 'k'
 if alias | grep -q '^alias k='; then

@@ -44,3 +44,11 @@ cat > ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyter
     "lineHeight": 1.3
 }
 EoL
+
+
+# https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers-troubleshooting.html
+mkdir -p ~/.sagemaker
+cat > ~/.sagemaker/config.yaml <<EOF
+local:
+  container_root: /home/ec2-user/SageMaker/tmp
+EOF

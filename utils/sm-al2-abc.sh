@@ -4,6 +4,7 @@ source ~/.bashrc
 
 # AI BigData Cloud
 CUSTOM_DIR=/home/ec2-user/SageMaker/custom && mkdir -p "$CUSTOM_DIR"/bin
+# yum update -y
 
 echo "==============================================="
 echo "  Metadata ......"
@@ -50,19 +51,170 @@ echo "==============================================="
 
 
 echo "Local Stable Diffusion ......"
+# AWS Extension https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
+#wget https://raw.githubusercontent.com/TipTopBin/stable-diffusion-aws-extension/main/install.sh -O /home/ec2-user/SageMaker/custom/install-sd.sh
+#sh /home/ec2-user/SageMaker/custom/install-sd.sh
+#~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --no-half --listen
+# ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen
+# Docker https://github.com/TipTopBin/stable-diffusion-webui-docker.git
 if [ ! -z "$SD_HOME" ]; then
   cd $SD_HOME/sd-webui # WorkingDirectory 注意一定要进入到这个目录
   # TODO check GPU
   nohup $SD_HOME/sd-webui/webui.sh --gradio-auth admin:${SD_PWD} --cors-allow-origins=* --enable-insecure-extension-access --allow-code --medvram --xformers --listen --port 8760 > $SD_HOME/sd.log 2>&1 & # execute asynchronously
 fi
+# https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md
+# wget https://raw.githubusercontent.com/awslabs/stable-diffusion-aws-extension/main/install.sh -O ~/environment/aiml/install-sd.sh
+# sh ~/environment/aiml/install-sd.sh
+# # CPU 如果遇到 pip 找不到错误，尝试更新到 Python 3.8+，然后重启
+# ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --no-half --listen
+# ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen
+
+
+
+# # https://docs.conda.io/en/latest/miniconda.html
+# # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/persistent-conda-ebs/on-create.sh
+# # installs a custom, persistent installation of conda on the Notebook Instance's EBS volume, and ensures
+# # The on-create script downloads and installs a custom conda installation to the EBS volume via Miniconda. Any relevant
+# # packages can be installed here.
+# #   1. ipykernel is installed to ensure that the custom environment can be used as a Jupyter kernel   
+# #   2. Ensure the Notebook Instance has internet connectivity to download the Miniconda installer
+
+# CONDA_DIRECTORY="/home/ec2-user/SageMaker/custom/miniconda"
+# if [ -d "$CONDA_DIRECTORY" ]; then
+#     echo "$CONDA_DIRECTORY exists."
+# else
+#     echo "Setup Persistant Conda."
+#     sudo -u ec2-user -i <<'EOF'
+# unset SUDO_UID
+
+# # Install a separate conda installation via Miniconda
+# WORKING_DIR=/home/ec2-user/SageMaker/custom
+# mkdir -p "$WORKING_DIR"
+# # wget https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+# wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O "$WORKING_DIR/miniconda.sh"
+# bash "$WORKING_DIR/miniconda.sh" -b -u -p "$WORKING_DIR/miniconda" 
+# rm -rf "$WORKING_DIR/miniconda.sh"
+# EOF
+# fi
+
+
+## 2021
+# # wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+# # bash Anaconda3-2021.05-Linux-x86_64.sh -b -p /home/ec2-user/anaconda3
+# wget -O /tmp/Anaconda3-2021.05-Linux-x86_64.sh https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+# bash /tmp/Anaconda3-2021.05-Linux-x86_64.sh -b -p /home/ec2-user/environment/anaconda3
+## 2022
+# wget -O /tmp/Anaconda3-2022.10-Linux-x86_64.sh https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+# bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /home/ec2-user/environment/aiml/anaconda3
+# cat >> ~/.bashrc <<EOF
+# export PATH="/home/ec2-user/environment/aiml/anaconda3/bin:\$PATH"
+# EOF
+# source ~/.bashrc
+# conda config --show
+# conda info --envs
+# conda init
+## create a new conda environment
+# conda create -y -n builder --override-channels --strict-channel-priority -c conda-forge -c nodefaults jupyterlab=3 cookiecutter nodejs jupyter-packaging git build
+## remove environment
+# conda remove -n builder --all
+## switch environment
+# conda activate builder
+## start jupyter lab
+## Preview Running Application -> Pop Out Into New Window (建议 ChromeFirefox 页面无法展示)
+# . /home/ec2-user/environment/aiml/anaconda3/etc/profile.d/conda.sh
+# conda activate builder
+# jupyter lab --port=8080 --ServerApp.allow_remote_access=True
+
+
+# echo "Jupyter ......"
+# # https://studio.us-east-1.prod.workshops.aws/workshops/public/9cc3f765-77c6-4255-99a1-8e98ff483347
+# # touch /home/ec2-user/jupyterpassword.py
+# # echo "from notebook.auth import passwd" | cat >> /home/ec2-user/jupyterpassword.py
+# # echo "import os" | cat >> jupyterpassword.py
+# # echo "print(passwd('Awslabs'))" | cat >> /home/ec2-user/jupyterpassword.py
+# cat > /home/ec2-user/environment/aiml/jupyterpassword.py <<EOF
+# from notebook.auth import passwd
+# import random, string
+# generated_string = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(17))
+# f = open("/home/ec2-user/environment/aiml/jupyterpassword.txt", "w")
+# f.write(generated_string)
+# f.close()
+# print(passwd(generated_string))
+# EOF
+
+# # echo "eval \"\$(/home/ec2-user/anaconda3/bin/conda shell.bash hook)\"" | cat >> /home/ec2-user/jupytersetup.sh
+# # echo "conda init" | cat >> /home/ec2-user/jupytersetup.sh
+# # echo "jupyter notebook --generate-config" | cat >> /home/ec2-user/jupytersetup.sh
+
+# # a="encrypted_pwd=\$(python3 /home/ec2-user/jupyterpassword.py)"
+# # echo $a | cat >> /home/ec2-user/jupytersetup.sh
+# # b="sed -i 's/c = get_config()/#c = get_config()/' /root/.jupyter/jupyter_notebook_config.py"
+# # echo $b | cat >> /home/ec2-user/jupytersetup.sh
+# # c="sed -i \"1 i\\c.NotebookApp.password=\\'\$encrypted_pwd\'\" /root/.jupyter/jupyter_notebook_config.py"
+# # echo $c | cat >> /home/ec2-user/jupytersetup.sh
+# # d="sed -i '1 i\\c.NotebookApp.port=8888' /root/.jupyter/jupyter_notebook_config.py"
+# # echo $d | cat >> /home/ec2-user/jupytersetup.sh
+# # e="sed -i '1 i\\c.NotebookApp.open_browser=False' /root/.jupyter/jupyter_notebook_config.py"
+# # echo $e | cat >> /home/ec2-user/jupytersetup.sh
+# # f="sed -i \"1 i\\c.NotebookApp.ip='*'\" /root/.jupyter/jupyter_notebook_config.py"
+# # echo $f | cat >> /home/ec2-user/jupytersetup.sh
+
+# echo "eval \"\$(/home/ec2-user/environment/aiml/anaconda3/bin/conda shell.bash hook)\"" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# echo "conda init" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# echo "jupyter notebook --generate-config" | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+
+# a="encrypted_pwd=\$(python3 /home/ec2-user/environment/aiml/jupyterpassword.py)"
+# echo $a | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# b="sed -i 's/c = get_config()/#c = get_config()/' /root/.jupyter/jupyter_notebook_config.py"
+# echo $b | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# c="sed -i \"1 i\\c.NotebookApp.password=\\'\$encrypted_pwd\'\" /root/.jupyter/jupyter_notebook_config.py"
+# echo $c | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# d="sed -i '1 i\\c.NotebookApp.port=8888' /root/.jupyter/jupyter_notebook_config.py"
+# echo $d | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# e="sed -i '1 i\\c.NotebookApp.open_browser=False' /root/.jupyter/jupyter_notebook_config.py"
+# echo $e | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+# f="sed -i \"1 i\\c.NotebookApp.ip='*'\" /root/.jupyter/jupyter_notebook_config.py"
+# echo $f | cat >> /home/ec2-user/environment/aiml/jupytersetup.sh
+
+# # setup in root 
+# sudo su
+# chmod +x /home/ec2-user/environment/aiml/jupytersetup.sh
+# /home/ec2-user/environment/aiml/jupytersetup.sh
+# source ~/.bashrc
+# # conda -V
+# exit
+
+# # manage in ec2-user
+# echo "export PATH=/home/ec2-user/environment/anaconda3/bin:\$PATH" | sudo tee -a ~/.bashrc
+# source ~/.bashrc
+# mkdir /home/ec2-user/environment/notebooks
+
+# ## start up example (run as root)
+# # sudo su
+# # cd /home/ec2-user/environment/notebooks
+# # jupyter notebook --allow-root
+
+
+# echo "Griptape ......"
+# # # https://blog.beachgeek.co.uk/getting-started-with-griptape/
+# # # https://www.griptape.ai/
+# # cd ~/environment/aiml
+# # python -m venv griptape
+# # cd griptape/
+# # source bin/activate
 
 
 echo "==============================================="
 echo "  Data ......"
 echo "==============================================="
+# echo "  Data on Amazon EKS (DoEKS) ......"
+# git clone https://github.com/TipTopBin/data-on-eks.git ~/environment/do/data-on-eks
+
+
 if [ ! -f $CUSTOM_DIR/flink-1.16.3/bin/flink ]; then
   echo "Setup Flink"
   wget https://dlcdn.apache.org/flink/flink-1.16.3/flink-1.16.3-bin-scala_2.12.tgz
+  # wget https://archive.apache.org/dist/flink/flink-1.15.3/flink-1.15.3-bin-scala_2.12.tgz -O /tmp/flink-1.15.3.tgz
   sudo tar xzvf flink-*.tgz -C $CUSTOM_DIR/
   sudo chown -R ec2-user $CUSTOM_DIR/flink-1.16.3
   # flink -v
@@ -73,13 +225,86 @@ EOF
 fi
 
 
+# echo "  Kafka ......"
+# wget https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz -O /tmp/kafka_2.12-2.8.1.tgz
+# tar -xzf /tmp/kafka_2.12-2.8.1.tgz -C ~/environment/do/
+# sudo chown -R ec2-user ~/environment/do
+# cat >> ~/.bashrc <<EOF
+# export PATH="~/environment/do/kafka_2.12-2.8.1/bin:$PATH"
+# EOF
+# source ~/.bashrc
+# # ln -s kafka_2.12-2.8.1 kafka
+
+
+# echo "  Install Cruise Control ......"
+# git clone https://github.com/linkedin/cruise-control.git ~/environment/do/cruise-control && cd ~/environment/do/cruise-control/
+# ./gradlew jar copyDependantLibs
+# mkdir logs; touch logs/kafka-cruise-control.out
+# # export MSK_ARN=`aws kafka list-clusters|grep ClusterArn|cut -d ':' -f 2-|cut -d ',' -f 1 | sed -e 's/\"//g'`
+# export MSK_ARN=$(aws kafka list-clusters --output json | jq -r .ClusterInfoList[].ClusterArn)
+# # export MSK_BROKERS=`aws kafka get-bootstrap-brokers --cluster-arn $MSK_ARN|grep BootstrapBrokerString|grep 9092| cut -d ':' -f 2- | sed -e 's/\"//g' | sed -e 's/,$//'`
+# export MSK_BROKERS=$(aws kafka get-bootstrap-brokers --cluster-arn $MSK_ARN --output json | jq -r .BootstrapBrokerString)
+# # export MSK_ZOOKEEPER=`aws kafka describe-cluster --cluster-arn $MSK_ARN|grep ZookeeperConnectString|grep -v Tls|cut -d ':' -f 2-|sed 's/,$//g'|sed -e 's/\"//g'`
+# export MSK_ZOOKEEPER=$(aws kafka describe-cluster --cluster-arn $MSK_ARN|grep ZookeeperConnectString|grep -v Tls|cut -d ':' -f 2-|sed 's/,$//g'|sed -e 's/\"//g')
+# echo "export MSK_ARN=\"${MSK_ARN}\"" | tee -a ~/.bashrc
+# echo "export MSK_BROKERS=\"${MSK_BROKERS}\"" | tee -a ~/.bashrc
+# echo "export MSK_ZOOKEEPER=\"${MSK_ZOOKEEPER}\"" >> ~/.bashrc
+# source ~/.bashrc
+
+# # sed -i "s/localhost:9092/${MSK_BROKERS}/g" config/cruisecontrol.properties
+# # sed -i "s/localhost:2181/${MSK_ZOOKEEPER}/g" config/cruisecontrol.properties
+# # sed -i "s/webserver.http.port=9090/webserver.http.port=8080/g" config/cruisecontrol.properties 
+# # sed -i "s/capacity.config.file=config\/capacityJBOD.json/capacity.config.file=.\/config\/capacityCores.json/g" config/cruisecontrol.properties
+# # sudo chmod -R 777 .
+# # # sed -i "s/com.linkedin.kafka.cruisecontrol.monitor.sampling.CruiseControlMetricsReporterSampler/com.linkedin.kafka.cruisecontrol.monitor.sampling.prometheus.PrometheusMetricSampler/g" config/cruisecontrol.properties
+# # # echo "prometheus.server.endpoint=localhost:9090" >> config/cruisecontrol.properties
+# # update capacityCores.json
+# # # start 
+# # cd ~/environment/do/cruise-control/
+# # ./kafka-cruise-control-start.sh -daemon config/cruisecontrol.properties
+# wget https://github.com/linkedin/cruise-control-ui/releases/download/v0.3.4/cruise-control-ui-0.3.4.tar.gz  -O /tmp/cruise-control-ui-0.3.4.tar.gz
+# sudo tar xzvf /tmp/cruise-control-ui-0.3.4.tar.gz -C ~/environment/do/cruise-control/
+# sudo chown -R ec2-user ~/environment/do/cruise-control/
+
+
+
+# echo "  Install emr-on-eks-custom-image ......"
+# wget -O /tmp/amazon-emr-on-eks-custom-image-cli-linux.zip https://github.com/awslabs/amazon-emr-on-eks-custom-image-cli/releases/download/v1.03/amazon-emr-on-eks-custom-image-cli-linux-v1.03.zip
+# sudo mkdir -p /opt/emr-on-eks-custom-image
+# unzip /tmp/amazon-emr-on-eks-custom-image-cli-linux.zip -d /opt/emr-on-eks-custom-image
+# sudo /opt/emr-on-eks-custom-image/installation
+# emr-on-eks-custom-image --version
+# cat >> ~/.bashrc <<EOF
+# alias eec=emr-on-eks-custom-image
+# EOF
+# source ~/.bashrc
+# eec --version
+
+
+# echo "  mwaa-local-runner ......"
+# # https://dev.to/aws/getting-mwaa-local-runner-up-on-aws-cloud9-1nhd
+
+
+# echo "  postgresql ......"
+# # https://catalog.workshops.aws/performance-tuning/en-US/30-environment
+# sudo amazon-linux-extras install -y python3.8 postgresql14
+# sudo yum install -y jq postgresql-contrib
+
+
+# echo "  mysql ......"
+# wget -c https://dev.mysql.com/get/Downloads/MySQL-Shell/mysql-shell-8.0.32-linux-glibc2.12-x86-64bit.tar.gz
+# tar -xf mysql-shell-8.0.32-linux-glibc2.12-x86-64bit.tar.gz
+# mysqlsh
+
 
 echo "==============================================="
 echo " Cloud Native ......"
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo yum groupinstall "Development Tools" -y
-sudo yum -y install jq gettext bash-completion moreutils openssl zsh xsel xclip amazon-efs-utils nc telnet mtr traceroute netcat 
+sudo yum -y install jq gettext bash-completion moreutils openssl zsh xsel xclip amazon-efs-utils nc telnet mtr traceroute netcat graphviz lynx
+#envsubst for environment variables substitution (envsubst is included in gettext package)
+yum -y install openssl-devel bzip2-devel expat-devel gdbm-devel readline-devel sqlite-devel
 # sudo yum -y install siege fio ioping dos2unix
 
 if [ ! -f $CUSTOM_DIR/bin/yq ]; then
@@ -112,5 +337,144 @@ export PATH="$CUSTOM_DIR/apache-maven-3.8.6/bin:\$PATH"
 EOF
   # mvn --version  
 fi
+
+
+# echo "  Cloudscape ......"
+# https://cloudscape.design/get-started/integration/using-cloudscape-components/
+
+
+# echo " VS Code ......"
+# https://aws.amazon.com/blogs/machine-learning/host-code-server-on-amazon-sagemaker/
+# curl -L https://github.com/aws-samples/amazon-sagemaker-codeserver/releases/download/v0.1.5/amazon-sagemaker-codeserver-0.1.5.tar.gz -o /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz
+# tar -xvzf /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver-0.1.5.tar.gz -d /home/ec2-user/SageMaker/custom/ 
+# cd /home/ec2-user/SageMaker/custom/amazon-sagemaker-codeserver/install-scripts/notebook-instances
+# chmod +x *.sh
+# sudo ./install-codeserver.sh
+# sudo ./setup-codeserver.sh
+# Another way
+# conda install -y -c conda-forge code-server
+# code-server --auth none
+
+
+# echo " resource-lister ......"
+# # https://github.com/awslabs/resource-lister
+# python3 -m pip install pipx
+# python3 -m pip install boto3
+# python3 -m pipx install resource-lister
+# # pipx run resource_lister
+# # python3 -m pipx run resource_lister
+
+# echo "  Install ccat ......"
+# go install github.com/owenthereal/ccat@latest
+# cat >> ~/.bashrc <<EOF
+# alias cat=ccat
+# EOF
+# source ~/.bashrc
+
+
+# echo "  CDK ......"
+## switch back to CDK 1.x
+# https://www.npmjs.com/package/aws-cdk?activeTab=versions
+# npm uninstall aws-cdk
+# npm install -g aws-cdk@1.199.0
+# npm install -g aws-cdk@1.199.0 --force
+## Upgrade to latest version
+# sudo npm install -g aws-cdk
+# cdk --version
+
+# echo "  Install ParallelCluster ......"
+# if ! command -v pcluster &> /dev/null
+# then
+#   echo ">> pcluster is missing, reinstalling it"
+#   sudo pip3 install 'aws-parallelcluster'
+# else
+#   echo ">> Pcluster $(pcluster version) found, nothing to install"
+# fi
+# pcluster version
+
+
+
+# echo "  SAM ......"
+# cd /tmp
+# wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+# unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+# sudo ./sam-installation/install
+# sam --version
+# cd -
+
+
+# echo "  cargo ......"
+# curl https://sh.rustup.rs -sSf | sh
+# source ~/.bashrc
+# sudo yum install -y openssl-devel
+# cargo install drill
+
+
+# echo "  Install terraform ......"
+# sudo yum install -y yum-utils
+# sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+# sudo yum install terraform -y
+# echo "alias tf='terraform'" >> ~/.bashrc
+# echo "alias tfp='terraform plan -out tfplan'" >> ~/.bashrc
+# echo "alias tfa='terraform apply --auto-approve'" >> ~/.bashrc # terraform apply tfplan
+# source ~/.bashrc
+# terraform --version
+
+
+# Python
+# echo "  pyenv ......"
+# git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+# cat << 'EOT' >> ~/.bashrc
+# export PYENV_ROOT="$HOME/.pyenv"
+# export PATH="$HOME/.pyenv/bin:$PATH"
+# eval "$(pyenv init -)"
+# EOT
+# # echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+# source ~/.bashrc
+
+
+# echo "  Upgrade Python ......"
+# # https://gist.github.com/094459/3eba3e5f4fb1ccaef1cb12044412f90b
+# ## use amazon-linux-extras to install python 3.8
+# # sudo amazon-linux-extras install python3.8 -y
+# # python -m ensurepip --upgrade --user
+# # sudo pip3 install --upgrade pip
+# # sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
+# # sudo update-alternatives --set python3 /usr/local/bin/python3.8
+# ## use pyenv to install python 3.9 (about 5 minutes to finish)
+# sudo yum -y update
+# sudo yum -y install bzip2-devel xz-devel
+# pyenv install 3.9.15
+# pyenv global 3.9.15
+# export PATH="$HOME/.pyenv/shims:$PATH"
+# source ~/.bash_profile
+# python --version
+# ## pyenv-virtualenv
+# git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+# echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+# . ~/.bashrc
+
+
+# NodeJS
+# echo "  NodeJS ......"
+# ## nvm
+# # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+# . ~/.nvm/nvm.sh
+# nvm -v
+# ## LTS
+# ## nvm install --lts
+# ## node v16
+# # nvm install 16
+# ## node v17
+# nvm install 17
+# node -e "console.log('Running Node.js ' + process.version)"
+# #nvm uninstall 17
+# ## npm
+# npm list --depth=0
+# ## Redoc https://github.com/Redocly/redoc
+# # npm i
+# # npm run watch
+# # npm install -g esbuild
 
 
