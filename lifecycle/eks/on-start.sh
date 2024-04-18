@@ -4,63 +4,22 @@ set -eux
 # Under ec2-user
 sudo -u ec2-user -i <<'EOF'
 
-echo "Modern application development setup ..."
-aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/eks/sm-al2-MAD.sh /home/ec2-user/SageMaker/custom/sm-al2-MAD.sh
-
+echo "Init and do your self configuration ..." # For production, please use s3 bucket
+# aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/${LC_NAME}/sm-al2-init.sh /home/ec2-user/SageMaker/custom/sm-al2-init.sh
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-init.sh -O /home/ec2-user/SageMaker/custom/sm-al2-init.sh
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-jupyter.sh -O /home/ec2-user/SageMaker/custom/sm-al2-jupyter.sh
+wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-abc.sh -O /home/ec2-user/SageMaker/custom/sm-al2-abc.sh
 chmod +x /home/ec2-user/SageMaker/custom/*.sh
 chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
+nohup /home/ec2-user/SageMaker/custom/sm-al2-init.sh > /home/ec2-user/SageMaker/custom/sm-al2-init.log 2>&1 &  # execute asynchronously
+nohup /home/ec2-user/SageMaker/custom/sm-al2-jupyter.sh > /home/ec2-user/SageMaker/custom/sm-al2-jupyter.log 2>&1 &
+nohup /home/ec2-user/SageMaker/custom/sm-al2-abc.sh > /home/ec2-user/SageMaker/custom/sm-al2-abc.log 2>&1 &
 
-nohup /home/ec2-user/SageMaker/custom/sm-al2-MAD.sh > /home/ec2-user/SageMaker/custom/sm-al2-MAD.log 2>&1 &  # execute asynchronously
-
-echo "Configue Jupyterlab"
-mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
-{
-    // Notifications
-    // @jupyterlab/apputils-extension:notification
-    // Notifications settings.
-    // *******************************************
-
-    // Fetch official Jupyter news
-    // Whether to fetch news from Jupyter news feed. If `true`, it will make a request to a website.
-    "fetchNews": "false"
-}
-EoL
-
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings <<EoL
-{
-    // Theme
-    // @jupyterlab/apputils-extension:themes
-    // Theme manager settings.
-    // *************************************
-
-    // Selected Theme
-    // Application-level visual styling theme
-    "theme": "JupyterLab Dark"
-}
-EoL
-
-mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings <<EoL
-{
-    // Terminal
-    // @jupyterlab/terminal-extension:plugin
-    // Terminal settings.
-    // *************************************
-
-    // Font size
-    // The font size used to render text.
-    "fontSize": 15,
-    "lineHeight": 1.3
-}
-EoL
 
 echo "Install Extensions ... "
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
-
 pip install amazon-codewhisperer-jupyterlab-ext
 jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
-
 source /home/ec2-user/anaconda3/bin/deactivate
 
 EOF
@@ -68,7 +27,8 @@ EOF
 
 # Under root
 echo "Auto stop to save cost ..."
-IDLE_TIME=28800 # 8 hour
+IDLE_TIME=18720 # 5.2 hour
+# IDLE_TIME=28800 # 8 hour
 
 CONDA_PYTHON_DIR=$(source /home/ec2-user/anaconda3/bin/activate /home/ec2-user/anaconda3/envs/JupyterSystemEnv && which python)
 if $CONDA_PYTHON_DIR -c "import boto3" 2>/dev/null; then

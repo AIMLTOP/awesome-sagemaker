@@ -1,11 +1,15 @@
 #!/bin/bash
 
-# Modern application development
-
 source ~/.bashrc
 
 CUSTOM_DIR=/home/ec2-user/SageMaker/custom
-mkdir -p "$CUSTOM_DIR"/bin
+if [ ! -d "$CUSTOM_DIR" ]; then
+  echo "Set custom dir and bashrc"
+  mkdir -p "$CUSTOM_DIR"/bin
+  echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
+  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
+fi
+
 
 echo "==============================================="
 echo "  Load custom bashrc ......"
@@ -27,19 +31,17 @@ EOF
 
 source ~/.bashrc
 
-# check if a ENV CUSTOM_BASH exist
-if [ ! -z ${CUSTOM_BASH} ]; then
-  # Update path
-  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:~/.local/bin/' >> ~/.bashrc
-
+# check if a ENV ACCOUNT_ID exist
+if [ -z ${ACCOUNT_ID} ]; then
   # create CUSTOM_BASH file
+  echo "Add envs: ACCOUNT_ID AWS_REGION"
   cat >> ~/SageMaker/custom/bashrc <<EOF
-export CUSTOM_BASH=/home/ec2-user/SageMaker/custom/bashrc
 export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
 
 EOF
 fi
+
 
 echo "==============================================="
 echo "  Utilities ......"
@@ -261,6 +263,26 @@ fi
 # easy-ssh -c controller-group cluster-name
 
 
+# S3 bucket
+# mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
+if [ ! -z "$S3_INTG_AUTO" ]; then
+    mkdir -p /home/ec2-user/SageMaker/s3/${S3_INTG_AUTO}
+    mount-s3 ${S3_INTG_AUTO} /home/ec2-user/SageMaker/s3/${S3_INTG_AUTO} --allow-other --allow-delete --dir-mode 777
+    # sudo mount-s3 ${HP_S3_BUCKET} $HP_S3_MP --max-threads 96 --part-size 16777216 --allow-other --allow-delete --maximum-throughput-gbps 100 --dir-mode 777
+fi
+
+
+# EFS
+if [ ! -z "$EFS_FS_ID" ]; then
+  mkdir -p /home/ec2-user/SageMaker/efs
+  # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
+  mkdir -p /home/ec2-user/SageMaker/efs/${EFS_FS_NAME}
+  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} efs _netdev,tls 0 0" | sudo tee -a /etc/fstab
+  sudo mount -a
+  sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
+  #sudo chmod 777 /home/ec2-user/SageMaker/efs*
+fi
+
 
 echo "==============================================="
 echo "  Env, Alias and Path ......"
@@ -339,7 +361,7 @@ if alias | grep -q '^alias k='; then
   echo "Alias 'k' exists"
 else
   echo "Alias 'k' does not exist"
-  cat >> ~/.bashrc <<EOF
+  cat >> ~/SageMaker/custom/bashrc <<EOF
 source <(kubectl completion bash)
 alias k=kubectl
 complete -F __start_kubectl k
@@ -349,6 +371,5 @@ alias e=eksctl
 complete -F __start_eksctl e
 EOF
 fi
-
 
 echo " done"
