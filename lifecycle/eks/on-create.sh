@@ -13,9 +13,6 @@ wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/infra/en
 chmod +x /home/ec2-user/SageMaker/custom/env.sh
 /home/ec2-user/SageMaker/custom/env.sh ~/SageMaker/custom/bashrc
 
-echo "Fetching auto stop script"
-mkdir -p /home/ec2-user/SageMaker/custom
-aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/${LC_NAME}/autostop.py /home/ec2-user/SageMaker/custom/autostop.py
 EOF
 
 # Under root
