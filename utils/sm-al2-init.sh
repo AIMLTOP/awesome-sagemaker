@@ -6,9 +6,10 @@ CUSTOM_DIR=/home/ec2-user/SageMaker/custom
 if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
   mkdir -p "$CUSTOM_DIR"/bin
+  mkdir -p "$CUSTOM_DIR"/envs
   mkdir -p /home/ec2-user/SageMaker/lab
-  mkdir -p /home/ec2-user/SageMaker/tmp
-  chmod -R 777 /home/ec2-user/SageMaker/tmp
+  # mkdir -p /home/ec2-user/SageMaker/tmp
+  # chmod -R 777 /home/ec2-user/SageMaker/tmp
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
@@ -469,14 +470,14 @@ fi
 # mount-s3 [OPTIONS] <BUCKET_NAME> <DIRECTORY>
 if [ ! -z "$S3_INTG_AUTO" ]; then
     mkdir -p /home/ec2-user/SageMaker/s3/${S3_INTG_AUTO}
-    mount-s3 ${S3_INTG_AUTO} /home/ec2-user/SageMaker/s3/${S3_INTG_AUTO} --allow-other --allow-delete --dir-mode 777
+    mount-s3 ${S3_INTG_AUTO} /home/ec2-user/SageMaker/s3/${S3_INTG_AUTO} --allow-delete --dir-mode 777
+    # fusermount: option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf
     # sudo mount-s3 ${HP_S3_BUCKET} $HP_S3_MP --max-threads 96 --part-size 16777216 --allow-other --allow-delete --maximum-throughput-gbps 100 --dir-mode 777
 fi
 
 
 # EFS
 if [ ! -z "$EFS_FS_ID" ]; then
-  mkdir -p /home/ec2-user/SageMaker/efs
   # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
   mkdir -p /home/ec2-user/SageMaker/efs/${EFS_FS_NAME}
   echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} efs _netdev,tls 0 0" | sudo tee -a /etc/fstab
@@ -497,7 +498,7 @@ if [ -z ${dry} ]; then
   # Add alias if not set before
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
-# Add by sm-nb-MAD
+# Add by sm-nb-init
 alias ..='source ~/.bashrc'
 alias c=clear
 
