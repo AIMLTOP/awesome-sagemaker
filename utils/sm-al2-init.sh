@@ -458,6 +458,12 @@ then
   {
   cat ~/.ssh/id_rsa.pub|tr '\n' ' '
   } >> ~/.ssh/authorized_keys
+
+  # SSH Forward
+  sudo adduser ubuntu
+  sudo mkdir -p /home/ubuntu/.ssh
+  sudo cp /home/ec2-user/.ssh/* /home/ubuntu/.ssh/
+  sudo chown -R ubuntu /home/ubuntu*
 fi
 
 
