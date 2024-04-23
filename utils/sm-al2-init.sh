@@ -453,6 +453,11 @@ then
   sudo chmod 400 ~/.ssh/id_rsa
   sudo chown -R ec2-user:ec2-user ~/.ssh/
   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+
+  # 本地免密，方便 EKS Node 能反向 SSH 到 Notebook Instance
+  {
+  cat ~/.ssh/id_rsa.pub|tr '\n' ' '
+  } >> ~/.ssh/authorized_keys
 fi
 
 
@@ -538,7 +543,7 @@ alias ka='kubectl apply -f'
 alias ke='kubectl explain'
 alias kr='kubectl run \$dry'
 
-alias tk='kt karpenter -n \${KARPENTER_NAMESPACE}'
+alias tk='kt karpenter -n kube-system'
 alias tlbc='kt aws-load-balancer-controller -n kube-system'
 alias tebs='kt ebs-csi-controller -n kube-system'
 alias tefs='kt efs-csi-controller -n kube-system'
