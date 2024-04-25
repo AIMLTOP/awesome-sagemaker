@@ -9,7 +9,7 @@ CUSTOM_DIR=/home/ec2-user/SageMaker/custom && mkdir -p "$CUSTOM_DIR"/bin
 echo "==============================================="
 echo "  Metadata ......"
 echo "==============================================="
-if [ -z ${SAGE_NB_NAME} ]; then
+if [ ! -z ${SAGE_NB_NAME} ]; then
   # Add SageMaker related ENVs if not set before
   export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
   export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)

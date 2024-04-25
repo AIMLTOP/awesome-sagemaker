@@ -7,10 +7,10 @@ if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
   mkdir -p "$CUSTOM_DIR"/bin
   mkdir -p "$CUSTOM_DIR"/envs
-  mkdir -p /home/ec2-user/SageMaker/lab
-  # mkdir -p /home/ec2-user/SageMaker/tmp
   mkdir -p "$CUSTOM_DIR"/tmp
   chmod -R 777 "$CUSTOM_DIR"/tmp
+
+  mkdir -p /home/ec2-user/SageMaker/labs
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
@@ -57,7 +57,7 @@ aws configure set region $AWS_REGION
 if [ -z ${FLAVOR} ]; then
   echo "Add env: FLAVOR"
   cat >> ~/SageMaker/custom/bashrc <<EOF
-FLAVOR=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)
+FLAVOR="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)"
 
 EOF
 fi
@@ -522,9 +522,9 @@ echo "  Env, Alias and Path ......"
 echo "==============================================="
 source ~/.bashrc
 
-# check if a ENV dry exist
-if [ -z ${dry} ]; then
-
+# check if a ENV KREW_ROOT exist
+# if [ ! -z ${dry} ]; then # 变量有空格，检查失效
+if [ ! -z ${KREW_ROOT} ]; then
   # Add alias if not set before
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
