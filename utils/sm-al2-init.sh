@@ -9,7 +9,8 @@ if [ ! -d "$CUSTOM_DIR" ]; then
   mkdir -p "$CUSTOM_DIR"/envs
   mkdir -p /home/ec2-user/SageMaker/lab
   # mkdir -p /home/ec2-user/SageMaker/tmp
-  # chmod -R 777 /home/ec2-user/SageMaker/tmp
+  mkdir -p "$CUSTOM_DIR"/tmp
+  chmod -R 777 "$CUSTOM_DIR"/tmp
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
@@ -52,6 +53,14 @@ test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is 
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
+
+if [ -z ${FLAVOR} ]; then
+  echo "Add env: FLAVOR"
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+FLAVOR=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)
+
+EOF
+fi
 
 
 echo "==============================================="
@@ -229,9 +238,19 @@ if [ ! -f $CUSTOM_DIR/bin/k8sgpt_Linux_x86_64.tar.gz ]; then
   wget -O $CUSTOM_DIR/bin/k8sgpt_Linux_x86_64.tar.gz https://github.com/k8sgpt-ai/k8sgpt/releases/download/v0.3.25/k8sgpt_Linux_x86_64.tar.gz
   tar -xvf $CUSTOM_DIR/bin/k8sgpt_Linux_x86_64.tar.gz -C $CUSTOM_DIR/bin
 fi
-k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
-k8sgpt auth list
-k8sgpt auth default -p amazonbedrock
+# k8sgpt auth add --backend amazonbedrock --model anthropic.claude-v2
+# k8sgpt auth list
+# k8sgpt auth default -p amazonbedrock
+
+
+# docker 
+# tmp dir
+# Give docker build a bit more space. E.g., as of Nov'21, building a custom
+# image based on the pytorch-1.10 DLC would fail due to exhausted /tmp.
+sudo sed -i \
+    's|^\[Service\]$|[Service]\nEnvironment="DOCKER_TMPDIR=/home/ec2-user/SageMaker/custom/tmp"|' \
+    /usr/lib/systemd/system/docker.service
+
 
 
 # # Docker Compose
