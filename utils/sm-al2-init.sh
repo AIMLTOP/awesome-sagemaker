@@ -35,6 +35,11 @@ do
 done
 EOF
 
+cat >> ~/.gitconfig <<EOF
+[alias]
+    pcp = "!git pull && git add . && read -p 'Enter commit message: ' commit_message && git commit -m \"\$commit_message\" && git push"
+EOF
+
 source ~/.bashrc
 
 # check if a ENV ACCOUNT_ID exist
