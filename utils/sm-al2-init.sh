@@ -560,7 +560,9 @@ export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
 export PATH="\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH"
 
 alias nlog=eks-log-collector.sh
-alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage" 
+#alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage"
+alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm ghcr.io/laniksj/dfimage"
+
 alias kk='kubectl-karpenter.sh'
 alias kb='k8sgpt'
 alias kt=kubetail
