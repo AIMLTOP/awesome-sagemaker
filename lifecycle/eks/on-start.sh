@@ -4,21 +4,12 @@ set -eux
 # Under ec2-user
 sudo -u ec2-user -i <<'EOF'
 
-echo "Init and do your self configuration ..." # For production, please use s3 bucket
-# aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/$LC_NAME/sm-al2-init.sh /home/ec2-user/SageMaker/custom/sm-al2-init.sh
-# aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/$LC_NAME/sm-al2-jupyter.sh /home/ec2-user/SageMaker/custom/sm-al2-jupyter.sh
-# aws s3 cp s3://$IA_S3_BUCKET/sagemaker/lifecycle/$LC_NAME/autostop.py /home/ec2-user/SageMaker/custom/autostop.py
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-init.sh -O /home/ec2-user/SageMaker/custom/sm-al2-init.sh
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-jupyter.sh -O /home/ec2-user/SageMaker/custom/sm-al2-jupyter.sh
-wget https://raw.githubusercontent.com/TipTopBin/awesome-sagemaker/main/utils/sm-al2-abc.sh -O /home/ec2-user/SageMaker/custom/sm-al2-abc.sh
-wget https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py -O /home/ec2-user/SageMaker/custom/autostop.py
-
-chmod +x /home/ec2-user/SageMaker/custom/*.sh
-chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
+echo "Init and do your self configuration ..." # Replace with your own bucket and lifecycle name
+aws s3 sync s3://$IA_S3_BUCKET/sagemaker/lifecycle/$LC_NAME/ /home/ec2-user/SageMaker/custom/
+chmod +x /home/ec2-user/SageMaker/custom/*.sh && chown ec2-user:ec2-user /home/ec2-user/SageMaker/custom/ -R
 nohup /home/ec2-user/SageMaker/custom/sm-al2-init.sh > /home/ec2-user/SageMaker/custom/sm-al2-init.log 2>&1 &  # execute asynchronously
 nohup /home/ec2-user/SageMaker/custom/sm-al2-jupyter.sh > /home/ec2-user/SageMaker/custom/sm-al2-jupyter.log 2>&1 &
 nohup /home/ec2-user/SageMaker/custom/sm-al2-abc.sh > /home/ec2-user/SageMaker/custom/sm-al2-abc.log 2>&1 &
-
 
 echo "Install Extensions ... "
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
