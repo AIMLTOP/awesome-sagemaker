@@ -529,7 +529,8 @@ source ~/.bashrc
 
 # check if a ENV KREW_ROOT exist
 # if [ ! -z ${dry} ]; then # 变量有空格，检查失效
-if [ ! -z ${KREW_ROOT} ]; then
+# if [ ! -z ${KREW_ROOT} ]; then # Shell 嵌套执行，检查也会失效
+if ! grep -q "KREW_ROOT" ~/SageMaker/custom/bashrc; then
   # Add alias if not set before
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
