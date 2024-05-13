@@ -11,12 +11,6 @@ nohup /home/ec2-user/SageMaker/custom/sm-al2-init.sh > /home/ec2-user/SageMaker/
 nohup /home/ec2-user/SageMaker/custom/sm-al2-jupyter.sh > /home/ec2-user/SageMaker/custom/sm-al2-jupyter.log 2>&1 &
 nohup /home/ec2-user/SageMaker/custom/sm-al2-abc.sh > /home/ec2-user/SageMaker/custom/sm-al2-abc.log 2>&1 &
 
-echo "Install Extensions ... "
-source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
-pip install amazon-codewhisperer-jupyterlab-ext
-jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
-source /home/ec2-user/anaconda3/bin/deactivate
-
 EOF
 
 

@@ -2,6 +2,13 @@
 
 source ~/.bashrc
 
+echo "Install Extensions ... "
+source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
+pip install amazon-codewhisperer-jupyterlab-ext
+jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
+source /home/ec2-user/anaconda3/bin/deactivate
+
+
 echo "Configue Jupyterlab"
 mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
 cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
