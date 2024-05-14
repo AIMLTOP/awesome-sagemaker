@@ -49,6 +49,9 @@ echo "==============================================="
 # # ask-bedrock converse
 # # ask-bedrock configure
 
+# echo "rhubarb ......"
+# https://github.com/awslabs/rhubarb
+# pip install pyrhubarb
 
 echo "Local Stable Diffusion ......"
 # AWS Extension https://github.com/awslabs/stable-diffusion-aws-extension/blob/main/docs/Environment-Preconfiguration.md

@@ -67,6 +67,12 @@ FLAVOR="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)"
 EOF
 fi
 
+sudo bash -c 'cat >> /etc/sysctl.conf' << EOF
+fs.inotify.max_user_watches=520088
+EOF
+sudo sysctl -p
+cat /proc/sys/fs/inotify/max_user_watches
+
 
 echo "==============================================="
 echo "  Utilities ......"
@@ -552,6 +558,7 @@ alias s5='s5cmd'
 
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
+alias 2h='cd /home/ec2-user/SageMaker/hands'
 
 export TERM=xterm-256color
 #export TERM=xterm-color
