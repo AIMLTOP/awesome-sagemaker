@@ -35,11 +35,6 @@ do
 done
 EOF
 
-cat >> ~/.gitconfig <<EOF
-[alias]
-    pcp = "!git pull && git add . && read -p 'Enter commit message: ' commit_message && git commit -m \"\$commit_message\" && git push"
-EOF
-
 source ~/.bashrc
 
 # check if a ENV ACCOUNT_ID exist
@@ -527,6 +522,16 @@ if [ ! -z "$EFS_FS_ID" ]; then
   #sudo chmod 777 /home/ec2-user/SageMaker/efs*
 fi
 
+# Git
+if [ ! -z "$GIT_USER" ]; then
+  git config --global user.name ${GIT_USER}
+  git config --global user.email ${GIT_MAIL}  
+fi
+env GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
+cat >> ~/.gitconfig <<EOF
+[alias]
+    pcp = "!git pull && git add . && read -p 'Enter commit message: ' commit_message && git commit -m \"\$commit_message\" && git push"
+EOF
 
 echo "==============================================="
 echo "  Env, Alias and Path ......"
