@@ -524,10 +524,11 @@ fi
 
 # Git
 if [ ! -z "$GIT_USER" ]; then
+  echo "setup git user"
   git config --global user.name ${GIT_USER}
   git config --global user.email ${GIT_MAIL}  
 fi
-env GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
+# env GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
 cat >> ~/.gitconfig <<EOF
 [alias]
     pcp = "!git pull && git add . && read -p 'Enter commit message: ' commit_message && git commit -m \"\$commit_message\" && git push"
@@ -567,6 +568,7 @@ alias 2h='cd /home/ec2-user/SageMaker/hands'
 
 export TERM=xterm-256color
 #export TERM=xterm-color
+export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
 
 export dry="--dry-run=client -o yaml"
 export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
