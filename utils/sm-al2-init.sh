@@ -3,13 +3,13 @@
 source ~/.bashrc
 
 CUSTOM_DIR=/home/ec2-user/SageMaker/custom
+mkdir -p "$CUSTOM_DIR"/bin && \
+  mkdir -p "$CUSTOM_DIR"/docker && \
+  mkdir -p "$CUSTOM_DIR"/envs && \
+  mkdir -p "$CUSTOM_DIR"/tmp
 if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
-  mkdir -p "$CUSTOM_DIR"/bin
-  mkdir -p "$CUSTOM_DIR"/envs
-  mkdir -p "$CUSTOM_DIR"/tmp
   chmod -R 777 "$CUSTOM_DIR"/tmp
-
   mkdir -p /home/ec2-user/SageMaker/labs
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
@@ -256,7 +256,19 @@ fi
 sudo sed -i \
     's|^\[Service\]$|[Service]\nEnvironment="DOCKER_TMPDIR=/home/ec2-user/SageMaker/custom/tmp"|' \
     /usr/lib/systemd/system/docker.service
+# change docker data root
+sudo ~ec2-user/anaconda3/bin/python -c "
+import json
 
+with open('/etc/docker/daemon.json') as f:
+    d = json.load(f)
+
+d['data-root'] = '/home/ec2-user/SageMaker/custom/docker'
+
+with open('/etc/docker/daemon.json', 'w') as f:
+    json.dump(d, f, indent=4)
+    f.write('\n')
+"
 
 
 # # Docker Compose
@@ -533,6 +545,27 @@ cat >> ~/.gitconfig <<EOF
 [alias]
     pcp = "!git pull && git add . && read -p 'Enter commit message: ' commit_message && git commit -m \"\$commit_message\" && git push"
 EOF
+echo 'Set editor to /usr/bin/vim (for DL AMI)'
+git config --global core.editor /usr/bin/vim
+echo 'Set default branch to main (effective only with git>=2.28)'
+git config --global init.defaultBranch main
+echo Adjusting log aliases...
+git config --global alias.lol "log --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(bold white)— %an%C(reset)%C(bold yellow)%d%C(reset)' --abbrev-commit --date=relative"
+#git config --global alias.lola "lol --all"  # SageMaker's git does not support alias chain :(
+git config --global alias.lola "! git lol --all"
+git config --global alias.lolc "! clear; git lol -\$(expr \`tput lines\` '*' 2 / 5)"
+git config --global alias.lolac "! clear; git lol --all -\$(expr \`tput lines\` '*' 2 / 5)"
+# Needed when notebook instance is not configured with a code repository.
+echo Setup steps for HTTPS connections to AWS CodeCommit repositories
+git config --global credential.helper '!aws codecommit credential-helper $@'
+git config --global credential.UseHttpPath true
+if command -v delta &> /dev/null ; then
+    echo "adjust-git.sh: delta is available..."
+    git config --global core.pager "delta -s"
+    git config --global interactive.diffFilter "delta -s --color-only"
+    git config --global delta.navigate "true"
+fi
+
 
 echo "==============================================="
 echo "  Env, Alias and Path ......"
