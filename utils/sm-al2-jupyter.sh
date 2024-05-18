@@ -2,6 +2,8 @@
 
 source ~/.bashrc
 
+JUPYTER_CONFIG_ROOT=~/.jupyter/lab/user-settings/\@jupyterlab
+
 echo "Install Extensions ... "
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
 pip install amazon-codewhisperer-jupyterlab-ext
@@ -10,7 +12,8 @@ source /home/ec2-user/anaconda3/bin/deactivate
 
 
 echo "Configue Jupyterlab"
-mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
+mkdir -p $JUPYTER_CONFIG_ROOT/apputils-extension/
+# mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
 cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
 {
     // Notifications
@@ -24,7 +27,8 @@ cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.j
 }
 EoL
 
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings <<EoL
+# cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyterlab-settings <<EoL
+cat > $JUPYTER_CONFIG_ROOT/apputils-extension/themes.jupyterlab-settings <<EoL
 {
     // Theme
     // @jupyterlab/apputils-extension:themes
@@ -34,11 +38,23 @@ cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/themes.jupyter
     // Selected Theme
     // Application-level visual styling theme
     "theme": "JupyterLab Dark"
+
+    // Theme CSS Overrides
+    // Override theme CSS variables by setting key-value pairs here
+    "overrides": {
+        "code-font-size": "11px",
+        "content-font-size1": "13px"
+    }
+
+    // Scrollbar Theming
+    // Enable/disable styling of the application scrollbars
+    // "theme-scrollbars": false
 }
 EoL
 
-mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/
-cat > ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings <<EoL
+
+mkdir -p $JUPYTER_CONFIG_ROOT/terminal-extension/
+cat > $JUPYTER_CONFIG_ROOT/terminal-extension/plugin.jupyterlab-settings <<EoL
 {
     // Terminal
     // @jupyterlab/terminal-extension:plugin
@@ -49,8 +65,97 @@ cat > ~/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyter
     // The font size used to render text.
     "fontSize": 15,
     "lineHeight": 1.3
+
+    // Theme
+    // The theme for the terminal.
+    "theme": "dark"    
 }
 EoL
+
+# mkdir -p $JUPYTER_CONFIG_ROOT/fileeditor-extension/
+# cat << EOF > $JUPYTER_CONFIG_ROOT/fileeditor-extension/plugin.jupyterlab-settings
+# {
+#     "editorConfig": {
+#         "rulers": [80, 100],
+#         "codeFolding": true,
+#         "lineNumbers": true,
+#         "lineWrap": "off"
+#     }
+# }
+# EOF
+
+mkdir -p $JUPYTER_CONFIG_ROOT/codemirror-extension/
+cat << EOF > $JUPYTER_CONFIG_ROOT/codemirror-extension/plugin.jupyterlab-settings
+{
+    // CodeMirror
+    // @jupyterlab/codemirror-extension:plugin
+    // Text editor settings for all CodeMirror editors.
+    // ************************************************
+
+    "defaultConfig": {
+        "codeFolding": true,
+        "highlightActiveLine": true,
+        "highlightTrailingWhitespace": true,
+        "rulers": [
+            80,
+            100
+        ]
+    }
+}
+EOF
+
+mkdir -p $JUPYTER_CONFIG_ROOT/notebook-extension/
+cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
+{
+    // Notebook
+    // @jupyterlab/notebook-extension:tracker
+    // Notebook settings.
+    // **************************************
+
+    // Code Cell Configuration
+    // The configuration for all code cells; it will override the CodeMirror default configuration.
+    "codeCellConfig": {
+        "lineNumbers": true,
+        "lineWrap": true
+    },
+
+    // Markdown Cell Configuration
+    // The configuration for all markdown cells; it will override the CodeMirror default configuration.
+    "markdownCellConfig": {
+        "lineNumbers": true,
+        "lineWrap": true
+    },
+
+    // Raw Cell Configuration
+    // The configuration for all raw cells; it will override the CodeMirror default configuration.
+    "rawCellConfig": {
+        "lineNumbers": true,
+        "lineWrap": true
+    }
+}
+EOF
+
+# cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
+# {
+#     "codeCellConfig": {
+#         "rulers": [80, 100],
+#         "codeFolding": true,
+#         "lineNumbers": true,
+#         "lineWrap": "off"
+#     },
+#     "markdownCellConfig": {
+#         "rulers": [80, 100],
+#         "codeFolding": true,
+#         "lineNumbers": true,
+#         "lineWrap": "off"
+#     },
+#     "rawCellConfig": {
+#         "rulers": [80, 100],
+#         "lineNumbers": true,
+#         "lineWrap": "off"
+#     }
+# }
+# EOF
 
 
 # https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers-troubleshooting.html
@@ -59,8 +164,6 @@ cat > ~/.sagemaker/config.yaml <<EOF
 local:
   container_root: /home/ec2-user/SageMaker/tmp
 EOF
-
-
 
 try_append() {
     local key="$1"
@@ -108,3 +211,4 @@ try_append \
 
 echo 'To enforce the change to jupyter config: sudo initctl restart jupyter-server --no-wait'
 echo 'then refresh your browser'
+echo "After this script finishes, reload the Jupyter-Lab page in your browser."
