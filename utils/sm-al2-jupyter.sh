@@ -3,14 +3,141 @@
 source ~/.bashrc
 
 JUPYTER_CONFIG_ROOT=~/.jupyter/lab/user-settings/\@jupyterlab
+CONDA_ENV_DIR=~/anaconda3/envs/JupyterSystemEnv/
+BIN_DIR=$CONDA_ENV_DIR/bin
 
-echo "Install Extensions ... "
+echo "==============================================="
+echo "  Upgrade to JLab-3.x ......"
+echo "==============================================="
+################################################################################
+# [IMPLEMENTATION NOTES] Upgrade in-place JupyterSystemEnv instead of a new
+# dedicated conda env for the new JLab, because the existing conda environment
+# has sagemaker nbi agents installed (and possibly other pypi stuffs needed to
+# make notebook instance works).
+################################################################################
+# Completely remove these unused or outdated Python packages.
+$BIN_DIR/pip uninstall --yes jupyterlab-git
+
+# These will be outdated by Jlab-3.x which has built-in versions of them.
+declare -a EXTS_TO_DEL=(
+    jupyterlab-celltags
+    jupyterlab-toc
+    jupyterlab-git
+    nbdime-jupyterlab
+)2
+for i in "${EXTS_TO_DEL[@]}"; do
+    rm $CONDA_ENV_DIR/share/jupyter/lab/extensions/$i-*.tgz || true
+done
+
+# Do whatever it takes to prevent JLab pop-up "Build recommended..."
+$BIN_DIR/jupyter lab clean
+cp $CONDA_ENV_DIR/share/jupyter/lab/static/package.json{,.ori}
+cat $CONDA_ENV_DIR/share/jupyter/lab/static/package.json.ori \
+  | jq 'del(.dependencies."@jupyterlab/git", .jupyterlab.extensions."@jupyterlab/git", .jupyterlab.extensionMetadata."@jupyterlab/git")' \
+  > $CONDA_ENV_DIR/share/jupyter/lab/static/package.json
+
+# Also silence JLab pop-up "Build recommended..." due to SageMaker extensions (examples and session agent).
+cat << 'EOF' > ~/.jupyter/jupyter_server_config.json
+{
+  "LabApp": {
+    "tornado_settings": {
+      "page_config_data": {
+        "buildCheck": false,
+        "buildAvailable": false
+      }
+    }
+  }
+}
+EOF
+
+
+# Upgrade jlab & extensions
+# declare -a PKGS=(
+#     ipython
+#     notebook
+#     "nbclassic!=0.4.0"   # https://github.com/jupyter/nbclassic/issues/121
+#     ipykernel
+#     jupyterlab
+#     jupyter-server-proxy
+#     "environment_kernels>=1.2.0"  # https://github.com/Cadair/jupyter_environment_kernels/releases/tag/v1.2.0
+
+#     jupyter
+#     jupyter_client
+#     jupyter_console
+#     jupyter_core
+
+#     jupyter_bokeh
+
+#     # https://github.com/jupyter/nbdime/issues/621
+#     nbdime
+#     ipython_genutils
+
+#     jupyterlab-execute-time
+#     jupyterlab-skip-traceback
+#     # jupyterlab-unfold
+
+#     # jupyterlab_code_formatter requires formatters in its venv.
+#     # See: https://github.com/ryantam626/jupyterlab_code_formatter/issues/153
+#     #
+#     # [20230401] v1.6.0 is broken on python<=3.8
+#     # See: https://github.com/ryantam626/jupyterlab_code_formatter/issues/193#issuecomment-1488742233
+#     "jupyterlab_code_formatter!=1.6.0"
+#     black
+#     isort
+# )
+
+# Overwrite above definition of PKGS to exclude jlab packages. This is done to reduce update time
+# (because sagemaker alinux2 is pretty up-to-date. Usually 1-2 patch versions away only).
+# To still update jlab packages, comment the PKGS definition below and uncomment above one.
+declare -a PKGS=(
+    "environment_kernels>=1.2.0"  # https://github.com/Cadair/jupyter_environment_kernels/releases/tag/v1.2.0
+    jupyter_bokeh
+    jupyterlab-execute-time
+    jupyterlab-skip-traceback
+    jupyterlab-unfold
+    ipython_genutils  # https://github.com/jupyter/nbdime/issues/621
+
+    # jupyterlab_code_formatter requires formatters in its venv.
+    # See: https://github.com/ryantam626/jupyterlab_code_formatter/issues/153
+    #
+    # [20230401] v1.6.0 is broken on python<=3.8
+    # See: https://github.com/ryantam626/jupyterlab_code_formatter/issues/193#issuecomment-1488742233
+    "jupyterlab_code_formatter!=1.6.0"
+    black
+    isort
+)
+$BIN_DIR/pip install --no-cache-dir --upgrade pip  # Let us welcome colorful pip.
+$BIN_DIR/pip install --no-cache-dir --upgrade "${PKGS[@]}"
+
+
+echo "==============================================="
+echo "  Start-up settings ......"
+echo "==============================================="
+# No JupyterSystemEnv's "Python3 (ipykernel)", same as stock notebook instance
+[[ -f ~/anaconda3/envs/JupyterSystemEnv/share/jupyter/kernels/python3/kernel.json ]] \
+    && cp ~/anaconda3/envs/JupyterSystemEnv/share/jupyter/kernels/python3/kernel.json ~/SageMaker/customkernel-backup.json \
+    && rm ~/anaconda3/envs/JupyterSystemEnv/share/jupyter/kernels/python3/kernel.json
+
+# File operations
+for i in ~/.jupyter/jupyter_{notebook,server}_config.py; do
+    echo "c.FileContentsManager.delete_to_trash = False" >> $i
+    echo "c.FileContentsManager.always_delete_dir = True" >> $i
+done
+
+
+echo "==============================================="
+echo "  Install Extensions ......"
+echo "==============================================="
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
 pip install amazon-codewhisperer-jupyterlab-ext
 jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
 source /home/ec2-user/anaconda3/bin/deactivate
 
 
+
+echo "==============================================="
+echo "  Apply jlab-3+ UI configs ......"
+echo "==============================================="
 echo "Configue Jupyterlab"
 mkdir -p $JUPYTER_CONFIG_ROOT/apputils-extension/
 # mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
