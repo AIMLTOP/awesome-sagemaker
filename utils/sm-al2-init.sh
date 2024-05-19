@@ -16,7 +16,7 @@ if [ ! -d "$CUSTOM_DIR" ]; then
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
   echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> ~/SageMaker/custom/bashrc # Persistent bash history
-  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
+  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:/home/ec2-user/.local/bin' >> ~/SageMaker/custom/bashrc
 fi
 
 
@@ -751,6 +751,9 @@ alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nod
 alias nsel=ec2-instance-selector
 
 alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
+
+export PIPX_HOME=~/SageMaker/custom/pipx
+export PIPX_BIN_DIR=~/SageMaker/custom/bin
 
 # Other
 
