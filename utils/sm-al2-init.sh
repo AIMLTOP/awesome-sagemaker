@@ -11,15 +11,17 @@ mkdir -p "$CUSTOM_DIR"/bin && \
 if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
   chmod -R 777 "$CUSTOM_DIR"/tmp
+  # touch ${CUSTOM_DIR}/bash_history
   mkdir -p /home/ec2-user/SageMaker/labs
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
+  echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> ~/SageMaker/custom/bashrc # Persistent bash history
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin' >> ~/SageMaker/custom/bashrc
 fi
 
 
 echo "==============================================="
-echo "  Load custom bashrc ......"
+echo "  Load custom bashrc and ssh ......"
 echo "==============================================="
 # Add custom bash file if not set before
 cat >> ~/.bashrc <<EOF
@@ -36,17 +38,32 @@ do
 done
 EOF
 
+
+
 source ~/.bashrc
 
 # check if a ENV ACCOUNT_ID exist
-if [ -z ${ACCOUNT_ID} ]; then
-  echo "Add envs: ACCOUNT_ID AWS_REGION"
-  cat >> ~/SageMaker/custom/bashrc <<EOF
+if [ -z "${MY_AZ}" ]; then
+  echo "Add envs: ACCOUNT_ID AWS_REGION MY_AZ"
+  # ACCOUNT_ID=$(aws sts get-caller-identity | grep Account | awk '{print $2}' | sed -e 's/"//g' -e 's/,//g')
+
+  MY_AZ=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
+  if [[ $MY_AZ == "" ]]; then
+    # IMDSv2
+    IMDS_TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+    MY_AZ=`curl -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
+  fi
+  # AWS_REGION="`echo \"$MY_AZ\" | sed 's/[a-z]\$//'`"
+
+  cat >> ~/SageMaker/custom/bashrc <<EOF  
+
 export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+export MY_AZ=${MY_AZ}
 
 EOF
 fi
+
 
 source ~/.bashrc
 
@@ -55,7 +72,7 @@ aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
 
-if [ -z ${FLAVOR} ]; then
+if [ -z "${FLAVOR}" ]; then
   echo "Add env: FLAVOR"
   cat >> ~/SageMaker/custom/bashrc <<EOF
 FLAVOR="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)"
@@ -63,11 +80,51 @@ FLAVOR="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)"
 EOF
 fi
 
+
+# SSH 放在脚本靠前位置，方便调试
+if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
+then
+  echo "Setup SSH Keys"
+  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
+  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
+  sudo chmod 400 ~/.ssh/id_rsa
+  sudo chown -R ec2-user:ec2-user ~/.ssh/
+  # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
+
+  # 本地免密，方便 EKS Node 能反向 SSH 到 Notebook Instance
+  {
+  cat ~/.ssh/id_rsa.pub|tr '\n' ' '
+  } >> ~/.ssh/authorized_keys
+
+  # SSH Forward
+  sudo adduser ubuntu
+  sudo mkdir -p /home/ubuntu/.ssh
+  sudo cp /home/ec2-user/.ssh/* /home/ubuntu/.ssh/
+  sudo chown -R ubuntu /home/ubuntu*
+fi
+# sagemaker-hyperpod ssh
+# https://catalog.workshops.aws/sagemaker-hyperpod/en-US/01-cluster/05-ssh
+if [ ! -f $CUSTOM_DIR/bin/easy-ssh ]; then
+  wget -O $CUSTOM_DIR/bin/easy-ssh https://raw.githubusercontent.com/TipTopBin/awesome-distributed-training/main/1.architectures/5.sagemaker-hyperpod/easy-ssh.sh
+  chmod +x $CUSTOM_DIR/bin/easy-ssh
+fi
+# easy-ssh -h
+# easy-ssh -c controller-group cluster-name
+
+
+echo "==============================================="
+echo "  Performance config ......"
+echo "==============================================="
 sudo bash -c 'cat >> /etc/sysctl.conf' << EOF
 fs.inotify.max_user_watches=520088
 EOF
 sudo sysctl -p
 cat /proc/sys/fs/inotify/max_user_watches
+
+# yum
+grep '^max_connections=' /etc/yum.conf &> /dev/null || echo "max_connections=10" | sudo tee -a /etc/yum.conf
+
+
 
 
 echo "==============================================="
@@ -75,9 +132,44 @@ echo "  Utilities ......"
 echo "==============================================="
 # moreutils: The command sponge allows us to read and write to the same file (cat a.txt|sponge a.txt)
 sudo amazon-linux-extras install epel -y
+sudo yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/cyqsimon/el-rust-pkgs/repo/epel-7/cyqsimon-el-rust-pkgs-epel-7.repo
+#sudo yum update -y  # Disable. It's slow to update 100+ SageMaker-provided packages.
 sudo yum groupinstall "Development Tools" -y
-sudo yum -y install jq gettext bash-completion moreutils openssl tree zsh xsel xclip amazon-efs-utils nc telnet mtr traceroute netcat 
-# sudo yum -y install siege fio ioping dos2unix
+sudo yum -y install \
+    jq \
+    gettext \
+    bash-completion \
+    moreutils \
+    openssl \
+    tree \
+    zsh \
+    xsel \
+    xclip \
+    amazon-efs-utils \
+    nc \
+    telnet \
+    mtr \
+    traceroute \
+    netcat
+sudo yum install -y \
+    htop \
+    tree \
+    fio \
+    ioping \
+    dstat \
+    siege \
+    dos2unix \
+    tig \
+    ncdu \
+    ripgrep \
+    bat \
+    git-delta \
+    inxi \
+    mediainfo \
+    git-lfs \
+    nvme-cli \
+    aria2
+
 
 if [ ! -f $CUSTOM_DIR/bin/yq ]; then
   wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $CUSTOM_DIR/bin/yq
@@ -97,6 +189,23 @@ sudo mv ~/anaconda3/bin/aws ~/anaconda3/bin/aws1
 ls -l /usr/local/bin/aws
 source ~/.bashrc
 aws --version
+# # Catch-up with awscliv2 which has nearly weekly releases. 
+# aria2c -x5 --dir /tmp -o awscli2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+# cd /tmp && unzip -o -q /tmp/awscli2.zip
+# aws/install --update --install-dir ~/SageMaker/custom/aws-cli-v2 --bin-dir ~/SageMaker/custom/bin
+# sudo ln -s ~/SageMaker/custom/bin/aws /usr/local/bin/aws2 || true
+# rm /tmp/awscli2.zip
+# rm -fr /tmp/aws/
+# export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
+aws configure set default.region ${AWS_REGION}
+aws configure get default.region
+aws configure set region $AWS_REGION
+# refer from aws-samples hpc repo
+aws configure set default.s3.max_concurrent_requests 100
+aws configure set default.s3.max_queue_size 10000
+aws configure set default.s3.multipart_threshold 64MB
+aws configure set default.s3.multipart_chunksize 16MB
+aws configure set default.cli_auto_prompt on-partial
 
 
 # Install session-manager
@@ -251,6 +360,7 @@ fi
 
 
 # docker 
+sudo rm /etc/yum.repos.d/docker-ce.repo || true # Lots of problem, from wrong .repo content to broken selinux-container
 # tmp dir
 # Give docker build a bit more space. E.g., as of Nov'21, building a custom
 # image based on the pytorch-1.10 DLC would fail due to exhausted /tmp.
@@ -286,6 +396,7 @@ sudo systemctl show --property=Environment docker
 
 
 # # Docker Compose
+ln -s ~/anaconda3/bin/docker-compose ~/.local/bin/
 # #sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 # sudo mkdir -p /usr/local/lib/docker/cli-plugins/
 # sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
@@ -293,6 +404,10 @@ sudo systemctl show --property=Environment docker
 # # sudo curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o $CUSTOM_DIR/docker-compose
 # # sudo chmod +x $CUSTOM_DIR/docker-compose
 # # $CUSTOM_DIR/docker-compose version
+# local mode
+# curl -sfL \
+#     https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-local-mode/main/blog/pytorch_cnn_cifar10/setup.sh \
+#     | /bin/bash -s
 
 
 # echo "  Install eks anywhere ......"
@@ -488,44 +603,13 @@ sudo systemctl show --property=Environment docker
 
 
 echo "==============================================="
-echo "  Load config ......"
+echo "  Load custom config ......"
 echo "==============================================="
+# EKS
 if [ ! -z "$EKS_CLUSTER_NAME" ]; then
     # aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
     /usr/local/bin/aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
 fi
-
-
-if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
-then
-  echo "Setup SSH Keys"
-  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
-  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
-  sudo chmod 400 ~/.ssh/id_rsa
-  sudo chown -R ec2-user:ec2-user ~/.ssh/
-  # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
-
-  # 本地免密，方便 EKS Node 能反向 SSH 到 Notebook Instance
-  {
-  cat ~/.ssh/id_rsa.pub|tr '\n' ' '
-  } >> ~/.ssh/authorized_keys
-
-  # SSH Forward
-  sudo adduser ubuntu
-  sudo mkdir -p /home/ubuntu/.ssh
-  sudo cp /home/ec2-user/.ssh/* /home/ubuntu/.ssh/
-  sudo chown -R ubuntu /home/ubuntu*
-fi
-
-
-# sagemaker-hyperpod ssh
-# https://catalog.workshops.aws/sagemaker-hyperpod/en-US/01-cluster/05-ssh
-if [ ! -f $CUSTOM_DIR/bin/easy-ssh ]; then
-  wget -O $CUSTOM_DIR/bin/easy-ssh https://raw.githubusercontent.com/TipTopBin/awesome-distributed-training/main/1.architectures/5.sagemaker-hyperpod/easy-ssh.sh
-  chmod +x $CUSTOM_DIR/bin/easy-ssh
-fi
-# easy-ssh -h
-# easy-ssh -c controller-group cluster-name
 
 
 # S3 bucket
@@ -585,7 +669,6 @@ echo "==============================================="
 echo "  Env, Alias and Path ......"
 echo "==============================================="
 source ~/.bashrc
-
 # check if a ENV KREW_ROOT exist
 # if [ ! -z ${dry} ]; then # 变量有空格，检查失效
 # if [ ! -z ${KREW_ROOT} ]; then # Shell 嵌套执行，检查也会失效
@@ -602,17 +685,35 @@ alias aid='aws sts get-caller-identity'
 
 alias z='zip -r ../1.zip .'
 alias g=git
-alias l='ls -CF'
-alias la='ls -A'
-alias ll='ls -alh --color=auto'
-alias ls='ls --color=auto'
 alias jc=/bin/journalctl
 alias s5='s5cmd'
-
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
 alias 2h='cd /home/ec2-user/SageMaker/hands'
+alias ncdu='ncdu --color dark'
 
+alias l='ls -CF'
+alias la='ls -A'
+alias ls='ls --color=auto'
+# alias ll='ls -alh --color=auto'
+alias ll='ls -alhF --color=auto'
+
+# Better dir color on dark terminal: changed from dark blue to lighter blue
+export LS_COLORS="di=38;5;39"
+
+man() {
+    env \
+        LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+        LESS_TERMCAP_md=$(printf "\e[1;31m") \
+        LESS_TERMCAP_me=$(printf "\e[0m") \
+        LESS_TERMCAP_se=$(printf "\e[0m") \
+        LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+        LESS_TERMCAP_ue=$(printf "\e[0m") \
+        LESS_TERMCAP_us=$(printf "\e[1;32m") \
+        man "$@"
+}
+
+export DSTAT_OPTS="-cdngym"
 export TERM=xterm-256color
 #export TERM=xterm-color
 export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
@@ -655,6 +756,10 @@ alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
 
 EOF
 fi    
+
+echo "" | sudo tee /etc/profile.d/initsmnb-cli.sh
+echo '' | sudo tee -a /etc/profile.d/initsmnb-cli.sh
+
 
 source ~/.bashrc
 

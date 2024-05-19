@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# 调试要小心，如果 JLab 无法打开，可以注释新加的配置
 source ~/.bashrc
 
 JUPYTER_CONFIG_ROOT=~/.jupyter/lab/user-settings/\@jupyterlab
@@ -41,10 +41,10 @@ cat > $JUPYTER_CONFIG_ROOT/apputils-extension/themes.jupyterlab-settings <<EoL
 
     // Theme CSS Overrides
     // Override theme CSS variables by setting key-value pairs here
-    "overrides": {
-        "code-font-size": "11px",
-        "content-font-size1": "13px"
-    }
+    //"overrides": {
+    //    "code-font-size": "11px",
+    //    "content-font-size1": "13px"
+    //}
 
     // Scrollbar Theming
     // Enable/disable styling of the application scrollbars
@@ -68,7 +68,7 @@ cat > $JUPYTER_CONFIG_ROOT/terminal-extension/plugin.jupyterlab-settings <<EoL
 
     // Theme
     // The theme for the terminal.
-    "theme": "dark"    
+    //"theme": "dark"    
 }
 EoL
 
@@ -177,6 +177,7 @@ try_append() {
 
 touch ~/.jupyter/jupyter_server_config.py
 
+#echo "On a new SageMaker terminal, which uses 'sh' by default, type 'bash -l' (without the quotes)"
 try_append \
     c.NotebookApp.terminado_settings \
     "{'shell_command': ['/bin/bash', '-l']}" \
@@ -200,6 +201,54 @@ try_append \
     "['/home/ec2-user/anaconda3/envs', '/home/ec2-user/SageMaker/envs']" \
     "Register additional prefixes for conda environments" \
     server
+
+
+# This nbdime is broken. It crashes with ModuleNotFoundError: jsonschema.protocols.
+rm ~/anaconda3/bin/nb{diff,diff-web,dime,merge,merge-web,show} ~/anaconda3/bin/git-nb* || true
+hash -r
+
+# Use the good working nbdime
+ln -s ~/anaconda3/envs/JupyterSystemEnv/bin/nb{diff,diff-web,dime,merge,merge-web,show} ~/.local/bin/ || true
+ln -s ~/anaconda3/envs/JupyterSystemEnv/bin/git-nb* ~/.local/bin/ || true
+~/.local/bin/nbdime config-git --enable --global
+
+# pre-commit cache survives reboot (NOTE: can also set $PRE_COMMIT_HOME)
+mkdir -p ~/SageMaker/custom/.pre-commit.cache
+ln -s ~/SageMaker/custom/.pre-commit.cache ~/.cache/pre-commit || true
+
+
+# Bash patch
+cat << 'EOF' >> ~/.bash_profile
+
+# Workaround: when starting tmux from conda env, deactivate in all tmux sessions.
+if [[ ! -z "$TMUX" ]]; then
+    for i in $(seq $CONDA_SHLVL); do
+        conda deactivate
+    done
+fi
+EOF
+
+# PS1 must preceed conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
+# 路径显示更简洁 (base) [ec2-user@ip-172-16-48-86 custom]$ -> (base) [~/SageMaker/custom] $ 
+cp ~/.bashrc{,.ori}
+cat << 'EOF' > ~/.bashrc
+git_branch() {
+   local branch=$(/usr/bin/git branch 2>/dev/null | grep '^*' | colrm 1 2)
+   [[ "$branch" == "" ]] && echo "" || echo "($branch) "
+}
+
+# All colors are bold
+COLOR_GREEN="\[\033[1;32m\]"
+COLOR_PURPLE="\[\033[1;35m\]"
+COLOR_YELLOW="\[\033[1;33m\]"
+COLOR_OFF="\[\033[0m\]"
+
+# Define PS1 before conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
+export PS1="[$COLOR_GREEN\w$COLOR_OFF] $COLOR_PURPLE\$(git_branch)$COLOR_OFF\$ "
+EOF
+
+# Original .bashrc content
+cat ~/.bashrc.ori >> ~/.bashrc
 
 echo 'To enforce the change to jupyter config: sudo initctl restart jupyter-server --no-wait'
 echo 'then refresh your browser'

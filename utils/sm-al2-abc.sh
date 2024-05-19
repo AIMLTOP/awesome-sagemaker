@@ -10,17 +10,28 @@ echo "==============================================="
 echo "  Metadata ......"
 echo "==============================================="
 if [ ! -z ${SAGE_NB_NAME} ]; then
-  # Add SageMaker related ENVs if not set before
+  echo "Add SageMaker notebook variables: SAGE_NB_URL" # Add SageMaker related ENVs if not set before
   export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
+  # SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json  | jq -r '.ResourceName')
   export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
   export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
   export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})   # Get sagemaker role name
   # export SAGE_ROLE_NAME=$(basename "$ROLE") # another way
+  export SAGE_NB_URL=$(cat /etc/opt/ml/sagemaker-notebook-instance-config.json \
+    | jq -r '.notebook_uri' \
+    | sed 's/[\\()]//g' \
+    | sed "s/|${SAGE_NB_NAME}\.notebook/.notebook/"
+  )
 
-  echo "export SAGE_NB_NAME=\"$SAGE_NB_NAME\"" >> ~/SageMaker/custom/bashrc
-  echo "export SAGE_LC_NAME=\"$SAGE_LC_NAME\"" >>~/SageMaker/custom/bashrc
-  echo "export SAGE_ROLE_NAME=\"$SAGE_ROLE_NAME\"" >> ~/SageMaker/custom/bashrc
-  echo "export SAGE_ROLE_ARN=\"$SAGE_ROLE_ARN\"" >> ~/SageMaker/custom/bashrc
+  cat >> /home/ec2-user/SageMaker/custom/bashrc <<EOF
+
+export SAGE_NB_NAME=$SAGE_NB_NAME
+export SAGE_NB_URL=$SAGE_NB_URL
+export SAGE_LC_NAME=$SAGE_LC_NAME
+export SAGE_ROLE_NAME=$SAGE_ROLE_NAME
+export SAGE_ROLE_ARN=$SAGE_ROLE_ARN
+
+EOF
 fi
 
 
@@ -236,6 +247,22 @@ fi
 #   cat >> ~/SageMaker/custom/bashrc <<EOF
 # export PATH="$CUSTOM_DIR/flink-1.15.3/bin:\$PATH"
 # EOF
+
+
+echo "
+Setting system-wide JAVA_HOME to enable .ipynb to run pyspark-2.x (from the
+conda_python3 kernel), directly on this notebook instance.
+
+- This version of pyspark requires Java-1.8. However, since some time in 2021,
+  every .ipynb notebooks will automatically inherit
+  os.environ['JAVA_HOME'] == '/home/ec2-user/anaconda3/envs/JupyterSystemEnv',
+  and this OpenJDK-11 breaks the pyspark-2.x.
+
+- Note that setting JAVA_HOME in ~/.bashrc is not sufficient, because it affects
+  only pyspark scripts or REPL ran from a terminal.
+"
+
+echo 'export JAVA_HOME=/usr/lib/jvm/java' | sudo tee -a /etc/profile.d/java.sh
 
 
 # echo "  Kafka ......"
@@ -491,3 +518,97 @@ fi
 # # npm install -g esbuild
 
 
+# Vim
+VIM_SM_ROOT=/home/ec2-user/SageMaker/custom
+VIM_RTP=${VIM_SM_ROOT}/.vim
+VIMRC=${VIM_SM_ROOT}/.vimrc
+
+apply_vim_setting() {
+    # vimrc
+    [[ -f ~/.vimrc ]] && rm ~/.vimrc
+    ln -s ${VIMRC} ~/.vimrc
+
+    echo "Vim initialized"
+}
+
+if [[ ! -f ${VIM_RTP}/_SUCCESS ]]; then
+    echo "Initializing vim from ${VIMRC_SRC}"
+
+    # vimrc
+    cat << EOF > ${VIMRC}
+set rtp+=${VIM_RTP}
+
+" Hybrid line numbers
+"
+" Prefer built-in over RltvNmbr as the later makes vim even slower on
+" high-latency aka. cross-region instance.
+:set number relativenumber
+:augroup numbertoggle
+:  autocmd!
+:  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+:  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+:augroup END
+
+" Relative number only on focused-windows
+autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &number | set relativenumber   | endif
+autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &number | set norelativenumber | endif
+
+" Remap keys to navigate window aka split screens to ctrl-{h,j,k,l}
+" See: https://vi.stackexchange.com/a/3815
+"
+" Vim defaults to ctrl-w-{h,j,k,l}. However, ctrl-w on Linux (and Windows)
+" closes browser tab.
+"
+" NOTE: ctrl-l was "clear and redraw screen". The later can still be invoked
+"       with :redr[aw][!]
+nmap <C-h> <C-w>h
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
+nmap <C-l> <C-w>l
+
+set laststatus=2
+set hlsearch
+set colorcolumn=80
+set splitbelow
+set splitright
+
+"set cursorline
+"set lazyredraw
+set nottyfast
+
+autocmd FileType help setlocal number
+
+""" Coding style
+" Prefer spaces to tabs
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set nowrap
+set foldmethod=indent
+set foldlevel=99
+set smartindent
+filetype plugin indent on
+
+""" Shortcuts
+map <F3> :set paste!<CR>
+" Use <leader>l to toggle display of whitespace
+nmap <leader>l :set list!<CR>
+
+" Highlight trailing space without plugins
+highlight RedundantSpaces ctermbg=red guibg=red
+match RedundantSpaces /\s\+$/
+
+" Terminado supports 256 colors
+set t_Co=256
+"colorscheme delek
+"colorscheme elflord
+"colorscheme murphy
+"colorscheme ron
+highlight colorColumn ctermbg=237
+
+EOF
+    mkdir -p ${VIM_RTP}
+    touch ${VIM_RTP}/_SUCCESS
+fi
+
+apply_vim_setting
