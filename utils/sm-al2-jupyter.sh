@@ -84,56 +84,56 @@ EoL
 # }
 # EOF
 
-mkdir -p $JUPYTER_CONFIG_ROOT/codemirror-extension/
-cat << EOF > $JUPYTER_CONFIG_ROOT/codemirror-extension/plugin.jupyterlab-settings
-{
-    // CodeMirror
-    // @jupyterlab/codemirror-extension:plugin
-    // Text editor settings for all CodeMirror editors.
-    // ************************************************
+# mkdir -p $JUPYTER_CONFIG_ROOT/codemirror-extension/
+# cat << EOF > $JUPYTER_CONFIG_ROOT/codemirror-extension/plugin.jupyterlab-settings
+# {
+#     // CodeMirror
+#     // @jupyterlab/codemirror-extension:plugin
+#     // Text editor settings for all CodeMirror editors.
+#     // ************************************************
 
-    "defaultConfig": {
-        "codeFolding": true,
-        "highlightActiveLine": true,
-        "highlightTrailingWhitespace": true,
-        "rulers": [
-            80,
-            100
-        ]
-    }
-}
-EOF
+#     "defaultConfig": {
+#         "codeFolding": true,
+#         "highlightActiveLine": true,
+#         "highlightTrailingWhitespace": true,
+#         "rulers": [
+#             80,
+#             100
+#         ]
+#     }
+# }
+# EOF
 
-mkdir -p $JUPYTER_CONFIG_ROOT/notebook-extension/
-cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
-{
-    // Notebook
-    // @jupyterlab/notebook-extension:tracker
-    // Notebook settings.
-    // **************************************
+# mkdir -p $JUPYTER_CONFIG_ROOT/notebook-extension/
+# cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
+# {
+#     // Notebook
+#     // @jupyterlab/notebook-extension:tracker
+#     // Notebook settings.
+#     // **************************************
 
-    // Code Cell Configuration
-    // The configuration for all code cells; it will override the CodeMirror default configuration.
-    "codeCellConfig": {
-        "lineNumbers": true,
-        "lineWrap": true
-    },
+#     // Code Cell Configuration
+#     // The configuration for all code cells; it will override the CodeMirror default configuration.
+#     "codeCellConfig": {
+#         "lineNumbers": true,
+#         "lineWrap": true
+#     },
 
-    // Markdown Cell Configuration
-    // The configuration for all markdown cells; it will override the CodeMirror default configuration.
-    "markdownCellConfig": {
-        "lineNumbers": true,
-        "lineWrap": true
-    },
+#     // Markdown Cell Configuration
+#     // The configuration for all markdown cells; it will override the CodeMirror default configuration.
+#     "markdownCellConfig": {
+#         "lineNumbers": true,
+#         "lineWrap": true
+#     },
 
-    // Raw Cell Configuration
-    // The configuration for all raw cells; it will override the CodeMirror default configuration.
-    "rawCellConfig": {
-        "lineNumbers": true,
-        "lineWrap": true
-    }
-}
-EOF
+#     // Raw Cell Configuration
+#     // The configuration for all raw cells; it will override the CodeMirror default configuration.
+#     "rawCellConfig": {
+#         "lineNumbers": true,
+#         "lineWrap": true
+#     }
+# }
+# EOF
 
 # cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
 # {
@@ -156,14 +156,6 @@ EOF
 #     }
 # }
 # EOF
-
-
-# https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers-troubleshooting.html
-mkdir -p ~/.sagemaker
-cat > ~/.sagemaker/config.yaml <<EOF
-local:
-  container_root: /home/ec2-user/SageMaker/tmp
-EOF
 
 try_append() {
     local key="$1"

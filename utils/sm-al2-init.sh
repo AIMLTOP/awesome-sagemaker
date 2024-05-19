@@ -367,7 +367,12 @@ with open('/etc/docker/daemon.json', 'w') as f:
     json.dump(d, f, indent=4)
     f.write('\n')
 "
-
+# https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers-troubleshooting.html
+mkdir -p ~/.sagemaker
+cat > ~/.sagemaker/config.yaml <<EOF
+local:
+  container_root: /home/ec2-user/SageMaker/custom/docker
+EOF
 
 # # Docker Compose
 # #sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose

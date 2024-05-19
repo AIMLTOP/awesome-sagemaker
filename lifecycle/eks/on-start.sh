@@ -36,4 +36,5 @@ echo "Starting the SageMaker autostop script in cron"
 
 echo "Restarting the Jupyter server.."
 sudo systemctl daemon-reload
-sudo systemctl restart jupyter-server
+sudo systemctl restart jupyter-server # Amazon Linux 2
+# sudo initctl restart jupyter-server --no-wait # Other OS
