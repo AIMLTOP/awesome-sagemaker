@@ -208,7 +208,7 @@ fi
 
 
 echo "==============================================="
-echo "  Data ......"
+echo "  BigData ......"
 echo "==============================================="
 # echo "  Data on Amazon EKS (DoEKS) ......"
 # git clone https://github.com/TipTopBin/data-on-eks.git ~/environment/do/data-on-eks
