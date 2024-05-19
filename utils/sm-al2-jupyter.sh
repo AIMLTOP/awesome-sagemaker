@@ -136,9 +136,9 @@ source /home/ec2-user/anaconda3/bin/deactivate
 
 
 echo "==============================================="
-echo "  Apply jlab-3+ UI configs ......"
+echo "  Apply Jupyterlab-3+ UI configs ......"
 echo "==============================================="
-echo "Configue Jupyterlab"
+# Disable notification -- Jlab started to get extremely noisy since v3.6.0+
 mkdir -p $JUPYTER_CONFIG_ROOT/apputils-extension/
 # mkdir -p ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
 cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings <<EoL
@@ -150,7 +150,9 @@ cat > ~/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.j
 
     // Fetch official Jupyter news
     // Whether to fetch news from Jupyter news feed. If `true`, it will make a request to a website.
-    "fetchNews": "false"
+    "fetchNews": "false",
+    "checkForUpdates": false,
+    "doNotDisturbMode": true   // Silence all notifications.
 }
 EoL
 
@@ -179,7 +181,8 @@ cat > $JUPYTER_CONFIG_ROOT/apputils-extension/themes.jupyterlab-settings <<EoL
 }
 EoL
 
-
+# macOptionIsMeta is brand-new since JLab-3.0.
+# See: https://jupyterlab.readthedocs.io/en/3.0.x/getting_started/changelog.html#other
 mkdir -p $JUPYTER_CONFIG_ROOT/terminal-extension/
 cat > $JUPYTER_CONFIG_ROOT/terminal-extension/plugin.jupyterlab-settings <<EoL
 {
@@ -195,9 +198,18 @@ cat > $JUPYTER_CONFIG_ROOT/terminal-extension/plugin.jupyterlab-settings <<EoL
 
     // Theme
     // The theme for the terminal.
-    //"theme": "dark"    
+    //"theme": "dark",
+
+    // Treat option as meta key on macOS (new in JLab-3.0)
+    // Option key on macOS can be used as meta key. This enables to use shortcuts such as option + f
+    // to move cursor forward one word
+    //"macOptionIsMeta": true 
 }
 EoL
+
+# # Undo the old "mac-option-is-meta" mechanism designed for jlab<3.0.
+# echo "# JLab-3 + macOptionIsMeta deprecates fix-osx-keymap.sh" > ~/.inputrc
+# rm ~/.ipython/profile_default/startup/01-osx-jupyterlab-keys.py || true
 
 # mkdir -p $JUPYTER_CONFIG_ROOT/fileeditor-extension/
 # cat << EOF > $JUPYTER_CONFIG_ROOT/fileeditor-extension/plugin.jupyterlab-settings
@@ -208,6 +220,16 @@ EoL
 #         "lineNumbers": true,
 #         "lineWrap": "off"
 #     }
+
+    # "editorConfig": {
+    #     "rulers": [80, 100],
+    #     "codeFolding": true,
+    #     "lineNumbers": true,
+    #     "lineWrap": "off",
+    #     "showTrailingSpace": true,
+    #     "wordWrapColumn": 100
+    # }
+
 # }
 # EOF
 
@@ -231,36 +253,42 @@ EoL
 # }
 # EOF
 
-# mkdir -p $JUPYTER_CONFIG_ROOT/notebook-extension/
-# cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
-# {
-#     // Notebook
-#     // @jupyterlab/notebook-extension:tracker
-#     // Notebook settings.
-#     // **************************************
+# Show trailing space is brand-new since JLab-3.2.0
+# See: https://jupyterlab.readthedocs.io/en/3.2.x/getting_started/changelog.html#id22
+mkdir -p $JUPYTER_CONFIG_ROOT/notebook-extension/
+cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
+{
+    // Notebook
+    // @jupyterlab/notebook-extension:tracker
+    // Notebook settings.
+    // **************************************
 
-#     // Code Cell Configuration
-#     // The configuration for all code cells; it will override the CodeMirror default configuration.
-#     "codeCellConfig": {
-#         "lineNumbers": true,
-#         "lineWrap": true
-#     },
+    // Code Cell Configuration
+    // The configuration for all code cells; it will override the CodeMirror default configuration.
+    "codeCellConfig": {
+        "lineNumbers": true,
+        "lineWrap": true
+    },
 
-#     // Markdown Cell Configuration
-#     // The configuration for all markdown cells; it will override the CodeMirror default configuration.
-#     "markdownCellConfig": {
-#         "lineNumbers": true,
-#         "lineWrap": true
-#     },
+    // Markdown Cell Configuration
+    // The configuration for all markdown cells; it will override the CodeMirror default configuration.
+    "markdownCellConfig": {
+        "lineNumbers": true,
+        "lineWrap": true
+    },
 
-#     // Raw Cell Configuration
-#     // The configuration for all raw cells; it will override the CodeMirror default configuration.
-#     "rawCellConfig": {
-#         "lineNumbers": true,
-#         "lineWrap": true
-#     }
-# }
-# EOF
+    // Raw Cell Configuration
+    // The configuration for all raw cells; it will override the CodeMirror default configuration.
+    "rawCellConfig": {
+        "lineNumbers": true,
+        "lineWrap": true
+    },
+
+    // Since: jlab-2.0.0
+    // Used by jupyterlab-execute-time to display cell execution time.
+    "recordTiming": true    
+}
+EOF
 
 # cat << EOF > $JUPYTER_CONFIG_ROOT/notebook-extension/tracker.jupyterlab-settings
 # {
@@ -270,12 +298,38 @@ EoL
 #         "lineNumbers": true,
 #         "lineWrap": "off"
 #     },
+    # "codeCellConfig": {
+    #     "rulers": [80, 100],
+    #     "codeFolding": true,
+    #     "lineNumbers": true,
+    #     "lineWrap": "off",
+    #     "showTrailingSpace": true,
+    #     "wordWrapColumn": 100
+    # },
+
 #     "markdownCellConfig": {
 #         "rulers": [80, 100],
 #         "codeFolding": true,
 #         "lineNumbers": true,
 #         "lineWrap": "off"
 #     },
+
+    # "markdownCellConfig": {
+    #     "rulers": [80, 100],
+    #     "codeFolding": true,
+    #     "lineNumbers": true,
+    #     "lineWrap": "off",
+    #     "showTrailingSpace": true,
+    #     "wordWrapColumn": 100
+    # },
+    # "rawCellConfig": {
+    #     "rulers": [80, 100],
+    #     "lineNumbers": true,
+    #     "lineWrap": "off",
+    #     "showTrailingSpace": true,
+    #     "wordWrapColumn": 100
+    # },
+
 #     "rawCellConfig": {
 #         "rulers": [80, 100],
 #         "lineNumbers": true,
@@ -283,6 +337,144 @@ EoL
 #     }
 # }
 # EOF
+
+
+# Since: jlab-3.1.0
+# - Conforms to markdown standard that h1 is for title,and h2 is for sections
+#   (numbers start from 1).
+# - Do not auto-number headings in output cells.
+mkdir -p $JUPYTER_CONFIG_ROOT/toc-extension
+cat << EOF > $JUPYTER_CONFIG_ROOT/toc-extension/registry.jupyterlab-settings
+{
+    // Table of Contents
+    // @jupyterlab/toc-extension:plugin
+    // Table of contents settings.
+    // ********************************
+
+    "includeOutput": false,
+    "numberHeaders": true,
+    "numberingH1": false
+}
+EOF
+
+
+# Default to the advanced json editor to edit the settings.
+# Since v3.4.x; https://github.com/jupyterlab/jupyterlab/pull/12466
+mkdir -p $JUPYTER_CONFIG_ROOT/settingeditor-extension
+cat << EOF > $JUPYTER_CONFIG_ROOT/settingeditor-extension/form-ui.jupyterlab-settings
+{
+    // Settings Editor Form UI
+    // @jupyterlab/settingeditor-extension:form-ui
+    // Settings editor form ui settings.
+    // *******************************************
+
+    "settingEditorType": "json"
+}
+EOF
+
+# Show command palette on lhs navbar, similar behavior to smnb.
+mkdir -p $JUPYTER_CONFIG_ROOT/apputils-extension/
+cat << EOF > $JUPYTER_CONFIG_ROOT/apputils-extension/palette.jupyterlab-settings
+{
+    // Command Palette
+    // @jupyterlab/apputils-extension:palette
+    // Command palette settings.
+    // **************************************
+
+    "modal": false      // Command palette on the left panel.
+}
+EOF
+
+
+mkdir -p $JUPYTER_CONFIG_ROOT/completer-extension
+cat << 'EOF' > $JUPYTER_CONFIG_ROOT/completer-extension/manager.jupyterlab-settings
+{
+    // Code Completion
+    // @jupyterlab/completer-extension:manager
+    // Code Completion settings.
+    // ***************************************
+
+    "autoCompletion": true
+}
+EOF
+
+
+# Linter for notebook editors and code editors. Do not autosave on notebook, because it's broken
+# on multi-line '!some_command \'. Note that autosave doesn't work on text editor anyway.
+mkdir -p $JUPYTER_CONFIG_ROOT/../jupyterlab_code_formatter/
+cat << EOF > $JUPYTER_CONFIG_ROOT/../jupyterlab_code_formatter/settings.jupyterlab-settings
+{
+    // Jupyterlab Code Formatter
+    // jupyterlab_code_formatter:settings
+    // Jupyterlab Code Formatter settings.
+    // ***********************************
+
+    "formatOnSave": false,
+
+    "black": {
+        "line_length": 100,
+        "string_normalization": true
+    },
+
+    // Isort Config
+    // Config to be passed into isort's SortImports function call.
+    "isort": {
+        //"multi_line_output": 3,
+        //"include_trailing_comma": true,
+        //"force_grid_wrap": 0,
+        //"use_parentheses": true,
+        "line_length": 100
+    }
+}
+EOF
+
+
+# Shortcuts to format notebooks or codes with black and isort.
+mkdir -p $JUPYTER_CONFIG_ROOT/shortcuts-extension
+cat << EOF > $JUPYTER_CONFIG_ROOT/shortcuts-extension/shortcuts.jupyterlab-settings
+{
+    // Keyboard Shortcuts
+    // @jupyterlab/shortcuts-extension:shortcuts
+    // Keyboard shortcut settings.
+    // *****************************************
+
+    "shortcuts": [
+        {
+            "command": "jupyterlab_code_formatter:black",
+            "keys": [
+                "Ctrl Shift B"
+            ],
+            "selector": ".jp-Notebook.jp-mod-editMode"
+        },
+        {
+            "command": "jupyterlab_code_formatter:black",
+            "keys": [
+                "Ctrl Shift B"
+            ],
+            "selector": ".jp-CodeMirrorEditor"
+        },
+        {
+            "command": "jupyterlab_code_formatter:isort",
+            "keys": [
+                "Ctrl Shift I"
+            ],
+            "selector": ".jp-Notebook.jp-mod-editMode"
+        },
+        {
+            "command": "jupyterlab_code_formatter:isort",
+            "keys": [
+                "Ctrl Shift I"
+            ],
+            "selector": ".jp-CodeMirrorEditor"
+        }
+    ]
+}
+EOF
+
+
+echo "==============================================="
+echo "  Server settings ......"
+echo "==============================================="
 
 try_append() {
     local key="$1"
