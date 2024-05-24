@@ -10,12 +10,11 @@ mkdir -p "$CUSTOM_DIR"/bin && \
   mkdir -p "$CUSTOM_DIR"/tmp
 if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
-  chmod -R 777 "$CUSTOM_DIR"/tmp
+  sudo chmod 777 "$CUSTOM_DIR"/tmp
   # touch ${CUSTOM_DIR}/bash_history
   mkdir -p /home/ec2-user/SageMaker/labs
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
-  echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> ~/SageMaker/custom/bashrc # Persistent bash history
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:/home/ec2-user/.local/bin' >> ~/SageMaker/custom/bashrc
 fi
 
@@ -205,7 +204,7 @@ aws configure set default.s3.max_concurrent_requests 100
 aws configure set default.s3.max_queue_size 10000
 aws configure set default.s3.multipart_threshold 64MB
 aws configure set default.s3.multipart_chunksize 16MB
-aws configure set default.cli_auto_prompt on-partial
+# aws configure set default.cli_auto_prompt on-partial
 
 
 # Install session-manager
@@ -673,10 +672,12 @@ source ~/.bashrc
 # if [ ! -z ${dry} ]; then # 变量有空格，检查失效
 # if [ ! -z ${KREW_ROOT} ]; then # Shell 嵌套执行，检查也会失效
 if ! grep -q "KREW_ROOT" ~/SageMaker/custom/bashrc; then
+  echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> ~/SageMaker/custom/bashrc # Persistent bash history
+  
   # Add alias if not set before
   cat >> ~/SageMaker/custom/bashrc <<EOF
 
-# Add by sm-nb-init
+# Start adding by sm-nb-init
 alias ..='source ~/.bashrc'
 alias c=clear
 
@@ -755,13 +756,11 @@ alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
 export PIPX_HOME=~/SageMaker/custom/pipx
 export PIPX_BIN_DIR=~/SageMaker/custom/bin
 
-# Other
-
 EOF
 fi    
 
-echo "" | sudo tee /etc/profile.d/initsmnb-cli.sh
-echo '' | sudo tee -a /etc/profile.d/initsmnb-cli.sh
+# echo "" | sudo tee /etc/profile.d/initsmnb-cli.sh
+# echo '' | sudo tee -a /etc/profile.d/initsmnb-cli.sh
 
 
 source ~/.bashrc
@@ -787,6 +786,9 @@ complete -F __start_kubectl k
 . <(eksctl completion bash)
 alias e=eksctl
 complete -F __start_eksctl e
+
+# End adding by sm-nb-init
+
 EOF
 fi
 
