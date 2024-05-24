@@ -3,19 +3,22 @@
 source ~/.bashrc
 
 CUSTOM_DIR=/home/ec2-user/SageMaker/custom
+CUSTOM_BASH="${1:-/home/ec2-user/SageMaker/custom/bashrc}"
+
 mkdir -p "$CUSTOM_DIR"/bin && \
   mkdir -p "$CUSTOM_DIR"/docker && \
   mkdir -p "$CUSTOM_DIR"/envs && \
   mkdir -p "$CUSTOM_DIR"/vscode && \
-  mkdir -p "$CUSTOM_DIR"/tmp
+  mkdir -p "$CUSTOM_DIR"/tmp && \
+  mkdir -p "$CUSTOM_DIR"/logs
 if [ ! -d "$CUSTOM_DIR" ]; then
   echo "Set custom dir and bashrc"
   sudo chmod 777 "$CUSTOM_DIR"/tmp
   # touch ${CUSTOM_DIR}/bash_history
   mkdir -p /home/ec2-user/SageMaker/labs
 
-  echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> ~/SageMaker/custom/bashrc
-  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:/home/ec2-user/.local/bin' >> ~/SageMaker/custom/bashrc
+  echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> $CUSTOM_BASH
+  echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:/home/ec2-user/.local/bin' >> $CUSTOM_BASH
 fi
 
 
@@ -54,7 +57,7 @@ if [ -z "${MY_AZ}" ]; then
   fi
   # AWS_REGION="`echo \"$MY_AZ\" | sed 's/[a-z]\$//'`"
 
-  cat >> ~/SageMaker/custom/bashrc <<EOF  
+  cat >> $CUSTOM_BASH <<EOF  
 
 export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
@@ -73,7 +76,7 @@ aws configure set region $AWS_REGION
 
 if [ -z "${FLAVOR}" ]; then
   echo "Add env: FLAVOR"
-  cat >> ~/SageMaker/custom/bashrc <<EOF
+  cat >> $CUSTOM_BASH <<EOF
 FLAVOR="$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f 2)"
 
 EOF
@@ -672,11 +675,11 @@ source ~/.bashrc
 # check if a ENV KREW_ROOT exist
 # if [ ! -z ${dry} ]; then # 变量有空格，检查失效
 # if [ ! -z ${KREW_ROOT} ]; then # Shell 嵌套执行，检查也会失效
-if ! grep -q "KREW_ROOT" ~/SageMaker/custom/bashrc; then
-  echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> ~/SageMaker/custom/bashrc # Persistent bash history
+if ! grep -q "KREW_ROOT" $CUSTOM_BASH; then
+  echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> $CUSTOM_BASH # Persistent bash history
   
   # Add alias if not set before
-  cat >> ~/SageMaker/custom/bashrc <<EOF
+  cat >> $CUSTOM_BASH <<EOF
 
 # Start adding by sm-nb-init
 alias ..='source ~/.bashrc'
@@ -763,14 +766,13 @@ fi
 # echo "" | sudo tee /etc/profile.d/initsmnb-cli.sh
 # echo '' | sudo tee -a /etc/profile.d/initsmnb-cli.sh
 
-
 source ~/.bashrc
 
 if [ ! -f $CUSTOM_DIR/bin/b ]; then
   sudo bash -c "cat << EOF > /usr/local/bin/b
   #!/bin/bash
   /bin/bash
-  EOF"
+EOF"
   sudo chmod +x /usr/local/bin/b  
 fi
 
@@ -779,7 +781,7 @@ if alias | grep -q '^alias k='; then
   echo "Alias 'k' exists"
 else
   echo "Alias 'k' does not exist"
-  cat >> ~/SageMaker/custom/bashrc <<EOF
+  cat >> $CUSTOM_BASH <<EOF
 source <(kubectl completion bash)
 alias k=kubectl
 complete -F __start_kubectl k
