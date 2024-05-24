@@ -5,7 +5,8 @@ source ~/.bashrc
 # Tag to Env
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 
-BASH_FILE="${1:-~/.bashrc}"
+# BASH_FILE="${1:-~/.bashrc}"
+BASH_FILE="${1:-/home/ec2-user/.bashrc}"
 NAME_PREFIX="SageVPC"
 
 echo "==============================================="
@@ -64,13 +65,34 @@ export EKS_SHAREDNODE_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-
 # Extrenal security group
 export EKS_EXTERNAL_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$EKS_VPC_ID"  "Name=tag:Name,Values=*${NAME_PREFIX}-SG-external*" | jq -r '.SecurityGroups[]|.GroupId')
 
-echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ${BASH_FILE}
-echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ${BASH_FILE}
-echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ${BASH_FILE}
-echo "export EKS_ADDITIONAL_SG=${EKS_ADDITIONAL_SG}" | tee -a ${BASH_FILE}
-echo "export EKS_CUSTOMNETWORK_SG=${EKS_CUSTOMNETWORK_SG}" | tee -a ${BASH_FILE}
-echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ${BASH_FILE}
-echo "export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}" | tee -a ${BASH_FILE}
+# echo "export EKS_VPC_ID=\"$EKS_VPC_ID\"" >> ${BASH_FILE}
+# echo "export EKS_VPC_CIDR=\"$EKS_VPC_CIDR\"" >> ${BASH_FILE}
+# echo "export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}" | tee -a ${BASH_FILE}
+# echo "export EKS_ADDITIONAL_SG=${EKS_ADDITIONAL_SG}" | tee -a ${BASH_FILE}
+# echo "export EKS_CUSTOMNETWORK_SG=${EKS_CUSTOMNETWORK_SG}" | tee -a ${BASH_FILE}
+# echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ${BASH_FILE}
+# echo "export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}" | tee -a ${BASH_FILE}
+
+if ! grep -q "PRI_SUBNET_1" "$BASH_FILE"; then  
+  # Add infra envs if not set before
+  cat >> ~/SageMaker/custom/bashrc <<EOF
+
+# Start adding by env.sh
+export EKS_VPC_ID=$EKS_VPC_ID
+export EKS_VPC_CIDR=$EKS_VPC_CIDR
+export EKS_CLUSTER_SG=${EKS_CLUSTER_SG}
+export EKS_ADDITIONAL_SG=${EKS_ADDITIONAL_SG}
+export EKS_CUSTOMNETWORK_SG=${EKS_CUSTOMNETWORK_SG}
+export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}
+export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}
+
+# End adding by env.sh
+
+EOF
+
+fi
+
+
 
 source ~/.bashrc
 aws sts get-caller-identity

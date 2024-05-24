@@ -264,11 +264,12 @@ if [ ! -f $CUSTOM_DIR/bin/eksctl_$PLATFORM.tar.gz ]; then
   curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz" -o $CUSTOM_DIR/bin/eksctl_$PLATFORM.tar.gz
   tar -xzf $CUSTOM_DIR/bin/eksctl_$PLATFORM.tar.gz -C $CUSTOM_DIR/bin
 fi
-if [ ! -f $CUSTOM_DIR/bin/eksctl_150.tar.gz ]; then
-  curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v0.150.0/eksctl_Linux_amd64.tar.gz" -o $CUSTOM_DIR/bin/eksctl_150.tar.gz
-  tar -xzf $CUSTOM_DIR/bin/eksctl_150.tar.gz
-  mv eksctl $CUSTOM_DIR/bin/eksctl150
-fi
+# old eksctl for upgrade testing
+# if [ ! -f $CUSTOM_DIR/bin/eksctl_150.tar.gz ]; then
+#   curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v0.150.0/eksctl_Linux_amd64.tar.gz" -o $CUSTOM_DIR/bin/eksctl_150.tar.gz
+#   tar -xzf $CUSTOM_DIR/bin/eksctl_150.tar.gz
+#   mv eksctl $CUSTOM_DIR/bin/eksctl150
+# fi
 
 if [ ! -f $CUSTOM_DIR/bin/kubectl ]; then
   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
