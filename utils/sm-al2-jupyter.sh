@@ -525,16 +525,14 @@ cat << EOF > $JUPYTER_CONFIG_ROOT/shortcuts-extension/shortcuts.jupyterlab-setti
         {
             "command": "notebook:clear-all-cell-outputs",
             "keys": [
-                "W",
-                "W"
+                "Ctrl ."
             ],
             "selector": ".jp-Notebook.jp-mod-editMode"
         },
         {
             "command": "notebook:clear-cell-output",
             "keys": [
-                "Q",
-                "Q"
+                "Ctrl ,"
             ],
             "selector": ".jp-Notebook.jp-mod-editMode"
         }        
