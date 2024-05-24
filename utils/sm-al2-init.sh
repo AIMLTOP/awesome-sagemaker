@@ -676,12 +676,12 @@ source ~/.bashrc
 # if [ ! -z ${dry} ]; then # 变量有空格，检查失效
 # if [ ! -z ${KREW_ROOT} ]; then # Shell 嵌套执行，检查也会失效
 if ! grep -q "KREW_ROOT" $CUSTOM_BASH; then
-  echo "export HISTFILE=${CUSTOM_DIR}/bash_history" >> $CUSTOM_BASH # Persistent bash history
-  
   # Add alias if not set before
   cat >> $CUSTOM_BASH <<EOF
 
 # Start adding by sm-nb-init
+
+export HISTFILE=${CUSTOM_DIR}/bash_history # Persistent bash history
 alias ..='source ~/.bashrc'
 alias c=clear
 
@@ -707,15 +707,15 @@ alias ll='ls -alhF --color=auto'
 export LS_COLORS="di=38;5;39"
 
 man() {
-    env \
-        LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-        LESS_TERMCAP_md=$(printf "\e[1;31m") \
-        LESS_TERMCAP_me=$(printf "\e[0m") \
-        LESS_TERMCAP_se=$(printf "\e[0m") \
-        LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-        LESS_TERMCAP_ue=$(printf "\e[0m") \
-        LESS_TERMCAP_us=$(printf "\e[1;32m") \
-        man "$@"
+    env \\
+        LESS_TERMCAP_mb=\$(printf "\e[1;31m") \\
+        LESS_TERMCAP_md=\$(printf "\e[1;31m") \\
+        LESS_TERMCAP_me=\$(printf "\e[0m") \\
+        LESS_TERMCAP_se=\$(printf "\e[0m") \\
+        LESS_TERMCAP_so=\$(printf "\e[1;44;33m") \\
+        LESS_TERMCAP_ue=\$(printf "\e[0m") \\
+        LESS_TERMCAP_us=\$(printf "\e[1;32m") \\
+        man "\$@"
 }
 
 export DSTAT_OPTS="-cdngym"
@@ -760,8 +760,18 @@ alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
 export PIPX_HOME=~/SageMaker/custom/pipx
 export PIPX_BIN_DIR=~/SageMaker/custom/bin
 
+source <(kubectl completion bash)
+alias k=kubectl
+complete -F __start_kubectl k
+
+. <(eksctl completion bash)
+alias e=eksctl
+complete -F __start_eksctl e
+
+# End adding by sm-nb-init
+
 EOF
-fi    
+fi
 
 # echo "" | sudo tee /etc/profile.d/initsmnb-cli.sh
 # echo '' | sudo tee -a /etc/profile.d/initsmnb-cli.sh
@@ -776,23 +786,23 @@ EOF"
   sudo chmod +x /usr/local/bin/b  
 fi
 
-# 检查是否存在别名 'k'
-if alias | grep -q '^alias k='; then
-  echo "Alias 'k' exists"
-else
-  echo "Alias 'k' does not exist"
-  cat >> $CUSTOM_BASH <<EOF
-source <(kubectl completion bash)
-alias k=kubectl
-complete -F __start_kubectl k
+# # 检查是否存在别名 'k'
+# if alias | grep -q '^alias k='; then
+#   echo "Alias 'k' exists"
+# else
+#   echo "Alias 'k' does not exist"
+#   cat >> $CUSTOM_BASH <<EOF
+# source <(kubectl completion bash)
+# alias k=kubectl
+# complete -F __start_kubectl k
 
-. <(eksctl completion bash)
-alias e=eksctl
-complete -F __start_eksctl e
+# . <(eksctl completion bash)
+# alias e=eksctl
+# complete -F __start_eksctl e
 
-# End adding by sm-nb-init
+# # End adding by sm-nb-init
 
-EOF
-fi
+# EOF
+# fi
 
 echo " done"
