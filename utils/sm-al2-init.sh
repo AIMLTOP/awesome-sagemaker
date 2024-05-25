@@ -53,6 +53,9 @@ do
 done
 EOF
 
+# persistent vscode extensions
+ln -s $CUSTOM_DIR/vscode ~/.vscode-server
+
 source ~/.bashrc
 
 # check if a ENV ACCOUNT_ID exist
@@ -136,8 +139,6 @@ cat /proc/sys/fs/inotify/max_user_watches
 
 # yum
 grep '^max_connections=' /etc/yum.conf &> /dev/null || echo "max_connections=10" | sudo tee -a /etc/yum.conf
-
-
 
 
 echo "==============================================="
@@ -739,10 +740,10 @@ COLOR_YELLOW="\[\033[1;33m\]"
 COLOR_OFF="\[\033[0m\]"
 
 export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
-# git_branch() {
-#    local branch=$(/usr/bin/git branch 2>/dev/null | grep '^*' | colrm 1 2)
-#    [[ "$branch" == "" ]] && echo "" || echo "($branch) "
-# }
+git_branch() {
+   local branch=\$(/usr/bin/git branch 2>/dev/null | grep '^*' | colrm 1 2)
+   [[ "\$branch" == "" ]] && echo "" || echo "(\$branch) "
+}
 
 export dry="--dry-run=client -o yaml"
 export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
@@ -797,8 +798,6 @@ fi
 # echo "" | sudo tee /etc/profile.d/initsmnb-cli.sh
 # echo '' | sudo tee -a /etc/profile.d/initsmnb-cli.sh
 
-source ~/.bashrc
-
 if [ ! -f $CUSTOM_DIR/bin/b ]; then
   sudo bash -c "cat << EOF > /usr/local/bin/b
   #!/bin/bash
@@ -806,24 +805,5 @@ if [ ! -f $CUSTOM_DIR/bin/b ]; then
 EOF"
   sudo chmod +x /usr/local/bin/b  
 fi
-
-# # 检查是否存在别名 'k'
-# if alias | grep -q '^alias k='; then
-#   echo "Alias 'k' exists"
-# else
-#   echo "Alias 'k' does not exist"
-#   cat >> $CUSTOM_BASH <<EOF
-# source <(kubectl completion bash)
-# alias k=kubectl
-# complete -F __start_kubectl k
-
-# . <(eksctl completion bash)
-# alias e=eksctl
-# complete -F __start_eksctl e
-
-# # End adding by sm-nb-init
-
-# EOF
-# fi
 
 echo " done"
