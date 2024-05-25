@@ -4,18 +4,23 @@ source ~/.bashrc
 
 # AI BigData Cloud
 CUSTOM_DIR=/home/ec2-user/SageMaker/custom && mkdir -p "$CUSTOM_DIR"/bin
+CUSTOM_BASH="${1:-/home/ec2-user/SageMaker/custom/bashrc}"
+
 # yum update -y
 
 echo "==============================================="
 echo "  Metadata ......"
 echo "==============================================="
-if [ ! -z ${SAGE_NB_NAME} ]; then
+# if [ ! -z ${SAGE_NB_NAME} ]; then
+if ! grep -q "SAGE_NB_NAME" $CUSTOM_BASH; then
   echo "Add SageMaker notebook variables: SAGE_NB_URL" # Add SageMaker related ENVs if not set before
   export SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json | jq .ResourceName | tr -d '"')
   # SAGE_NB_NAME=$(cat /opt/ml/metadata/resource-metadata.json  | jq -r '.ResourceName')
   export SAGE_LC_NAME=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query NotebookInstanceLifecycleConfigName --output text)
   export SAGE_ROLE_ARN=$(aws sagemaker describe-notebook-instance --notebook-instance-name ${SAGE_NB_NAME} --query RoleArn --output text)
   export SAGE_ROLE_NAME=$(echo ${SAGE_ROLE_ARN##*/})   # Get sagemaker role name
+  export SAGE_NB_IP=$(ip addr show dev eth2 | awk '/inet / {print $2}' | awk -F/ '{print $1}')
+
   # export SAGE_ROLE_NAME=$(basename "$ROLE") # another way
   export SAGE_NB_URL=$(cat /etc/opt/ml/sagemaker-notebook-instance-config.json \
     | jq -r '.notebook_uri' \
@@ -30,6 +35,7 @@ export SAGE_NB_URL=$SAGE_NB_URL
 export SAGE_LC_NAME=$SAGE_LC_NAME
 export SAGE_ROLE_NAME=$SAGE_ROLE_NAME
 export SAGE_ROLE_ARN=$SAGE_ROLE_ARN
+export SAGE_NB_IP=$SAGE_NB_IP
 
 EOF
 fi

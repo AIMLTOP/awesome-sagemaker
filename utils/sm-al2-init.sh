@@ -18,6 +18,7 @@ if [ ! -d "$CUSTOM_DIR" ]; then
   mkdir -p /home/ec2-user/SageMaker/labs
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> $CUSTOM_BASH
+  echo "export CUSTOM_BASH=${CUSTOM_BASH}" >> $CUSTOM_BASH
   echo 'export PATH=$PATH:/home/ec2-user/SageMaker/custom/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/bin:/home/ec2-user/.local/bin' >> $CUSTOM_BASH
 fi
 
@@ -261,11 +262,11 @@ fi
 
 # https://github.com/muesli/duf
 echo "Setup duf"
-if [ ! -f $CUSTOM_DIR/duf.rpm ]; then
+if [ ! -f $CUSTOM_DIR/bin/duf.rpm ]; then
     DOWNLOAD_URL="https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_amd64.rpm"
-    wget $DOWNLOAD_URL -O $CUSTOM_DIR/duf.rpm
+    wget $DOWNLOAD_URL -O $CUSTOM_DIR/bin/duf.rpm
 fi
-sudo yum localinstall -y $CUSTOM_DIR/duf.rpm
+sudo yum localinstall -y $CUSTOM_DIR/bin/duf.rpm
 
 
 echo "==============================================="
