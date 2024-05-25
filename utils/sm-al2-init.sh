@@ -37,6 +37,12 @@ git_branch() {
    [[ "$branch" == "" ]] && echo "" || echo "($branch) "
 }
 
+# Put before PS1 to effect and all colors are bold
+COLOR_GREEN="\[\033[1;32m\]"
+COLOR_PURPLE="\[\033[1;35m\]"
+COLOR_YELLOW="\[\033[1;33m\]"
+COLOR_OFF="\[\033[0m\]"
+
 # Define PS1 before conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
 export PS1="[$COLOR_GREEN\w$COLOR_OFF] $COLOR_PURPLE\$(git_branch)$COLOR_OFF\$ "
 
@@ -741,11 +747,7 @@ man() {
 export DSTAT_OPTS="-cdngym"
 export TERM=xterm-256color
 #export TERM=xterm-color
-# All colors are bold
-COLOR_GREEN="\[\033[1;32m\]"
-COLOR_PURPLE="\[\033[1;35m\]"
-COLOR_YELLOW="\[\033[1;33m\]"
-COLOR_OFF="\[\033[0m\]"
+
 
 export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
 # git_branch() {
