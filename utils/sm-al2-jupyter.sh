@@ -668,27 +668,6 @@ if [[ ! -z "$TMUX" ]]; then
 fi
 EOF
 
-# PS1 must preceed conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
-# 路径显示更简洁 (base) [ec2-user@ip-172-16-48-86 custom]$ -> (base) [~/SageMaker/custom] $ 
-cp ~/.bashrc{,.ori}
-cat << 'EOF' > ~/.bashrc
-git_branch() {
-   local branch=$(/usr/bin/git branch 2>/dev/null | grep '^*' | colrm 1 2)
-   [[ "$branch" == "" ]] && echo "" || echo "($branch) "
-}
-
-# All colors are bold
-COLOR_GREEN="\[\033[1;32m\]"
-COLOR_PURPLE="\[\033[1;35m\]"
-COLOR_YELLOW="\[\033[1;33m\]"
-COLOR_OFF="\[\033[0m\]"
-
-# Define PS1 before conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
-export PS1="[$COLOR_GREEN\w$COLOR_OFF] $COLOR_PURPLE\$(git_branch)$COLOR_OFF\$ "
-EOF
-
-# Original .bashrc content
-cat ~/.bashrc.ori >> ~/.bashrc
 
 echo 'To enforce the change to jupyter config: sudo initctl restart jupyter-server --no-wait'
 echo 'then refresh your browser'

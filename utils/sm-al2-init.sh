@@ -25,8 +25,20 @@ fi
 echo "==============================================="
 echo "  Load custom bashrc and ssh ......"
 echo "==============================================="
+# PS1 must preceed conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
+# 路径显示更简洁 (base) [ec2-user@ip-172-16-48-86 custom]$ -> (base) [~/SageMaker/custom] $ 
+cp ~/.bashrc{,.ori} # 备份原 .bashrc
+cat << 'EOF' > ~/.bashrc
+# Define PS1 before conda bash.hook, to correctly display CONDA_PROMPT_MODIFIER
+export PS1="[$COLOR_GREEN\w$COLOR_OFF] $COLOR_PURPLE\$(git_branch)$COLOR_OFF\$ "
+EOF
+
+# Add back original .bashrc content
+cat ~/.bashrc.ori >> ~/.bashrc
+
 # Add custom bash file if not set before
 cat >> ~/.bashrc <<EOF
+
 bashrc_files=(bashrc)
 path="/home/ec2-user/SageMaker/custom/"
 for file in \${bashrc_files[@]}
@@ -39,8 +51,6 @@ do
     fi
 done
 EOF
-
-
 
 source ~/.bashrc
 
@@ -721,7 +731,17 @@ man() {
 export DSTAT_OPTS="-cdngym"
 export TERM=xterm-256color
 #export TERM=xterm-color
+# All colors are bold
+COLOR_GREEN="\[\033[1;32m\]"
+COLOR_PURPLE="\[\033[1;35m\]"
+COLOR_YELLOW="\[\033[1;33m\]"
+COLOR_OFF="\[\033[0m\]"
+
 export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
+# git_branch() {
+#    local branch=$(/usr/bin/git branch 2>/dev/null | grep '^*' | colrm 1 2)
+#    [[ "$branch" == "" ]] && echo "" || echo "($branch) "
+# }
 
 export dry="--dry-run=client -o yaml"
 export KREW_ROOT="\$CUSTOM_DIR/bin/krew"
