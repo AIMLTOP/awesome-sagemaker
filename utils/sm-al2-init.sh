@@ -11,7 +11,9 @@ mkdir -p "$CUSTOM_DIR"/bin && \
   mkdir -p "$CUSTOM_DIR"/vscode && \
   mkdir -p "$CUSTOM_DIR"/tmp && \
   mkdir -p "$CUSTOM_DIR"/logs
-if [ ! -d "$CUSTOM_DIR" ]; then
+
+# if [ ! -d "$CUSTOM_DIR" ]; then
+if ! grep -q "CUSTOM_BASH" $CUSTOM_BASH; then
   echo "Set custom dir and bashrc"
   sudo chmod 777 "$CUSTOM_DIR"/tmp
   # touch ${CUSTOM_DIR}/bash_history
@@ -104,11 +106,11 @@ fi
 
 
 # SSH 放在脚本靠前位置，方便调试
-if [ -f /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ]
+if [ -f /home/ec2-user/SageMaker/custom/private_key.pem ]
 then
   echo "Setup SSH Keys"
-  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_private_key.pem ~/.ssh/id_rsa
-  sudo cp /home/ec2-user/SageMaker/custom/${EKS_CLUSTER_NAME}_public_key.pem ~/.ssh/id_rsa.pub
+  sudo cp /home/ec2-user/SageMaker/custom/private_key.pem ~/.ssh/id_rsa
+  sudo cp /home/ec2-user/SageMaker/custom/public_key.pem ~/.ssh/id_rsa.pub
   sudo chmod 400 ~/.ssh/id_rsa
   sudo chown -R ec2-user:ec2-user ~/.ssh/
   # ssh-keygen -f ~/.ssh/id_rsa -y > ~/.ssh/id_rsa.pub
