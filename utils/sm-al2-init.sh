@@ -692,6 +692,7 @@ if command -v delta &> /dev/null ; then
     git config --global interactive.diffFilter "delta -s --color-only"
     git config --global delta.navigate "true"
 fi
+git config pull.rebase false  # merge
 
 
 echo "==============================================="
