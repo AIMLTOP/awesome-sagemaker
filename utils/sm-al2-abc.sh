@@ -89,6 +89,9 @@ fi
 # ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --no-half --listen
 # ~/environment/aiml/stable-diffusion-webui/webui.sh --enable-insecure-extension-access --skip-torch-cuda-test --port 8080 --no-half --listen
 
+# persistent kaggle
+mkdir -p $CUSTOM_DIR/kaggle
+ln -s $CUSTOM_DIR/kaggle ~/.kaggle
 
 
 # # https://docs.conda.io/en/latest/miniconda.html
