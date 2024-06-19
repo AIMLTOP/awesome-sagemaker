@@ -186,8 +186,45 @@ echo "==============================================="
 source /home/ec2-user/anaconda3/bin/activate JupyterSystemEnv
 pip install amazon-codewhisperer-jupyterlab-ext
 jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
-source /home/ec2-user/anaconda3/bin/deactivate
 
+# https://github.com/jupyter-lsp/jupyterlab-lsp
+# https://github.com/aws-samples/sagemaker-studio-lifecycle-config-examples/blob/main/scripts/install-lsp-features/on-jupyter-server-start.sh
+echo "Installing jupyterlab-lsp and language tools"
+pip install jupyterlab-lsp \
+    'python-lsp-server[fall]' \
+    jupyterlab-spellchecker \
+    # jupyterlab-code-formatter
+#     'python-lsp-server[flake8,mccabe,pycodestyle,pydocstyle,pyflakes,pylint,rope]' \
+#     black isort    
+
+# Some LSP language servers install via JS, not Python. For full list of language servers see:
+# https://jupyterlab-lsp.readthedocs.io/en/stable/Language%20Servers.html
+# jlpm add --dev bash-language-server@"<5.0.0" dockerfile-language-server-nodejs
+npm install --save-dev bash-language-server@"<5.0.0" dockerfile-language-server-nodejs unified-language-server vscode-json-languageserver-bin yaml-language-server
+
+# This configuration override is optional, to make LSP "extra-helpful" by default:
+CMP_CONFIG_DIR=~/.jupyter/lab/user-settings/@jupyter-lsp/jupyterlab-lsp/
+CMP_CONFIG_FILE=completion.jupyterlab-settings
+CMP_CONFIG_PATH="$CMP_CONFIG_DIR/$CMP_CONFIG_FILE"
+if test -f $CMP_CONFIG_PATH; then
+    echo "jupyterlab-lsp config file already exists: Skipping default config setup"
+else
+    echo "Setting continuous hinting to enabled by default"
+    mkdir -p $CMP_CONFIG_DIR
+    echo '{ "continuousHinting": true }' > $CMP_CONFIG_PATH
+fi
+
+jupyter server extension enable jupyterlab-lsp jupyterlab-spellchecker --sys-prefix # 需要启用，否则会有兼容问题
+
+# 代码跳转设置 
+cd ~/SageMaker # 进入 jupyter 根目录
+ln -s / .lsp_symlink
+# 允许访问其他位置的包/代码
+cat >> ~/.jupyter/jupyter_server_config.py <<EOF
+c.ContentsManager.allow_hidden = True
+EOF
+
+source /home/ec2-user/anaconda3/bin/deactivate
 
 
 echo "==============================================="
@@ -415,17 +452,17 @@ EOF
 
 # Default to the advanced json editor to edit the settings.
 # Since v3.4.x; https://github.com/jupyterlab/jupyterlab/pull/12466
-mkdir -p $JUPYTER_CONFIG_ROOT/settingeditor-extension
-cat << EOF > $JUPYTER_CONFIG_ROOT/settingeditor-extension/form-ui.jupyterlab-settings
-{
-    // Settings Editor Form UI
-    // @jupyterlab/settingeditor-extension:form-ui
-    // Settings editor form ui settings.
-    // *******************************************
+# mkdir -p $JUPYTER_CONFIG_ROOT/settingeditor-extension
+# cat << EOF > $JUPYTER_CONFIG_ROOT/settingeditor-extension/form-ui.jupyterlab-settings
+# {
+#     // Settings Editor Form UI
+#     // @jupyterlab/settingeditor-extension:form-ui
+#     // Settings editor form ui settings.
+#     // *******************************************
 
-    "settingEditorType": "json"
-}
-EOF
+#     "settingEditorType": "json"
+# }
+# EOF
 
 # Show command palette on lhs navbar, similar behavior to smnb.
 mkdir -p $JUPYTER_CONFIG_ROOT/apputils-extension/
