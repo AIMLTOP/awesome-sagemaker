@@ -190,9 +190,10 @@ jupyter server extension enable amazon_codewhisperer_jupyterlab_ext
 # https://github.com/jupyter-lsp/jupyterlab-lsp
 # https://github.com/aws-samples/sagemaker-studio-lifecycle-config-examples/blob/main/scripts/install-lsp-features/on-jupyter-server-start.sh
 echo "Installing jupyterlab-lsp and language tools"
+# 保持简单，启用多个反而会有冲突
 pip install jupyterlab-lsp \
-    'python-lsp-server[fall]' \
-    jupyterlab-spellchecker \
+    'python-lsp-server[fall]'
+    # jupyterlab-spellchecker
     # jupyterlab-code-formatter
 #     'python-lsp-server[flake8,mccabe,pycodestyle,pydocstyle,pyflakes,pylint,rope]' \
 #     black isort    
@@ -214,15 +215,21 @@ else
     echo '{ "continuousHinting": true }' > $CMP_CONFIG_PATH
 fi
 
-jupyter server extension enable jupyterlab-lsp jupyterlab-spellchecker --sys-prefix # 需要启用，否则会有兼容问题
+# jupyter server extension enable --sys-prefix jupyterlab-lsp jupyterlab-spellchecker # 需要启用，否则会有兼容问题
+jupyter server extension enable jupyterlab-lsp --sys-prefix
+# jupyter server extension list --generate-config
+# jupyter server extension disable jupyterlab-lsp
 
-# 代码跳转设置 
-cd ~/SageMaker # 进入 jupyter 根目录
-ln -s / .lsp_symlink
+
 # 允许访问其他位置的包/代码
 cat >> ~/.jupyter/jupyter_server_config.py <<EOF
 c.ContentsManager.allow_hidden = True
 EOF
+# 代码跳转设置
+if [ ! -L ~/SageMaker/.lsp_symlink ]; then
+  cd ~/SageMaker # 进入 jupyter 根目录
+  ln -s / .lsp_symlink
+fi
 
 source /home/ec2-user/anaconda3/bin/deactivate
 
