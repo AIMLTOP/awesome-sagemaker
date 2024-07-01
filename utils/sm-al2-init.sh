@@ -661,6 +661,58 @@ if [ ! -z "$EFS_FS_ID" ]; then
   #sudo chmod 777 /home/ec2-user/SageMaker/efs*
 fi
 
+
+# Instance store
+# Install NVMe CLI
+sudo yum install nvme-cli mdadm -y
+
+# Get drives string
+instance_drives=$(sudo nvme list | grep "Amazon EC2 NVMe Instance Storage" | cut -d " " -f 1 || true)
+# Convert to array
+
+readarray -t instance_drives <<< "$instance_drives"
+num_drives=-1
+[[ ! -z "$instance_drives" ]] && num_drives=${#instance_drives[@]} || num_drives=0
+echo ${instance_drives[@]} $num_drives
+
+mount_location="/opt/dlami/nvme"
+mkdir -p $mount_location
+
+if [ $num_drives -gt 1 ]
+then
+  echo "${num_drives} extra devices found."
+
+  sudo mdadm --create /dev/md0 --level=0 --name=md0 --raid-devices=$num_drives "${instance_drives[@]}"
+
+  # Format drive with xfs 
+  sudo mkfs.xfs /dev/md0
+
+  uuid=$(sudo blkid -o value -s UUID /dev/md0)
+
+  # Create a filesystem path to mount the disk    
+  sudo mount /dev/md0 $mount_location
+
+  # Have disk be mounted on reboot
+  sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf 
+  echo "/dev/md0 $mount_location xfs defaults,noatime 0 2" | sudo tee -a /etc/fstab
+
+elif [ $num_drives -gt 0 ]
+then
+  echo "1 extra device found."
+
+  device=${instance_drives[0]}
+  sudo mkfs.xfs ${device}
+
+  echo "${device} ${mount_location} xfs defaults,noatime 1 2" | sudo tee -a /etc/fstab
+
+else
+  echo "No extra device found."
+fi
+
+sudo mount -a
+sudo chown -hR +1000:+1000 /opt/dlami/nvme*
+
+
 # Git
 if [ ! -z "$GIT_USER" ]; then
   echo "setup git user"
