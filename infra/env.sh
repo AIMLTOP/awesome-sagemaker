@@ -6,7 +6,7 @@ source ~/.bashrc
 # https://github.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/blob/master/scripts/set-env-variable/on-start.sh
 
 # BASH_FILE="${1:-~/.bashrc}"
-BASH_FILE="${1:-/home/ec2-user/.bashrc}"
+BASH_FILE="${1:-$HOME/.bashrc}"
 NAME_PREFIX="SageVPC"
 
 echo "==============================================="
@@ -76,7 +76,7 @@ if ! grep -q "PRI_SUBNET_1" "$BASH_FILE"; then
 	# echo "export EKS_SHAREDNODE_SG=${EKS_SHAREDNODE_SG}" | tee -a ${BASH_FILE}
 	# echo "export EKS_EXTERNAL_SG=${EKS_EXTERNAL_SG}" | tee -a ${BASH_FILE}
 
-  cat >> ~/SageMaker/custom/bashrc <<EOF
+  cat >> "$BASH_FILE" <<EOF
 
 export VPC_ID=$EKS_VPC_ID
 export VPC_CIDR=$EKS_VPC_CIDR
