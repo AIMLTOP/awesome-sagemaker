@@ -17,7 +17,7 @@ EOF
 
 # Under root
 echo "Auto stop to save cost ..."
-IDLE_TIME=18000 # 5 hour
+IDLE_TIME=16200 # 4.5 hour
 # IDLE_TIME=28800 # 8 hour
 # umask 022
 
