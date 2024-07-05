@@ -12,12 +12,13 @@ mkdir -p "$CUSTOM_DIR"/bin && \
   mkdir -p "$CUSTOM_DIR"/tmp && \
   mkdir -p "$CUSTOM_DIR"/logs
 
+# mkdir -p /home/ec2-user/SageMaker/labs
+
 # if [ ! -d "$CUSTOM_DIR" ]; then
 if ! grep -q "CUSTOM_BASH" $CUSTOM_BASH; then
   echo "Set custom dir and bashrc"
   sudo chmod 777 "$CUSTOM_DIR"/tmp
   # touch ${CUSTOM_DIR}/bash_history
-  mkdir -p /home/ec2-user/SageMaker/labs
 
   echo "export CUSTOM_DIR=${CUSTOM_DIR}" >> $CUSTOM_BASH
   echo "export CUSTOM_BASH=${CUSTOM_BASH}" >> $CUSTOM_BASH
@@ -653,9 +654,9 @@ fi
 
 # EFS
 if [ ! -z "$EFS_FS_ID" ]; then
-  # sudo mount -t efs -o tls ${EFS_FS_ID}:/ /efs # Using the EFS mount helper
   mkdir -p /home/ec2-user/SageMaker/efs/${EFS_FS_NAME}
-  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} efs _netdev,tls 0 0" | sudo tee -a /etc/fstab
+  echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" | sudo tee -a /etc/fstab # NFS
+  # echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} efs _netdev,tls 0 0" | sudo tee -a /etc/fstab # Using the EFS mount helper
   sudo mount -a
   sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
   #sudo chmod 777 /home/ec2-user/SageMaker/efs*
@@ -773,7 +774,7 @@ alias jc=/bin/journalctl
 alias s5='s5cmd'
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
-alias 2h='cd /home/ec2-user/SageMaker/hands'
+alias 2h='cd /home/ec2-user/SageMaker/efs/\${EFS_FS_NAME}/*hands'
 alias ncdu='ncdu --color dark'
 
 alias l='ls -CF'
