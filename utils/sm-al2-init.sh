@@ -153,6 +153,7 @@ sudo sysctl -p
 cat /proc/sys/fs/inotify/max_user_watches
 
 # yum
+yum-config-manager --disable centos-extras
 grep '^max_connections=' /etc/yum.conf &> /dev/null || echo "max_connections=10" | sudo tee -a /etc/yum.conf
 
 
@@ -658,7 +659,7 @@ if [ ! -z "$EFS_FS_ID" ]; then
   echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" | sudo tee -a /etc/fstab # NFS
   # echo "${EFS_FS_ID}.efs.${AWS_REGION}.amazonaws.com:/ /home/ec2-user/SageMaker/efs/${EFS_FS_NAME} efs _netdev,tls 0 0" | sudo tee -a /etc/fstab # Using the EFS mount helper
   sudo mount -a
-  sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
+  #sudo chown -hR +1000:+1000 /home/ec2-user/SageMaker/efs*
   #sudo chmod 777 /home/ec2-user/SageMaker/efs*
 fi
 
