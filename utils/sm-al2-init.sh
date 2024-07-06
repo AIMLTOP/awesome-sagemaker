@@ -153,7 +153,7 @@ sudo sysctl -p
 cat /proc/sys/fs/inotify/max_user_watches
 
 # yum
-yum-config-manager --disable centos-extras
+sudo yum-config-manager --disable centos-extras
 grep '^max_connections=' /etc/yum.conf &> /dev/null || echo "max_connections=10" | sudo tee -a /etc/yum.conf
 
 
