@@ -678,7 +678,7 @@ num_drives=-1
 echo ${instance_drives[@]} $num_drives
 
 mount_location="/opt/dlami/nvme"
-mkdir -p $mount_location
+sudo mkdir -p $mount_location
 
 if [ $num_drives -gt 1 ]
 then
@@ -712,7 +712,7 @@ else
 fi
 
 sudo mount -a
-sudo chown -hR +1000:+1000 /opt/dlami/nvme*
+sudo chown -hR +1000:+1000 /opt/dlami/*
 
 
 # Git

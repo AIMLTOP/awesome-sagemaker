@@ -44,7 +44,9 @@ fi
 echo "==============================================="
 echo "  AI/ML ......"
 echo "==============================================="
-# https://github.com/cloudbeer/BRClient
+# ParallelCluster
+# python3 -m pip install "aws-parallelcluster" --upgrade --user
+# pcluster version
 
 # # Ask bedrock
 # pip install ask-bedrock
@@ -559,20 +561,29 @@ fi
 
 
 # NodeJS
-# echo "  NodeJS ......"
-# ## nvm
-# # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-# . ~/.nvm/nvm.sh
-# nvm -v
-# ## LTS
-# ## nvm install --lts
-# ## node v16
-# # nvm install 16
-# ## node v17
-# nvm install 17
+echo " Setup nvm ......"
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+chmod ug+x ~/.nvm/nvm.sh
+source ~/.nvm/nvm.sh # . ~/.nvm/nvm.sh
+nvm -v
+
+# https://github.com/nodejs/release#release-schedule
+# LTS
+# nvm install --lts
+# node --version
+ 
+# node v16 Gallium
+# nvm install 16
+nvm install --lts=Gallium
+# node v18 Hydrogen
+# nvm install --lts=Hydrogen
 # node -e "console.log('Running Node.js ' + process.version)"
-# #nvm uninstall 17
+
+# uninstall
+# nvm uninstall 17
+
+
+
 # ## npm
 # npm list --depth=0
 # ## Redoc https://github.com/Redocly/redoc
