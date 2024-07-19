@@ -102,6 +102,7 @@ test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is 
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
 aws configure set region $AWS_REGION
+aws configure set default.s3.preferred_transfer_client crt
 
 if [ -z "${FLAVOR}" ]; then
   echo "Add env: FLAVOR"
