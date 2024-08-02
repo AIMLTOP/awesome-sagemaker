@@ -777,6 +777,7 @@ alias s5='s5cmd'
 alias 2s='cd /home/ec2-user/SageMaker'
 alias 2c='cd /home/ec2-user/SageMaker/custom'
 alias 2h='cd /home/ec2-user/SageMaker/efs/\${EFS_FS_NAME}/*hands'
+alias 2l='cd /home/ec2-user/SageMaker/efs/\${EFS_FS_NAME}/*labs'
 alias ncdu='ncdu --color dark'
 
 alias l='ls -CF'
