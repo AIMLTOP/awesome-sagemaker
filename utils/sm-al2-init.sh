@@ -70,6 +70,7 @@ EOF
 
 # persistent vscode extensions
 ln -s $CUSTOM_DIR/vscode ~/.vscode-server
+# 如果遇到 scp: Received message too long xxx, 本地 vscode 连不上，可以先移动一下 bash 文件
 
 source ~/.bashrc
 
@@ -270,7 +271,6 @@ if [ ! -f $CUSTOM_DIR/bin/s5cmd ]; then
     echo "Setup s5cmd"
     S5CMD_URL="https://github.com/peak/s5cmd/releases/download/v2.2.2/s5cmd_2.2.2_Linux-64bit.tar.gz"
     wget $S5CMD_URL -O /tmp/s5cmd.tar.gz
-    sudo mkdir -p /opt/s5cmd/
     sudo tar xzvf /tmp/s5cmd.tar.gz -C $CUSTOM_DIR/bin
 fi
 # mv/sync 等注意要加单引号，注意区域配置
@@ -845,6 +845,8 @@ alias es0='eksctl scale nodegroup --cluster=\${EKS_CLUSTER_NAME} --nodes=0 --nod
 alias nsel=ec2-instance-selector
 
 alias rr='sudo systemctl daemon-reload; sudo systemctl restart jupyter-server'
+
+alias sshh='easy-ssh -c controller-machine \${HP_CLUSTER_NAME} '
 
 export PIPX_HOME=~/SageMaker/custom/pipx
 export PIPX_BIN_DIR=~/SageMaker/custom/bin
