@@ -31,6 +31,7 @@ Metadata:
         Parameters:
           - CreatePublicSubnets
           - CreateS3Endpoint
+          - CreateS3ExpressEndpoint
           - CreateDynamoDBEndpoint
     ParameterLabels:
       AvailabilityZones:
@@ -43,6 +44,8 @@ Metadata:
         default: Create public subnets
       CreateS3Endpoint:
         default: Create an S3 endpoint
+      CreateS3ExpressEndpoint:
+        default: Create an S3 Express endpoint        
       CreateDynamoDBEndpoint:
         default: Create a DynamoDB endpoint
 
@@ -81,6 +84,15 @@ Parameters:
       Set to false if to avoid creating an S3 endpoint on your VPC.
     Type: String
 
+  CreateS3ExpressEndpoint:
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'true'
+    Description:
+      Set to false if to avoid creating an S3 Express endpoint on your VPC.
+    Type: String
+
   CreateDynamoDBEndpoint:
     AllowedValues:
       - 'true'
@@ -115,6 +127,7 @@ Conditions:
   6AZConditionPublic: !Condition '6AZCondition'
 
   S3EndpointCondition: !Equals [!Ref 'CreateS3Endpoint', 'true']
+  S3ExpressEndpointCondition: !Equals [!Ref 'CreateS3ExpressEndpoint', 'true']
   DynamoDBEndpointCondition: !Equals [!Ref 'CreateDynamoDBEndpoint', 'true']
 
 #########################
@@ -1404,7 +1417,7 @@ Resources:
 
   # S3 Express endpoint
   S3ExpressEndpoint:
-    Condition: S3EndpointCondition
+    Condition: S3ExpressEndpointCondition
     Type: AWS::EC2::VPCEndpoint
     Properties:
       PolicyDocument:
