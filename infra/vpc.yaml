@@ -1240,6 +1240,21 @@ Resources:
         ToPort: -1
         SourceSecurityGroupId: !GetAtt CustomNetworkSecurityGroup.GroupId
 
+  BenchSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Minimal rules for benchmark
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+          Description: "Enable all outbound traffic"                                                                
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ !Ref VPCName, 'SG', 'bench'] ]
+
   ExternalSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -1290,7 +1305,7 @@ Resources:
           Description: "Enable all outbound traffic"                                                                
       Tags:
         - Key: Name
-          Value: !Join [ '-', [ !Ref VPCName, 'SG', 'external'] ]                                        
+          Value: !Join [ '-', [ !Ref VPCName, 'SG', 'external'] ]                                  
 
   ExternalSecurityGroupIngress:
     Type: 'AWS::EC2::SecurityGroupIngress'
